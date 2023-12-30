@@ -1,3 +1,5 @@
+# https://psforhobby.tistory.com/10
+
 import random
 
 def miller_rabin(n, k=5):
@@ -26,7 +28,7 @@ def miller_rabin(n, k=5):
             return False
     return True
 
-def pollards_rho(n, attempts=50):
+def pollards_rho(n, attempts=70):
     for _ in range(attempts):
         x = random.randint(1, n - 1)
         y = x
