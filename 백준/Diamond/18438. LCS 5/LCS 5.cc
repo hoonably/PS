@@ -1,4 +1,5 @@
-// 공간복잡도로 인해서 히르쉬버그 알고리즘 사용
+// https://blog.naver.com/PostView.naver?blogId=jinhan814&logNo=222545842949
+// 공간복잡도 히르쉬버그 알고리즘
 
 #include <bits/stdc++.h>
 #define fastio cin.tie(0)->sync_with_stdio(0)
