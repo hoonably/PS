@@ -31,7 +31,9 @@ def merge_sort(arr):
             l += 1
         else:
             merged_arr.append(high_arr[h])
-            # 이거만 추가해주면 된다.
+            # 요기가 포인트다.
+            # 뒷부분의 h 번째 (len(low_arr) + h)에서 새로운 배열의 merged_index 번째로
+            # 한번에 몇칸 진행하는가에 대한 식이다.
             answer += len(low_arr) + h - merged_index
             merged_index += 1
             h += 1
