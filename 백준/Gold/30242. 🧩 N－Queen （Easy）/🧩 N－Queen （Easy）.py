@@ -1,55 +1,59 @@
 import sys
 
 
-def nqueen(depth):
-
-    # depth가 N일 때 > 모든 퀸을 다 놓은 것
-    if depth == N:
-        print(*board)
-        quit()
-
-    if board[depth] != 0:
-        nqueen(depth + 1)
-        return
-
-        # depth별 반복문
-    for i in range(1,N+1):
-
-        # 해당 depth를 visited 하지 않았을 때
-        if visited[i] == False:
-            temp = board[depth]
-            board[depth] = i  # (depth, i)에 퀸 올리기
-            if check(depth):
-                visited[i] = True
-                nqueen(depth + 1)  # 그 다음 열로 넘어감
-                visited[i] = False  # 다시 false로 설정해 백트래킹
-            board[depth] = temp
-
-
-# 모든 열에 대해 퀸과 대각선, 좌우에 위치해 있는지 체크
-def check(n):
+def q_check(x):
+    # 이미 기록된 0 ~ N 범위 보기
     for i in range(N):
-        if i==n:
-            continue
-        if board[i]==0:
-            continue
-        # 좌우에 있거나, 대각선에 있다면
-        # TODO(여기서 기존 queen이 어떻게 적재되고 있는걸까?)
-        if (board[n] == board[i]) or (abs(n - i) == abs(board[n] - board[i])):
-            return False
 
+        # 본인 단계 제외
+        if i==x:
+            continue
+
+        # 아직 안쓴거는 대각선 영향갈수있으니 제외
+        if row[i]==0:
+            continue
+
+        # row (가로)체크
+        # 체크하려는 row == 기록된 row(q_list[i]) 일때 False
+        if row[x] == row[i]:
+            return False
+        # 대각선 체크
+        # 체크하려는 row 와 이미 기록된 row 의 차가
+        # 체크하려는 column 과 기록된 column 의 차랑 같다면 대각선이니 False
+        if abs(row[x]-row[i]) == abs(x-i): # abs() = 절댓값 함수
+            return False
+    # 두 경우 다 피해가면 True
     return True
 
 
-# main
-if __name__ == '__main__':
-    N = int(input())  # dfs의 depth에 해당함
-    # depth별 적재
-    board = list(map(int, sys.stdin.readline().split()))
-    visited = [False] * (N+1)
-    for i in range(N):
-        if board[i]!=0:
-            visited[board[i]]=True
+def n_queen(n):
+    # 끝까지 완성한 경우
+    if n==N:
+        print(*row)
+        quit()
 
-    nqueen(0)
-    print(-1)
+    # 이미 써있는경우 바로 다음단계로
+    if row[n]!=0:
+        n_queen(n+1)
+        return
+
+    # 1부터 N까지 넣어보기
+    for i in range(1,N+1):
+        # 해당 숫자를 사용하지 않았을 때만 넣기
+        if visited[i] == False:
+            temp = row[n]
+            row[n] = i
+            if q_check(n):
+                visited[i]=True
+                n_queen(n+1)
+                visited[i]=False
+            row[n] = temp
+
+N = int(sys.stdin.readline())
+row = list(map(int, sys.stdin.readline().split()))
+visited = [False] * (N+1)
+for i in range(N):
+    if row[i] != 0:
+        visited[row[i]] = True
+n_queen(0)
+print(-1)
