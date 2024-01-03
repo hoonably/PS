@@ -1,77 +1,61 @@
 import sys
 
-# (r,c) 위치
-# (0,0)(0,1)(0,2)...
-# (1,0)(1,1)(1,2)...
-
-# (r,c)에 n을 넣어도 되는지 판별
+# 넣을 수 있는지 확인
 def s_check(r, c, n):
-    # 그 자리 초기화 해야 한다!!! 아니면 그 자리에 있다고 할 수 있음
-    sudoku[r][c]=0
-    # row (가로)에 같은게 있는지 체크
-    for i in range(9):
-        if sudoku[r][i] == n:
-            return False
-    # column (세로)에 같은게 있는지 체크
-    for i in range(9):
-        if sudoku[i][c] == n:
-            return False
-    # 3x3 구역에 같은게 있는지 체크
-    # 3칸씩 나눠서 구역을 하도록 설정
-    for i in range(r//3*3, r//3*3+3):
-        for j in range(c//3*3, c//3*3+3):
-            if sudoku[i][j] == n:
-                return False
+    if (n in row[r]) or (n in column[c]) or (n in area[r//3*3 + c//3]):
+        return False
     # 세 경우 다 아니면 True
     return True
-
 
 def sol_sudoku(r,c):
     # 끝까지 완성한 경우
     # 2차원 리스트 원소 포함 여부
-    if all(0 not in l for l in sudoku):
+    if r==8 and c==9:
         for i in sudoku:
             for j in i:
-                print(j,end='')
+                print(j, end='')
             print()
-        # return이면 다른 답도 모두 출력하므로
-        # 아예 프로그램을 종료시키는 quit()를 사용한다.
-        quit()
+        exit()
 
     # column이 범위를 넘어가면 다음 row의 0번 column으로 이동
     if c>=9:
         c=0
         r+=1
 
-    if sudoku[r][c]==0: # 비어있다면
-        for n in range(1,10):
-            #체크가 완료됐다면 넣기
-            if s_check(r,c,n):
-                sudoku[r][c] = n
-                # 다음 단계 재귀
-                sol_sudoku(r, c+1)
-                # 다시 부모 단계로 돌아감
-                sudoku[r][c] = 0
-    else: #채워져있다면 그냥 다음 단계
-        sol_sudoku(r,c+1)
+    # 이미 채워져있다면
+    if sudoku[r][c]!=0:
+        sol_sudoku(r, c + 1)
+        return
 
+    # 비어있다면 1부터 9까지 넣어보기
+    for n in range(1,10):
+        # 체크가 완료됐다면 넣기
+        if s_check(r,c,n):
+            sudoku[r][c] = n
+            row[r].add(sudoku[r][c])
+            column[c].add(sudoku[r][c])
+            area[r // 3 * 3 + c // 3].add(sudoku[r][c])
+            # 다음 단계 재귀
+            sol_sudoku(r, c+1)
+            # 다시 부모 단계로 돌아감
+            row[r].remove(sudoku[r][c])
+            column[c].remove(sudoku[r][c])
+            area[r // 3 * 3 + c // 3].remove(sudoku[r][c])
+            sudoku[r][c]=0
+
+row = [set() for _ in range(9)] # 가로줄
+column = [set() for _ in range(9)] # 세로줄
+area = [set() for _ in range(9)] # 3x3 구역
 sudoku = []
+
 for _ in range(9):
     str = list(map(int,sys.stdin.readline().rstrip()))
     sudoku.append(str)
 
-sol_sudoku(0, 0)
+for r in range(9):
+    for c in range(9):
+        row[r].add(sudoku[r][c]) # 가로줄
+        column[c].add(sudoku[r][c]) # 세로줄
+        area[r//3*3 + c//3].add(sudoku[r][c]) # 구역에 넣기
 
-'''
-예제만 맞을 수 있으니 이걸 대입해보자.
-근데 이걸 대입하면 백트래킹을 안해도 맞을 수 있어서 다른 것도 대입해봐야된다.
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 
-'''
+sol_sudoku(0, 0)
