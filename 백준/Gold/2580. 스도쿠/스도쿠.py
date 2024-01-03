@@ -1,5 +1,6 @@
 import sys
 
+# 넣을 수 있는지 확인
 def s_check(r, c, n):
     if (n in row[r]) or (n in column[c]) or (n in area[r//3*3 + c//3]):
         return False
