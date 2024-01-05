@@ -1,24 +1,32 @@
 import sys
 
-a = list(sys.stdin.readline().rstrip())
-b = list(sys.stdin.readline().rstrip())
+A = sys.stdin.readline().rstrip()
+B = sys.stdin.readline().rstrip()
 
-n = len(a)
-m = len(b)
+n, m = len(A), len(B)
 
-dp = [[""] * (m + 1) for _ in range(n + 1)]
+dp = [[0]*(m+1) for _ in range(n+1)]
 
-for i in range(1, n+1):
-    for j in range(1, m+1):
-        if a[i-1] == b[j-1]:
-            dp[i][j] = dp[i-1][j-1] + a[i-1]
+for i in range(n):
+    for j in range(m):
+        if A[i]==B[j]:
+            dp[i+1][j+1]=dp[i][j]+1
         else:
-            if len(dp[i-1][j]) >= len(dp[i][j-1]):
-                dp[i][j] = dp[i-1][j]
-            else:
-                dp[i][j] = dp[i][j-1]
+            dp[i+1][j+1]=max(dp[i][j+1], dp[i+1][j])
 
+print(dp[-1][-1])
 
-print(len(dp[-1][-1]))
-if dp:
-    print(dp[-1][-1])
+# 역추적
+ans = ''
+i, j = n, m
+while i>0 and j>0:
+    if dp[i][j]==dp[i][j-1]:
+        j-=1
+    elif dp[i][j]==dp[i-1][j]:
+        i-=1
+    else:
+       ans = A[i-1] + ans
+       i-=1
+       j-=1
+
+print(ans)
