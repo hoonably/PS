@@ -1,3 +1,5 @@
+//비트마스킹 사용
+
 #include <iostream>
 #include <vector>
 using namespace std;
