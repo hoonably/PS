@@ -10,7 +10,7 @@ cost = [0] + list(map(int, sys.stdin.readline().split()))
 length = sum(cost)+1
 
 # dp[i][j] = k
-# j만큼 비용이 들었을때 k만큼의 메모리를 줄일 수 있음
+# i번째 앱까지 확인하고 j만큼 비용이 들었을때 k만큼의 메모리를 줄일 수 있음
 dp = [[0 for _ in range(length)] for _ in range(N+1)]
 
 ans = 10001 # 비용 최댓값 100 * 100 이므로
@@ -23,6 +23,7 @@ for i in range(1, N+1):
 
     # 들어가는 비용 ~ 비용의 합 까지 반복
     for j in range(ci, length):
+        # i앱을 지울 공간이 남아있는 단계에서 i 앱을 지웠을 때 vs 그 전 단계
         dp[i][j] = max(dp[i-1][j-ci] + mi, dp[i][j])
 
         # 정리된 메모리 >= M 이라면
