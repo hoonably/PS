@@ -1,36 +1,39 @@
-# dp 반복문 사용 재귀 x
-
 import sys
 
-n = int(sys.stdin.readline())
-m=n
-P = []
+# [set(), {'U', 'N', 'I', 'T', 'S'}, {'UN', 'IS', 'NI', 'ST'},
+# {'IST', 'NIS', 'UNI'}, {'UNIS', 'NIST'}, {'UNIST'}] 생성
+correct = [set() for _ in range(6)]
+for i in range(5):
+    for j in range(i + 1, 6):
+        correct[j-i].add('UNIST'[i:j])
 
-for i in range(n):
-    s = sys.stdin.readline().rstrip()
+def compare(x):
+    # 검사할 범위
+    length = min(5, len(x))
+    for l in reversed(range(1, length+1)): # 최대 5부터 1까지 검사
+        if x[:l] in correct[l]: # 앞에서부터 l개 커팅한게 집합에 있는지
+            # 맞은 개수만큼 리턴
+            return l
+    return 0
 
-    # 미리 필요없는거 넣지 않기
-    if not s[0] in "UNIST":
-        m-=1
+dp = [0] * 6
+dp[0] = 1
+
+N = int(sys.stdin.readline())
+
+for _ in range(N):
+    st = sys.stdin.readline().rstrip()
+    if not st[0] in 'UNIST': # 불필요한 단어 미리 삭제
         continue
-    P.append(s[:5])  # 어차피 5글자 이후로는 필요가 없음
 
-# DP[i][j] : i번 문자열부터 UNIST의 j번째 부터 만드는 경우의 수
-# DP[ ][5] = 1 : DP 탑다운을 위해서 설정
-DP = [[0,0,0,0,0,1] for _ in range(m+1)]
+    # 시작지점 : U:1, N:2 이런식으로
+    start = 'UNIST'.index(st[0]) + 1
 
-for i in reversed(range(m)): # n-1 -> 0
-    for j in reversed(range(5)): # 4-> 0
-        DP[i][j] = DP[i + 1][j]
-        for k in range(5 - j):
-            if k >= len(P[i]): # 단어의 길이를 넘어서는거 방지
-                break
-            if "UNIST"[j + k] != P[i][k]: # 틀렸을 경우 break
-                break
+    # 맞는 길이
+    l = compare(st)
 
-            DP[i][j] += DP[i + 1][j + k + 1] # 맞는 경우 탑다운 경우의수 더하기
-            DP[i][j] %= 1000000007
+    for i in range(start, start + l):
+        dp[i] += dp[start - 1]
+        dp[i] %= 1000000007
 
-# for i in DP:
-#     print(i)
-print(DP[0][0])
+print(dp[-1])
