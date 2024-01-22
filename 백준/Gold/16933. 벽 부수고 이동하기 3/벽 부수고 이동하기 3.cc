@@ -1,85 +1,84 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <cstring>
 
 using namespace std;
 
-#define MAX_N 1001
-#define MAX_M 1001
-#define MAX_K 11
-
 struct Node {
-    int x, y, chance, dist;
+    int x, y, wall;
 };
 
-int dx[] = {-1, 1, 0, 0};
-int dy[] = {0, 0, -1, 1};
-
-bool is_valid(int x, int y, int n, int m) {
-    return (x >= 0 && x < n && y >= 0 && y < m);
-}
-
-int bfs(int start_x, int start_y, int end_x, int end_y, int n, int m, int k, vector<vector<int>>& graph) {
-    vector<vector<vector<bool>>> visited(k + 1, vector<vector<bool>>(n, vector<bool>(m, false)));
-
-    visited[0][start_x][start_y] = true;
-
+int make(vector<vector<int>>& arr, int n, int m, int k) {
     queue<Node> q;
-    q.push({start_x, start_y, 0, 1});
+    q.push({0, 0, 0});
+
+    int is_night = 1;
+    int ans = 1;
+
+    vector<vector<int>> visited(n, vector<int>(m, k + 1));
+    visited[0][0] = 0;
+
+    vector<pair<int, int>> direction = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
     while (!q.empty()) {
-        Node current = q.front();
-        q.pop();
+        int size = q.size();
+        for (int i = 0; i < size; i++) {
+            int x = q.front().x;
+            int y = q.front().y;
+            int wall = q.front().wall;
+            q.pop();
 
-        int x = current.x;
-        int y = current.y;
-        int chance = current.chance;
-        int dist = current.dist;
+            if (x == n - 1 && y == m - 1) {
+                return ans;
+            }
 
-        if (x == end_x && y == end_y) {
-            return dist;
-        }
+            for (const auto& d : direction) {
+                int nx = x + d.first;
+                int ny = y + d.second;
 
-        for (int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
+                if (0 <= nx && nx < n && 0 <= ny && ny < m) {
+                    if (visited[nx][ny] <= wall) {
+                        continue;
+                    }
 
-            if (is_valid(nx, ny, n, m)) {
-                if (graph[nx][ny] == 0 && !visited[chance][nx][ny]) {
-                    visited[chance][nx][ny] = true;
-                    q.push({nx, ny, chance, dist + 1});
-                } else if (graph[nx][ny] == 1 && chance < k && !visited[chance + 1][nx][ny] && dist % 2 == 1) {
-                    q.push({nx, ny, chance + 1, dist + 1});
-                    visited[chance + 1][nx][ny] = true;
+                    if (arr[nx][ny] == 0) {
+                        q.push({nx, ny, wall});
+                        visited[nx][ny] = wall;
+                    } else if (wall < k) {
+                        if (!is_night) {
+                            q.push({x, y, wall});
+                        } else {
+                            visited[nx][ny] = wall;
+                            q.push({nx, ny, wall + 1});
+                        }
+                    }
                 }
             }
         }
 
-        if (dist % 2 == 0) {
-            q.push({x, y, chance, dist + 1});
-        }
+        ans++;
+        is_night ^= 1;
     }
 
     return -1;
 }
 
 int main() {
-    int N, M, K;
-    cin >> N >> M >> K;
+    int n, m, k;
+    cin >> n >> m >> k;
 
-    vector<vector<int>> graph(N, vector<int>(M));
+    vector<vector<int>> arr(n, vector<int>(m));
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < n; i++) {
         string input;
         cin >> input;
-
-        for (int j = 0; j < M; j++) {
-            graph[i][j] = input[j] - '0';
+        for (int j = 0; j < m; j++) {
+            arr[i][j] = input[j] - '0';
         }
     }
 
-    cout << bfs(0, 0, N - 1, M - 1, N, M, K, graph) << endl;
+    int ans = make(arr, n, m, k);
+    cout << ans << endl;
 
     return 0;
 }
