@@ -27,7 +27,7 @@ def bfs(arr):
                     # 기록된 visited보다 벽 부순 횟수가 적다면
                     if wall < visited[nx][ny]:
 
-                        if arr[nx][ny] == 0:  # 벽이 없다면
+                        if arr[nx][ny] == '0':  # 벽이 없다면
                             queue.append((nx, ny, wall))
                             visited[nx][ny] = wall
 
@@ -44,5 +44,5 @@ def bfs(arr):
     return -1
 
 n, m, k = map(int, sys.stdin.readline().split())
-board = [list(map(int, sys.stdin.readline().rstrip())) for _ in range(n)]
+board = [sys.stdin.readline().rstrip() for _ in range(n)]
 print(bfs(board))
