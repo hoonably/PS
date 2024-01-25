@@ -30,11 +30,4 @@ for _ in range(T):
     if check:
         if reverse_check:  # 홀수번 R이 있었다면
             x.reverse()  # deque 뒤집기
-
-        if len(x)==0:
-            print('[]')
-        else:
-            print('[', end='')
-            for i in range(len(x)-1):
-                print(x[i], end=',')
-            print(x[-1], ']', sep='')
+        print("[" + ",".join(map(str, x)) + "]")
