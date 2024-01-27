@@ -13,26 +13,30 @@ def dijkstra(start):
         if dp[now_node] < now_dist:
             continue
 
-        for w, next_node in graph[now_node]:
-            next_dist = w + now_dist
+        for next_node, cost in graph[now_node]:
+            next_dist = cost + now_dist
             if next_dist < dp[next_node]:  # 유망하면
                 dp[next_node] = next_dist
                 heapq.heappush(heap,(next_dist, next_node))
 
 INF = sys.maxsize
 V, E = map(int, sys.stdin.readline().split())
-#시작점 K
+# 시작점 K
 K = int(sys.stdin.readline())
-#가중치 테이블 dp
+# dp[i] : i노드까지 가는 최단거리
 dp = [INF]*(V+1)
 heap = []
 graph = [[] for _ in range(V + 1)]
 
 for _ in range(E):
     u, v, w = map(int, sys.stdin.readline().split())
-    #(가중치, 목적지 노드) 형태로 저장
-    graph[u].append((w, v))
+    # (목적지 노드, 가중치) 형태로 저장
+    graph[u].append((v, w))
+    # 양방향이라면
+    # graph[v].append((u, w))
 
 dijkstra(K)
+
+
 for i in range(1,V+1):
     print("INF" if dp[i] == INF else dp[i])
