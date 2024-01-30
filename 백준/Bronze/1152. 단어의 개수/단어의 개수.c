@@ -10,13 +10,13 @@ int main(void) {
     len = strlen(word);
     
     // 띄어쓰기만 있을 경우 0 출력
-    if (len == 1 && *word == ' ') {
+    if (len == 1 && word[0] == ' ') {
         printf("%d", count);
         return 0;
     }
     
     for (int i = 1; i < len - 1; i++) {
-        if (*(word+i) == ' ') {
+        if (word[i] == ' ') {
             count++;
         }
     }
