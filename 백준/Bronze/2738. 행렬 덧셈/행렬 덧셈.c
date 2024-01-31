@@ -2,8 +2,9 @@
 
 int main(void){
     int N, M;
+    int A[101][101], B[101][101];
     scanf("%d %d", &N, &M);
-    int A[N][M], B[N][M];
+    
     for (int i=0; i<N; i++){
         for (int j=0; j<M; j++){
             scanf("%d", &A[i][j]);
