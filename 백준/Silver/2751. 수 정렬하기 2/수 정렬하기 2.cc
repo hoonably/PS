@@ -1,23 +1,32 @@
-#include <iostream>
-#include <algorithm>
+#include<iostream>
+#include<algorithm>
+#include<vector>
+
 using namespace std;
 
-int num[1000000]; 
-
 int main() {
-	int N;
-	cin >> N;
 
-	for (int i = 0; i < N; i++) {
-		cin >> num[i];
+
+	cin.tie(NULL);
+	ios::sync_with_stdio(false);
+
+	int n;
+	cin >> n;
+
+	vector<int>arr;
+
+	for (int i = 0; i < n; i++) {
+
+		int a;
+		cin >> a;
+		arr.push_back(a);
+
 	}
+	sort(arr.begin(), arr.end());
 
-    // sort(시작 배열 주소, 끝 배열 주소)
-	sort(num, num + N);
+	for (int i = 0; i < n; i++) {
 
-	for (int i = 0; i < N; i++) {
-		cout << num[i] << "\n";
+		cout << arr[i] << '\n';
+
 	}
-
-	return 0;
 }
