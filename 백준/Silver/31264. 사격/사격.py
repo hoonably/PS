@@ -1,42 +1,31 @@
 import sys
+from bisect import bisect_left
 
-def binary_search(target, data):
-    start = 0 			# 맨 처음 위치
-    end = len(data) - 1 	# 맨 마지막 위치
+input = sys.stdin.readline
 
-    while start <= end:
-        mid = (start + end) // 2  # 중간값
-        if data[mid] > target:  # target이 작으면 왼쪽을 더 탐색
-            end = mid - 1
-        else:                    # target이 크면 오른쪽을 더 탐색
-            start = mid + 1
-    return end
+n, m, a = map(int, input().split())
+S = sorted(list(map(int, input().split())))
 
-N, M, A = map(int, sys.stdin.readline().split())
-S = list(map(int, sys.stdin.readline().split()))
-S.sort()
+low, high = S[0], S[-1]
+while low <= high:
+    mid = (low + high) // 2
 
-# print(S)
+    score, level = 0, mid
+    for x in range(m):
+        index = bisect_left(S, level)
+        if index == 0:
+            break
 
-# 최소 시작 지점
-start_score = A
-for _ in range(M):
-    start_score //= 2
-start_score = max(start_score, S[0])
+        if index == n and S[index - 1] < level:
+            score += S[index - 1] * (m - x)
+            break
 
-while True:
-    score = start_score
-    chance = M
-    while chance > 0:
-        bs = binary_search(score, S)
-        # print("now_score", score, "shoot : ", S[bs])
-        score += S[bs]
-        chance -= 1
+        score += S[index - 1]
+        level += S[index - 1]
 
-    # print("\ntotal : ", score - start_score, "\n")
-
-    if score - start_score >= A:
-        print(start_score)
-        break
+    if score >= a:
+        high = mid - 1
     else:
-        start_score += 1
+        low = mid + 1
+
+print(high)
