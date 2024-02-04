@@ -1,16 +1,5 @@
 import sys
 
-N, M, A = map(int, sys.stdin.readline().split())
-S = list(map(int, sys.stdin.readline().split()))
-S.sort()
-
-# 최소 시작 지점
-# go = A
-# for _ in range(M):
-#     go //= 2
-
-go = S[0]
-
 def binary_search(target, data):
     start = 0 			# 맨 처음 위치
     end = len(data) - 1 	# 맨 마지막 위치
@@ -23,33 +12,31 @@ def binary_search(target, data):
             start = mid + 1
     return end
 
+N, M, A = map(int, sys.stdin.readline().split())
+S = list(map(int, sys.stdin.readline().split()))
+S.sort()
 
-def dfs(score):
-    start_score = score
+# print(S)
+
+# 최소 시작 지점
+start_score = A
+for _ in range(M):
+    start_score //= 2
+start_score = max(start_score, S[0])
+
+while True:
+    score = start_score
     chance = M
-    temp_S = S.copy()
-    # print("now_score", score, "remain: ", temp_S, end=' ')
-    while chance>0:
-        if score < temp_S[0]:
-            # print("Can't shoot")
-            break
-        bs = binary_search(score, temp_S)
-        # print("shoot : ", temp_S[bs])
-        score += temp_S[bs]
-        # print("now_score", score, "표적: ", temp_S, end=' ')
+    while chance > 0:
+        bs = binary_search(score, S)
+        # print("now_score", score, "shoot : ", S[bs])
+        score += S[bs]
         chance -= 1
 
     # print("\ntotal : ", score - start_score, "\n")
 
     if score - start_score >= A:
-        print(go)
-
-        return True
-    else:
-        return False
-
-
-while True:
-    if dfs(go):
+        print(start_score)
         break
-    go+=1
+    else:
+        start_score += 1
