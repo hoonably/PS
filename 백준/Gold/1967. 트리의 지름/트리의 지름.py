@@ -38,6 +38,3 @@ visited[best_idx] = 0
 dfs(best_idx, 0)
 
 print(max(visited))
-
-
-
