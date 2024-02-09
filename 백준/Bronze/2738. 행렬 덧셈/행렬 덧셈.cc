@@ -2,6 +2,9 @@
 using namespace std;
 
 int main(void){
+    ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+
     int N, M;
     int A[101][101], B[101][101];
     cin >> N >> M;
