@@ -1,4 +1,3 @@
-
 now = 0
 best = 0
 for _ in range(4):
