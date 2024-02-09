@@ -2,10 +2,12 @@
 using namespace std;
 
 int main(void){
-    int N, get_num, max, min;
-    scanf("%d", &N);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
 
-    cin >> get_num;
+    int N, get_num, max, min;
+    
+    cin >> N >> get_num;
     max = min = get_num;
 
     for (int i=0; i<N-1; i++){
