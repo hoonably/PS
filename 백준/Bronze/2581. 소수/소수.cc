@@ -1,6 +1,3 @@
-// 에라토스테네스의 체로 1000까지의 소수 벡터를 만든 후 안에 있는지 확인
-// O(N^1/2)
-
 #include <iostream>
 #include <vector>
 
