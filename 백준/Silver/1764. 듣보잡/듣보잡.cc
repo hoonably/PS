@@ -13,7 +13,7 @@ int main(){
         cin >> name;
         not_heard.insert(name);
     }
-    for (int i=0; i<N; i++){
+    for (int i=0; i<M; i++){
         cin >> name;
         if (not_heard.find(name)!=not_heard.end()){
             not_both.insert(name);
