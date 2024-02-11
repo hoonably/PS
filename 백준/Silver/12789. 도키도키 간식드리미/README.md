@@ -4,7 +4,7 @@
 
 ### 성능 요약
 
-메모리: 20860 KB, 시간: 284 ms
+메모리: 2020 KB, 시간: 0 ms
 
 ### 분류
 
@@ -12,7 +12,7 @@
 
 ### 제출 일자
 
-2023년 11월 27일 13:08:38
+2024년 2월 11일 22:17:53
 
 ### 문제 설명
 
@@ -24,11 +24,11 @@
 
 <p>현재 간식 배부 공간을 그림으로 나타내면 다음과 같다.</p>
 
-<p style="text-align:center"><img alt="" src="" style="height:169px; width:306px"></p>
+<p style="text-align:center"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/12789/1.png" style="height:169px; width:306px"></p>
 
 <p>위 예제는 다음 그림과 같이 움직였을 때 모두가 순서대로 간식을 받을 수 있다..</p>
 
-<p style="text-align:center"><img alt="" src="" style="height:119px; width:470px"></p>
+<p style="text-align:center"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/12789/2.png" style="height:119px; width:470px"></p>
 
 ### 입력 
 
