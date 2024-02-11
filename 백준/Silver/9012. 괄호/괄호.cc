@@ -2,7 +2,7 @@
 using namespace std;
 
 bool check(const string& str) {
-    stack<char> stack;
+    stack<int> stack;
     for (char s : str) {
         if (s == '(') {
             stack.push(0);
