@@ -1,32 +1,43 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-bool isPrime(long N) {
+vector<int> primes;
 
-    if (N<2) return false;
+// 소수 판별
+bool isPrime(unsigned int n) {
 
-    // 에라토스테네스의 체 알고리즘 적용
-    for (long i = 2; i * i <= N; i++) {
-        if (N % i == 0) return false;
-    }
-    return true;
+    if (n<2) return false;
+
+	int sqrtn = sqrt(n); // 제곱근까지만 보기
+
+    // 구해져있는 소수들로 소수가 맞는지 판단
+	for (auto p : primes)
+		if (p <= sqrtn && (n % p) == 0)
+			return false;
+
+	return true;
+}
+
+// 소수 벡터 만들기
+void precalcul_prime() {
+	for (int i = 2; i < 63246; ++i)
+		if (isPrime(i)){
+			primes.push_back(i);
+        }
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
+    precalcul_prime();  // 미리 소수 벡터 만들기
+
     int T;
-    long n;
+    unsigned int n;
     cin >> T;
     while (T--){
         cin >> n;
-        while (true){
-            if (isPrime(n)){
-                cout << n << '\n';
-                break;
-            }
-            n++;
-        }
+        while (!isPrime(n)) ++n;  // 소수가 맞을때까지 n 증가시키기
+        cout << n << '\n';
     }
 
     return 0;
