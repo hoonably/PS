@@ -25,7 +25,9 @@ vector<bool> findPrimes(int N) {
 }
 
 int main() {
-
+	ios_base::sync_with_stdio(false);
+    cin.tie(0);
+	
 	int m, n;
     cin >> m >> n;
     // n 이하의 자연수가 각각 소수인지 나타내는 bool 배열 얻어오기
