@@ -13,7 +13,7 @@ vector<bool> Eratos(int N) {
     // 에라토스테네스의 체 알고리즘 적용
     for (int i = 2; i * i <= N; i++) {
         if (isPrime[i]) {
-            for (int j = 2 * i; j <= N; j += i) {
+            for (int j = i * i; j <= N; j += i) {
                 isPrime[j] = false;
             }
         }
@@ -35,21 +35,19 @@ int main() {
 
     // 1000000 이하의 자연수가 각각 소수인지 나타내는 bool 배열 얻어오기
     vector<bool> isPrime = Eratos(1000000);
-    make_vector_prime(1000000, isPrime);
+    make_vector_prime(500000, isPrime); // 어차피 합이니까 반만
 
-    int T;
+    int T, n, cnt;
     cin >> T;
     while(T--){
-        int n;
         cin>>n;
-        int cnt=0;
+        cnt=0;
         for(int x:primes){
             if (x>n-x) break;
-            if (isPrime[n-x] == 1) cnt++;
+            if (isPrime[n-x]) cnt++;
         }
         cout << cnt << '\n';
     }
 
     return 0;
 }
-
