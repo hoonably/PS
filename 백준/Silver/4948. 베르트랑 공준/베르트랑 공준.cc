@@ -14,7 +14,7 @@ vector<bool> findPrimes(int N) {
     isPrime[1] = false;  // 1은 소수가 아님
 
     // 에라토스테네스의 체 알고리즘 적용
-    for (int i = 2; i * i <= N; ++i) {
+    for (int i = 2; i * i <= N; i++) {
         if (isPrime[i]) {
             for (int j = i * i; j <= N; j += i) {
                 isPrime[j] = false;
@@ -28,13 +28,13 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
 
+    // 123456 * 2 이하의 자연수가 각각 소수인지 나타내는 bool 배열 얻어오기
+    vector<bool> isPrime = findPrimes(123456 * 2);
+
 	int n;
     while(true){
         cin >> n;
         if (n==0) break;
-
-        // 123456 * 2 이하의 자연수가 각각 소수인지 나타내는 bool 배열 얻어오기
-        vector<bool> isPrime = findPrimes(123456 * 2);
 
         int cnt=0;
         for (int i=n+1; i<=2*n; i++){
