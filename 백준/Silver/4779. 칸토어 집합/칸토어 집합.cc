@@ -19,7 +19,7 @@ int main() {
 
     int N;
     while (!(cin >> N).eof()) {
-        cout << kantore(N) << endl;
+        cout << kantore(N) << '\n';
     }
 
     return 0;
