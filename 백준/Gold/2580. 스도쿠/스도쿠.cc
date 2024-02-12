@@ -17,22 +17,20 @@ void print_sudoku() {
     }
 }
    
-void DFS(int x, int y){
+void DFS(int depth){
 
-    // 가로줄 넘어가는 경우
-    if (x==9){
-        x=0; y++;  
-    }
-
-    // 탐색 종료
-    if (y == 9) {
+    int x = depth / MAX;    // x 좌표
+    int y = depth % MAX;    // y 좌표
+   
+    if (depth == MAX*MAX) {
         print_sudoku();
         exit(0);
     }
+
    
     // 이미 채워져있다면
     if (sudoku[x][y] != 0) {
-        DFS(x+1, y);
+        DFS(depth + 1);
         return;
     }
 
@@ -44,7 +42,7 @@ void DFS(int x, int y){
         Col[y][i] = true;
         Square[(x / 3) * 3 + (y / 3)][i] = true;
         
-        DFS(x+1, y);
+        DFS(depth + 1);
 
         sudoku[x][y] = 0;
         Row[x][i] = false;
@@ -69,7 +67,7 @@ int main(void) {
             Square[(i/3)*3 + (j/3)][sudoku[i][j]] = true;
         }
     }
-    DFS(0, 0);
+    DFS(0);
    
     return 0;
 }
