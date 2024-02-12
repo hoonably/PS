@@ -16,7 +16,7 @@ bool x1[42];
 bool x2[42];
 
 void backtracking(int depth) {
-    // 다 도달했을 때 1 카운트 후 종료
+    
     if (depth == N) {
         for (int i=0; i<N; i++){
             cout << ans[i] << ' ';
@@ -49,6 +49,9 @@ void backtracking(int depth) {
 }
 
 int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+
     cin >> N;
     int get_num;
     for (int i=0; i<N; i++){
