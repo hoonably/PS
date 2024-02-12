@@ -1,4 +1,3 @@
-
 def solve(n):
     global answer
     if n==0:
