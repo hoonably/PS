@@ -1,60 +1,71 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int N, poss[31][31]{}, Q[31]{}, A[31]{};
-bool yes = 0;
+/*
+N-Queen 문제
+2차원배열을 사용하면 체크하는데 많은 시간이 걸림.
+가로, 우상향 대각선, 우하향 대각선 bool 배열을 사용해 빠르게 판단 할 수 있다.
+*/
 
-void solve(int k) {
-	if (k == N + 1) {
-		if (!yes) {
-			for (int i = 1; i <= N; i++)	cout << A[i] << ' ';
-			yes = 1;
-		}
-		return;
-	}
-	if (Q[k]) {
-		solve(k + 1);
-		return;
-	}
-	for (int i = 1; i <= N; i++) {
-		if (poss[k][i])	continue;
-		A[k] = i;
-		for (int j = k + 1; j <= N; j++) {
-			int left = i - abs(j - k);
-			int right = i + abs(j - k);
-			if (left >= 1)	poss[j][left]++;
-			if (right <= N)	poss[j][right]++;
-			poss[j][i]++;
-		}
-		solve(k + 1);
-		if (yes)	break;
-		for (int j = k + 1; j <= N; j++) {
-			int left = i - abs(j - k);
-			int right = i + abs(j - k);
-			if (left >= 1)	poss[j][left]--;
-			if (right <= N)	poss[j][right]--;
-			poss[j][i]--;
-		}
-		A[k] = 0;
-	}
+int N;
+int cnt = 0;
+int ans[20];
+bool fix[20];  // 미리 고정된 단계
+bool row[21];
+bool x1[42];
+bool x2[42];
+
+void backtracking(int depth) {
+    // 다 도달했을 때 1 카운트 후 종료
+    if (depth == N) {
+        for (int i=0; i<N; i++){
+            cout << ans[i] << ' ';
+        }
+        exit(0);  //아예 프로그램 종료
+    }
+
+    if (fix[depth]) {
+        backtracking(depth + 1);
+        return;
+    }
+
+    for (int i = 1; i < N+1; ++i) {
+        // 놓을 수 없으면 패스
+        if (row[i] || x1[i + depth] || x2[i + ((N - 1) - depth)]) continue;
+        
+        row[i] = true;           // 가로줄 제거
+        x1[i + depth] = true;        // 오른쪽 위 방향 대각선 제거
+        x2[i + ((N - 1) - depth)] = true;  // 오른쪽 아래 방향 대각선 제거
+        ans[depth] = i;  // 말 놓기
+
+        // 자식 노드로 이동
+        backtracking(depth + 1);
+
+        // 백트래킹
+        row[i] = false;
+        x1[i + depth] = false;
+        x2[i + ((N-1)-depth)] = false;
+    }
 }
 
 int main() {
-	cin.tie(0)->sync_with_stdio(0);
-	
-	cin >> N;
-	for (int i = 1; i <= N; i++) {
-		cin >> A[i];
-		Q[i] = (bool)A[i];
-		if (!A[i])	continue;
-		for (int j = 1; j <= N; j++) {
-			int left = A[i] - abs(j - i);
-			int right = A[i] + abs(j - i);
-			if (left >= 1)	poss[j][left]++;
-			if (right <= N)	poss[j][right]++;
-			poss[j][A[i]]++;
-		}
-	}
-	solve(1);
-	if (!yes)	cout << -1;
+    cin >> N;
+    int get_num;
+    for (int i=0; i<N; i++){
+        cin >> get_num;
+        if (get_num==0) continue;
+
+        fix[i] = true;
+        ans[i] = get_num;
+        row[get_num] = true;           // 가로줄 제거
+        x1[get_num + i] = true;        // 오른쪽 위 방향 대각선 제거
+        x2[get_num + ((N - 1) - i)] = true;  // 오른쪽 아래 방향 대각선 제거
+    }
+
+    backtracking(0);
+
+    // exit(0) 을 만나지 않았다면 답이 없는거임
+    cout << -1;
+
+    return 0;
 }
