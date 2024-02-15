@@ -42,10 +42,11 @@ int main(){
 
     // 부분 합
     int ans = 1e9;
+    int rev = K*K;
     for (int i=0; i+K<=N; i++){
         for (int j=0; j+K<=M; j++){
             int temp = dp[i+K][j+K] - dp[i+K][j] - dp[i][j+K] + dp[i][j];  // K*K만큼 구간합
-            temp = min(temp, K*K-temp);  // W로 시작하는 경우랑 비교
+            temp = min(temp, rev-temp);  // W로 시작하는 경우랑 비교
             ans = min(ans, temp);
         }
     }
