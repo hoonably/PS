@@ -14,12 +14,12 @@ int main(){
     cin.tie(0);
     cin >> N >> M;
     for (int i=1; i<=N; i++){
-        cin >> S[i];
-        S[i] += S[i-1];
+        cin >> num;
+        *(S+i) = *(S+i-1) + num;
     }
     while(M--){
         cin >> s >> e;
-        cout << S[e]-S[s-1] << '\n';
+        cout << *(S+e)-*(S+s-1) << '\n';
     }
 
     
