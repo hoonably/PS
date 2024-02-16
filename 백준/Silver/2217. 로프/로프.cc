@@ -38,16 +38,9 @@ int main(){
 
     sort(rope+1, rope+N+1, compare);
 
-    double sum = 0;
     double best = 0;
     for (int i=1; i<=N; i++){
-        // cout << rope[i] << ' ';
-        // // 최대가 갱신이 안된다면 앞으로 계속 갱신이 안됨
-        // if (rope[i] * i < best) break;
-
-        // // 더 좋아졌다면 best 대체
-        // else best = rope[i] * i;
-        best = max(best, rope[i]*i);
+        best = max(best, *(rope+i) * i);
     }
     cout << (int)best;
 
