@@ -21,7 +21,6 @@ using namespace std;
 */
 
 int N;
-double rope[100001];
 
 bool compare(int a, int b) {
 	return a > b;
@@ -32,17 +31,19 @@ int main(){
     cin.tie(0);
     
     cin >> N;
-    for (int i=1; i<=N; i++){
+    vector<int> rope(N);
+
+    for (int i=0; i<N; i++){
         cin >> rope[i];
     }
 
-    sort(rope+1, rope+N+1, compare);
+    sort(rope.begin(), rope.end(), compare);
 
-    double best = 0;
-    for (int i=1; i<=N; i++){
-        best = max(best, *(rope+i) * i);
+    int best = 0;
+    for (int i=0; i<N; i++){
+        best = max(best, rope[i]*(i+1));
     }
-    cout << (int)best;
+    cout << best;
 
     return 0;
 }
