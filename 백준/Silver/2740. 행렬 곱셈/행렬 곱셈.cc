@@ -4,11 +4,15 @@ using namespace std;
 
 /*
 행렬의 곱셈이다.
+
 */
 
 int A[100][100], B[100][100], C[100][100];
 
 int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+
     int N, M, K;
     cin >> N >> M;
 
