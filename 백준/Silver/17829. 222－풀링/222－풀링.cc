@@ -12,14 +12,24 @@ typedef long long ll;
 int arr[1024][1024];
 int level;
 
-void change(int x, int y){
+void secondbig(int x, int y){
     int temp[4];
     temp[0] = arr[x][y];
     temp[1] = arr[x+level][y];
     temp[2] = arr[x][y+level];
     temp[3] = arr[x+level][y+level];
-    sort(temp, temp+4);
-    arr[x][y] = temp[2];  // 두번째로 큰 수를 가장 앞으로
+    int first = -10000;
+    int second = -10000;
+    for (int i=0;i<4;i++){
+        if (temp[i]>first) {
+            second = first;
+            first = temp[i];
+        }
+        else if (temp[i]>second){
+            second = temp[i];
+        }
+    }
+    arr[x][y] = second;  // 두번째로 큰 수를 가장 앞으로
 }
 
 int main(){
@@ -39,7 +49,7 @@ int main(){
     while (level<N){
         for (int x=0; x<N; x+=2*level){
             for (int y=0; y<N; y+=2*level){
-                change(x, y);
+                secondbig(x, y);
             }
         }
         level *= 2;
