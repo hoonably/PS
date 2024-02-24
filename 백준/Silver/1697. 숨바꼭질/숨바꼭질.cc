@@ -11,8 +11,8 @@ int dy[] = {0, 0, 1, -1};
 int dx[] = {1, -1, 0, 0};
 
 int N, K;
-int dist[200000];
-bool visited[200000];
+int dist[150000];
+bool visited[150000];
 
 int move(int loc, int num){
     if (num==0) return loc-1;
