@@ -6,10 +6,10 @@ typedef long long ll;
 /*
 N : 정점의 개수
 M : 간선의 개수
-R : 시작 노드
+1 : 시작 노드
 */
 
-int N, M, R;
+int N, M;
 bool visited[101];
 vector<int> graph[101];
 int cnt = 0;
