@@ -17,16 +17,14 @@ void bfs(int start_node){
     queue<int> q;
     q.push(start_node);
     visited[start_node]=true;
-
-    ans[start_node] = cnt++;
     
     while (!q.empty()){
         int cur_node = q.front();
+        ans[cur_node] = cnt++;
         q.pop();
         for (int next_node : graph[cur_node]){
             if (visited[next_node]) continue;
             visited[next_node] = true;
-            ans[next_node] = cnt++;
             q.push(next_node);
         }
     }
