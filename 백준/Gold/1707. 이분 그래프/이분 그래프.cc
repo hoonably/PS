@@ -5,7 +5,7 @@
 using namespace std;
 
 int V, E;
-int color[20001] = {-1};
+int color[20001];
 vector<vector<int>> graph(20001);
 
 bool bfs(int start_node) {
