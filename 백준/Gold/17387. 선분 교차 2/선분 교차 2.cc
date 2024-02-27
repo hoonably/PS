@@ -46,9 +46,9 @@ bool isOverlapped(P A, P B, P C, P D) {
     // 1. 선분이 일직선인 경우
     if(ans1 == 0 && ans2 == 0){     
         if(B <= A) swap(A, B);  // A, B 정렬
-        if(C <= D) swap(D, C);  // C, D 정렬
+        if(D <= C) swap(D, C);  // C, D 정렬
         
-        return A <= C && D <= B;  // 순위가 겹치면 true
+        return A <= D && C <= B;  // 순위가 겹치면 true
     }
 
     // 2. 한 점에서 교차 (CCW가 방향이 모두 다름)
