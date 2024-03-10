@@ -28,11 +28,7 @@ void getPostOrder(int start, int end){
 
     // root보다 큰 값이 나오는 순간부터 right node
     int root = preorder[start];
-    int idx = start+1;
-    while (idx < end){
-        if (preorder[idx]>root) break;
-        idx++;
-    }
+    int idx = upper_bound(preorder.begin()+start+1, preorder.begin()+end, root) - preorder.begin();
     getPostOrder(start+1, idx);
     getPostOrder(idx, end);
     cout << preorder[start] << '\n';  // root를 가장 나중에 출력
