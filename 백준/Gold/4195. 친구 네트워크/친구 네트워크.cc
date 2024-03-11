@@ -16,22 +16,21 @@ string getParent(string s) {
     return parent[s] = getParent(parent[s]);
 }
 
-// 작은 부모 노드의 값으로 초기화 (작은것을 항상 부모 노드로)
 void unionParent(string a, string b) {
     a = getParent(a);
     b = getParent(b);
-    if (a > b) {
-        parent[a] = b;
-        cnt[b] += cnt[a];
-    }
-    else if (a < b) {
-        parent[b] = a;
-        cnt[a] += cnt[b];
-    }
-    // a==b인경우 둘 다 이미 같은 집합이므로 합치지 않음
+
+    // a==b인 경우 둘이 이미 같은 집합이므로 합치지 않음
+    if (a == b) return;
+
+    parent[b] = a;
+    cnt[a] += cnt[b];
 }
 
-// 여기서 solve를 int로 쓰면 왜 출력초과가 나는가??
+// 여기서 실수로 void가 아닌 int로 썼는데 출력초과가 나옴.
+// (void로 바꾸기만 하면 맞음)
+// int로 함수를 썼을 경우 출력에 무슨 영향이 있는가?
+
 void solve(){
     int F;
     cin >> F;
