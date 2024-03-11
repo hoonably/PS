@@ -28,6 +28,26 @@ void unionParent(string a, string b) {
     cnt[A] += cnt[B];
 }
 
+void solve(){
+    int F;
+    cin >> F;
+    for(int i=0; i<F; i++){
+        string a, b;
+        cin >> a >> b;
+        // 처음 나옴 이름이라면 추가
+        if (parent.find(a)==parent.end()){
+            parent[a] = a;
+            cnt[a] = 1;
+        }
+        if (parent.find(b)==parent.end()){
+            parent[b] = b;
+            cnt[b] = 1;
+        }
+        unionParent(a, b);
+        cout << cnt[getParent(a)] << '\n';
+    }
+}
+
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
@@ -36,23 +56,7 @@ int main(){
     while(T--) {
         parent.clear();
         cnt.clear();
-        int F;
-        cin >> F;
-        for(int i=0; i<F; i++){
-            string a, b;
-            cin >> a >> b;
-            // 처음 나옴 이름이라면 추가
-            if (parent.find(a)==parent.end()){
-                parent[a] = a;
-                cnt[a] = 1;
-            }
-            if (parent.find(b)==parent.end()){
-                parent[b] = b;
-                cnt[b] = 1;
-            }
-            unionParent(a, b);
-            cout << cnt[getParent(a)] << '\n';
-        }
+        solve();
     }
 
     return 0;
