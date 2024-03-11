@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
-#define MAX 1000001
+#define MAX
 
 /*
-왜 출력초과가 나는가...
+
 */
 
 unordered_map<string, string> parent;
@@ -18,16 +18,20 @@ string getParent(string s) {
 
 // 작은 부모 노드의 값으로 초기화 (작은것을 항상 부모 노드로)
 void unionParent(string a, string b) {
-    string A = getParent(a);
-    string B = getParent(b);
-
+    a = getParent(a);
+    b = getParent(b);
+    if (a > b) {
+        parent[a] = b;
+        cnt[b] += cnt[a];
+    }
+    else if (a < b) {
+        parent[b] = a;
+        cnt[a] += cnt[b];
+    }
     // a==b인경우 둘 다 이미 같은 집합이므로 합치지 않음
-    if (A == B) return;
-
-    parent[B] = A;
-    cnt[A] += cnt[B];
 }
 
+// 여기서 solve를 int로 쓰면 왜 출력초과가 나는가??
 void solve(){
     int F;
     cin >> F;
