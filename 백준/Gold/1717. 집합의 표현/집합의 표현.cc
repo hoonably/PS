@@ -4,24 +4,22 @@ typedef long long ll;
 #define MAX 1000001
 
 /*
-
+union find
+= parent 초기화를 꼭 해주자.
 */
 
 int n, m;
 int parent[MAX];
 
-// 부모 노드를 찾는 함수
-int getParent(int x) {
+int findParent(int x) {
     if (parent[x] == x) return x;
-    return parent[x] = getParent(parent[x]);
+    return parent[x] = findParent(parent[x]);
 }
 
-// 작은 부모 노드의 값으로 초기화 (작은것을 항상 부모 노드로)
-void unionParent(int a, int b) {
-    a = getParent(a);
-    b = getParent(b);
-    if (a > b) parent[a] = b;
-    else parent[b] = a;
+void unionParent(int a, int b){
+    a = findParent(a);
+    b = findParent(b);
+    parent[b] = a;
 }
 
 int main(){
@@ -29,19 +27,19 @@ int main(){
     
     cin >> n >> m;
 
-    // 부모 노드 자신으로 먼저 기록
-    for (int i=0; i<=n; i++){
+    // parent 초기화
+    for (int i=1; i<=n; i++){
         parent[i]=i;
     }
 
     for (int i=0; i<m; i++){
-        int num, a, b;
-        cin >> num >> a >> b;
-        if (num==0) {  // 합침
+        int order, a, b;
+        cin >> order >> a >> b;
+        if (order==0) {  // order = 0일 경우 두 집합 합침
             unionParent(a, b);
         }
-        else{  // a와 b가 같은 집합인지
-            if (getParent(a)==getParent(b)) cout << "YES\n";
+        else {  // order !=0 일 경우 a와 b가 같은 집합이면 YES 출력
+            if (findParent(a)==findParent(b)) cout << "YES\n";
             else cout << "NO\n";
         }
     }
