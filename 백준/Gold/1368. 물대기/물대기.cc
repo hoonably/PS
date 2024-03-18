@@ -43,9 +43,7 @@ int MST(){
         ans += cost;
     }
 
-    // 아래 이거 해주면 안됨.
-    // 임의의 가상 노드 0으로 모두 이어져야 하므로!!!
-    // if (++cnt == V-1) return ans;  // V-1개이면 바로 끝
+    if (++cnt == V) return ans;  // V개이면 바로 끝
 
     return ans;
 }
