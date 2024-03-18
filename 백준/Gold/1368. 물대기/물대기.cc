@@ -10,10 +10,7 @@ typedef long long ll;
 
 int V, E;
 int parent[MAX];
-int cnt = 0;
 vector<tuple<int,int,int>> v;
-bool power[MAX];
-int sons[MAX];  // 자녀의 개수 (자신 미포함)
 
 int findParent(int x){
     if(parent[x] == x) return x;
@@ -32,7 +29,7 @@ int MST(){
         parent[i] = i;
     }
 
-    int ans = 0;
+    int ans = 0, cnt = 0;
     for(auto edge : v){
         auto [cost, now, next] = edge;
         
