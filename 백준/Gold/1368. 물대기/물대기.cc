@@ -4,9 +4,8 @@ typedef long long ll;
 #define MAX 301
 
 /*
-1. 모든 간선들의 가중치를 오름차순으로 정렬
-2. 비용이 작은 간선 순으로 연결하려는 2개의 노드가 아직 서로 연결되지 않은 상태라면, 
-    2개의 노드를 서로 연결하는 과정 반복
+기준점은 0으로 연결시켜주자. 
+대신 0도 노드에 포함이므로 V-1이 아니라 V까지
 */
 
 int V, E;
@@ -25,8 +24,7 @@ void unionParent(int a, int b){
     a = findParent(a);
     b = findParent(b);
 
-    if(a > b) parent[a] = b;
-    else parent[b] = a;
+    parent[b] = a;
 }
 
 int MST(){
@@ -44,6 +42,7 @@ int MST(){
     }
 
     if (++cnt == V) return ans;  // V개이면 바로 끝
+    // 모두 0으로 이어지는것이므로 모두 물에 연결되는것임.
 
     return ans;
 }
@@ -54,7 +53,7 @@ int main(){
     
     cin >> V;
 
-    // 우물은 0으로
+    // 우물은 0으로 이어주는게 제일 중요!
     for (int i=1; i<=V; i++){
         int cost;
         cin >> cost;
