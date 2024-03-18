@@ -38,10 +38,10 @@ int low_MST(){
 
         unionParent(now, next);
 
-        if (++cnt == V) break;  // V-1개이면 바로 끝
+        if (++cnt == V-1) break;  // V-1개이면 바로 끝
     }
 
-    return V-cnt;
+    return (V-1) - cnt + (firstGo^1);
 }
 
 // 오르막길
@@ -59,10 +59,10 @@ int high_MST(){
 
         unionParent(now, next);
 
-        if (++cnt == V) break;  // V-1개이면 바로 끝
+        if (++cnt == V-1) break;  // V-1개이면 바로 끝
     }
 
-    return cnt;
+    return cnt + (firstGo^1);
 }
 
 int main(){
@@ -71,8 +71,9 @@ int main(){
     cin >> V >> E;
 
     int a, b, c;
+    cin >> a >> b >> firstGo;
 
-    for(int i = 0; i <= E; i++){
+    for(int i = 0; i < E; i++){
         cin >> a >> b >> c;
         v[c].push_back({a, b});
     }
