@@ -34,14 +34,20 @@ int main(){
     while(M--){
         cin >> command;
 
-        // 추가 : 1과 OR 연산
-        if (command=="add") {
-            cin >> x;
-            S |= (1<<x);  // 1을 x만큼 왼쪽으로 시프트 (2^X)
+        if (command[0]=='a'){
+            if (command[1]=='d'){
+                cin >> x;
+                S |= (1<<x);  // 1을 x만큼 왼쪽으로 시프트 (2^X)
+            }
+            else {
+                S = (1<<21)-1;  
+                // 2의 21제곱 - 1
+                // 11111111111111111111  (1이 20개)
+            }
         }
 
         // 제거 : 0과 AND 연산
-        else if (command=="remove"){
+        else if (command[0]=='r'){
             cin >> x;
             S &= ~(1<<x);  // 2^X 의 반대와 and 연산
             
@@ -50,25 +56,18 @@ int main(){
         }
 
         // 있는지 확인
-        else if (command=="check"){
+        else if (command[0]=='c'){
             cin >> x;
             if (S & (1<<x)) cout << "1\n";  // 있다면
             else cout << "0\n";
         }
 
         // 반대로 바꿔주기
-        else if (command=="toggle"){
+        else if (command[0]=='t'){
             cin >> x;
             S ^= (1<<x);
             // x번째 자리가 1이라면 1^1=0이 되어 1->0이 되고
             // x번째 자리가 0이라면 0^1=1 이 되어 0 -> 1이 된다.
-        }
-
-        // 모두 true로 바꾸기
-        else if (command=="all"){
-            S = (1<<21)-1;  
-            // 2의 21제곱 -1
-            // 11111111111111111111  (1이 20개)
         }
 
         // 모두 false로
