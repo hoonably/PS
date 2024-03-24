@@ -13,12 +13,12 @@ CCW 의 값이 음수라면? : 점 C는 선분 AB의 시계방향에 위치한�
 CCW 의 값이 0 이라면? : 점 C는 선분 AB의 직선상에 위치한다.
 */
 
-struct coordinate {
+struct dot {
     int x;
     int y;
 };
 
-int ccw(coordinate p1, coordinate p2, coordinate p3) {
+int ccw(dot p1, dot p2, dot p3) {
     int s = p1.x * p2.y + p2.x * p3.y + p3.x * p1.y;
     s -= (p1.y * p2.x + p2.y * p3.x + p3.y * p1.x);
 
@@ -31,7 +31,7 @@ int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     
-    coordinate P1, P2, P3;
+    dot P1, P2, P3;
     cin >> P1.x >> P1.y;
     cin >> P2.x >> P2.y;
     cin >> P3.x >> P3.y;
