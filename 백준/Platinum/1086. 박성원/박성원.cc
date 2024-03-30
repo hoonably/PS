@@ -20,8 +20,8 @@ typedef pair<int,int> pii;
 
 int N,K;
 string num[15];
-int cache[51];
-int cachestr[15];
+int temRemain[51];
+int numRemain[15];
 
 // dp[i][k] : i 비트일때 나머지가 k인 것의 경우의 수
 ll dp[1 << 15][100];
@@ -50,13 +50,13 @@ int main(){
     dp[0][0] = 1;
     
     // 10의 0제곱부터 50제곱까지 K로 나눈 나머지 저장
-	cache[0] = 1 % K;
+	temRemain[0] = 1 % K;
 	for (int i = 1; i <= 50; i++) 
-		cache[i] = (cache[i - 1] * 10) % K;
+		temRemain[i] = (temRemain[i - 1] * 10) % K;
 	
     // 숫자들을 각각 K로 나눈 나머지 저장
 	for (int i = 0; i < N; ++i)
-		cachestr[i] = get_mod(num[i], K);
+		numRemain[i] = get_mod(num[i], K);
 
     // dp 실행
 	for(int cur = 0; cur < (1 << N); ++cur){
@@ -68,7 +68,7 @@ int main(){
  
 				for (int j = 0; j < K; ++j) {
                     // 다음 나머지 구하기
-					int nxtRemain = ((j * cache[num[i].length()]) % K + cachestr[i]) % K;
+					int nxtRemain = ((j * temRemain[num[i].length()]) % K + numRemain[i]) % K;
 					dp[nxt][nxtRemain] += dp[cur][j];
 				}
 			}
