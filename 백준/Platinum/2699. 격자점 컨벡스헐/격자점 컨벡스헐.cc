@@ -27,16 +27,15 @@ ll ccw(dot a, dot b, dot c) {
     return a.x * b.y + b.x * c.y + c.x * a.y - (b.x * a.y + c.x * b.y + a.x * c.y);
 }
 
-ll dist(dot a, dot b) {
-	return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
-}
-
 bool compare(dot a, dot b){ //반시계 정렬
     
     ll cc = ccw(P[0], a, b);
     if (cc) // 0 번 점을 기준으로 각도가 작은 순
         return cc < 0;
-    return dist(P[0], a) < dist(P[0], b);  // 거리에 따라
+    else if (a.y != b.y) //y가 큰 순
+        return a.y > b.y;
+    else //x가 작은 순
+        return a.x < b.x;
 }
 
 void solve(){
