@@ -4,7 +4,6 @@ typedef long long ll;
 typedef pair<int,int> pii;
 #define FOR(i,a,b) for(int i=(a);i<=(b);i++)
 #define MAX 100001
-#define INF 1e9;
 
 /*
 Graham scan 알고리즘을 통한 볼록 껍질 구하기
@@ -96,7 +95,7 @@ int main() {
     }
     
     // 회전하는 캘리퍼스 구하기
-    double ans = 1e15;  // 불필요한 연산 방지를 위해 일단 제곱으로 저장 후 나중에 루트 씌우기
+    double ans = DBL_MAX;  // 불필요한 연산 방지를 위해 일단 제곱으로 저장 후 나중에 루트 씌우기
     int C = 1;
     for (int A=0; A<now; A++){
         // 양수(반시계 방향)라면 C를 높이기
