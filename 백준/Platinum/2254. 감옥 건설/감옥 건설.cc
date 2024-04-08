@@ -23,10 +23,7 @@ dot CH[MAX];  // Convex Hull
 
 ll ccw(dot a, dot b, dot c) {
     // 양수라면 반시계방향
-    ll ret = a.x * b.y + b.x * c.y + c.x * a.y - (b.x * a.y + c.x * b.y + a.x * c.y);
-    if (ret>0) return 1;
-    if (ret<0) return -1;
-    return 0;
+    return a.x * b.y + b.x * c.y + c.x * a.y - (b.x * a.y + c.x * b.y + a.x * c.y);
 }
 
 bool compare(dot a, dot b){ //반시계 정렬
@@ -76,7 +73,7 @@ bool ConvexHull(){
     CH[now] = CH[0];  // 순환 위해
     for (int i=0; i<now; i++){
         // 반시계방향이 아니라면 밖 or 선 위에 있는거임
-        if (ccw(CH[i], CH[i+1], cow)!=1){
+        if (ccw(CH[i], CH[i+1], cow)<=0){
             return false;
         }
     }
