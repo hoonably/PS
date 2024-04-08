@@ -7,15 +7,7 @@ typedef pair<int,int> pii;
 
 /*
 Graham scan 알고리즘을 통한 볼록 껍질 구하기
-
-주어진 점들을 반시계방향으로 정렬하고, 정렬된 순서대로 점들을 탐색한다.
-stack에 첫 번째 점과 두 번째 점을 push 해준다. 
-
-그 다음 세 번째 점부터 N번째 점까지 다음의 과정을 반복할 것이다.
-만약 stack의 최상단에 있는 두 점을 이은 직선에 대해, 현재 탐색하는 정점이 직선의 왼쪽에 존재한다면 stack에 push한다.
-그렇지 않다면 stack을 pop하고 위 조건을 다시 확인한다.
-
-최종적으로 탐색이 끝나면 stack에는 Convex Hull을 구성하는 점들이 포함되어 있다.
++ // (Px, Py)가 볼록 다각형 안에 있는지 판단
 */
 
 struct dot {
@@ -79,18 +71,16 @@ bool ConvexHull(){
         now++;
     }
 
-
-
     // (Px, Py)가 볼록 다각형 안에 있는지 판단
-    ll chk = ccw(CH[now-1], CH[0], cow);
-    for (int i=0; i<now-1; i++){
-        if (chk != ccw(CH[i], CH[i+1], cow)){
+
+    CH[now] = CH[0];  // 순환 위해
+    for (int i=0; i<now; i++){
+        // 반시계방향이 아니라면 밖 or 선 위에 있는거임
+        if (ccw(CH[i], CH[i+1], cow)!=1){
             return false;
         }
     }
     
-
-
     // 사용한 담 모두 제거하고 배열 다시 구성하기
     for (int i=0; i<N; i++){
         // 일단 임시복사
