@@ -91,12 +91,7 @@ bool solve(){
 
     for(int i=1; i<N; i++) {
         if(Black[i].y < Black[0].y || (Black[i].y == Black[0].y && Black[i].x < Black[0].x)) {
-            long long temp = Black[0].x;
-            Black[0].x = Black[i].x;
-            Black[i].x = temp;
-            temp = Black[0].y;
-            Black[0].y = Black[i].y;
-            Black[i].y = temp;
+            swap(Black[0], Black[i]);
         }
     }
     sort(Black.begin()+1, Black.end(), CrossCompBlack);
@@ -118,12 +113,7 @@ bool solve(){
 
     for(int i=1; i<M; i++) {
         if(White[i].y < White[0].y || (White[i].y == White[0].y && White[i].x < White[0].x)) {
-            long long temp = White[0].x;
-            White[0].x = White[i].x;
-            White[i].x = temp;
-            temp = White[0].y;
-            White[0].y = White[i].y;
-            White[i].y = temp;
+            swap(White[0], White[i]);
         }
     }
 
