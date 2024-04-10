@@ -3,82 +3,68 @@ using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii;
 #define FOR(i,a,b) for(int i=(a);i<=(b);i++)
-#define MAX
+#define MAX 100000
 
 /*
 Graham scan 알고리즘을 통한 볼록 껍질 구하기
-주어진 점들을 반시계방향으로 정렬하고, 정렬된 순서대로 점들을 탐색한다..
-stack에 첫 번째 점과 두 번째 점을 push 해준다. 그 다음 세 번째 점부터 N번째 점까지 다음의 과정을 반복할 것이다.
-만약 stack의 최상단에 있는 두 점을 이은 직선에 대해, 현재 탐색하는 정점이 직선의 왼쪽에 존재한다면 stack에 push한다.
-그렇지 않다면 stack을 pop하고 위 조건을 다시 확인한다.
-최종적으로 탐색이 끝나면 stack에는 Convex Hull을 구성하는 점들이 포함되어 있다.
+
+sort 과정에서 y, x가 작은순으로 하지 않고 거리가 작은 순으로 해준다.
 */
 
 struct dot {
     ll x,y;
+    bool operator<(dot const &p1) const {
+        if (x!=p1.x) return x<p1.x;
+        else return y<p1.y;
+    }
 };
-
-vector <dot> v;
-stack <dot> s;
 
 ll ccw(dot a, dot b, dot c) {
     // 양수라면 반시계방향
     return a.x * b.y + b.x * c.y + c.x * a.y - (b.x * a.y + c.x * b.y + a.x * c.y);
 }
 
-bool compare(dot a, dot b){ //반시계 정렬
-    
-    ll cc = ccw(v[0], a, b);
-    if (cc) // 0 번 점을 기준으로 각도가 작은 순
-        return cc > 0;
-    else if (a.y != b.y) //y가 작은 순
-        return a.y < b.y;
-    else //x가 작은 순
-        return a.x < b.x;
+ll dist(dot a, dot b){
+	ll dx = a.x - b.x;
+	ll dy = a.y - b.y;
+	return dx*dx + dy*dy;
 }
 
-int main(int argc, const char * argv[]) {
-    ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
-    
-    int N;
-    cin >> N;
-    
-    v.resize(N);
-    for (int i=0; i<N; i++){
-        cin >> v[i].x >> v[i].y;
-    }
-    
-    // y좌표와 x좌표가 가장 작은 점이 v[0]에 오도록 정렬
-    for (int i=1; i<N; i++){
-        if(v[i].y < v[0].y || (v[i].y == v[0].y && v[i].x < v[0].x)){
-            swap(v[0].x, v[i].x);
-            swap(v[0].y, v[i].y);
-        }
-    }
-    
-    sort(v.begin()+1, v.end(), compare);
-    
-    // 볼록껍질 검사
-    s.push(v[0]);
-    s.push(v[1]);
-    for(int i=2; i<N; i++){
-        while (s.size() >= 2){
-            
-            // 상위 두개의 원소 반시계인지 비교
-            dot top2 = s.top();
-            s.pop();
-            dot top1 = s.top();
+int N;
+vector<dot> v;
 
-            // 반시계방향이라면 다시 넣고 종료
-            if (ccw(top1, top2, v[i]) > 0){
-                s.push(top2);
-                break;
-            }
-        }
-        s.push(v[i]);
-    }
+int main() {
+    ios::sync_with_stdio(0), cin.tie(0);
     
-    cout << s.size();
+	cin >> N;
+
+    // 그냥 push_back을 하면 할당 복사 해제 비용이 들어가 성능이 떨어짐
+
+	// reserve(N) : N의 용량을 미리 확보해놓음.
+	// resize(N, number) : N의 용량을 미리 확보해놓고
+	// 나머지 공간을 두 번째 매개변수의 값으로 채움. 두 번째 매개변수가 없으면 0
+    v.resize(N);
+	for(int i=0; i<N; i++) cin >> v[i].x >> v[i].y;
+
+	// 가장 작은 값을 맨 앞의 원소랑 바꿔줌 (x, y 순으로)
+	swap(v[0], *min_element(v.begin(), v.end()));
+
+	// 람다식을 이용한 sort
+	sort(v.begin()+1, v.end(), [&](dot &a, dot &b){
+        ll cc = ccw(v[0], a, b);
+        if (cc) // 0 번 점을 기준으로 각도가 작은 순
+            return cc > 0;
+        return dist(v[0], a) < dist(v[0], b);
+	});
+
+	// Convex Hull
+	vector<dot> CH;
+	for(auto &i : v){
+		while(CH.size() >= 2 && ccw(CH[CH.size()-2], CH.back(), i) <= 0) CH.pop_back();
+		CH.push_back(i);
+	}
+	cout << CH.size() << "\n";
+	// for(auto &i : CH) cout << i.x << " " << i.y << "\n";
     
     return 0;
 }
