@@ -8,6 +8,7 @@ typedef pair<int,int> pii;
 /*
 Graham scan 알고리즘을 통한 볼록 껍질 구하기
 
+문제의 조건에 따라 sort 과정에서 y, x가 작은순으로 하지 않고 거리가 작은 순으로 해준다.
 */
 
 struct dot {
@@ -32,16 +33,15 @@ ll dist(dot a, dot b){
 }
 
 int N, M;
-int ax[MAX], ay[MAX];
-int bx[MAX], by[MAX];
+dot A[MAX], B[MAX];
 vector<dot> v;
 
 int main() {
-    ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    ios::sync_with_stdio(0), cin.tie(0);
     
 	cin >> N >> M;
-	for(int i=0; i<N; i++) cin >> ax[i] >> ay[i];
-	for(int i=0; i<M; i++) cin >> bx[i] >> by[i];
+	for(int i=0; i<N; i++) cin >> A[i].x >> A[i].y;
+	for(int i=0; i<M; i++) cin >> B[i].x >> B[i].y;
 
 	// 그냥 push_back을 하면 할당 복사 해제 비용이 들어가 성능이 떨어짐
 
@@ -52,7 +52,7 @@ int main() {
 
 	for(int i=0; i<N; i++){
 		for(int j=0; j<M; j++){
-			v.push_back({ax[i]+bx[j], ay[i]+by[j]});
+			v.push_back({A[i].x+B[j].x, A[i].y+B[j].y});
 		}
 	}
 
@@ -63,6 +63,7 @@ int main() {
 	sort(v.begin()+1, v.end(), [&](dot &a, dot &b){
 		ll cw = ccw(v[0], a, b);
 		if(cw) return cw > 0;
+		// 중요!
 		return dist(v[0], a) < dist(v[0], b);
 	});
 
