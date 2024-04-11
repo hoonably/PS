@@ -8,6 +8,11 @@ typedef pair<int,int> pii;
 /*
 울타리의 꼭짓점이 각 점보다 최소 L만큼 떨어지도록 그려야 한다.
 모든 점에 +-L 을 해주고 둘레를 구하면 된다.
+
+로 해도 되지만 훨씬 빠른 방법이 있다.
+
+4방향에 대각선이 들어가기 때문에
+4*sqrt(2)*l 를 더해주면 된다.
 */
 
 #define x first
@@ -123,29 +128,11 @@ int main() {
 
 
     CH.build(v);
-    
-    // L을 적용해야한다면
-    if (L!=0){
-        vector<dot> temp(4*N);
-        for (int i=0; i<N; i++){
-            temp[i] = {v[i].x + L, v[i].y};
-        }
-        for (int i=0; i<N; i++){
-            temp[N+i] = {v[i].x - L, v[i].y};
-        }
-        for (int i=0; i<N; i++){
-            temp[2*N+i] = {v[i].x, v[i].y + L};
-        }
-        for (int i=0; i<N; i++){
-            temp[3*N+i] = {v[i].x, v[i].y - L};
-        }
-        CH.build(temp);
-    }
 
     // 선분 벡터
     auto Edges = CH.makeEdges();
 
-    double ans = 0;
+    double ans = 4*sqrt(2)*L;
     for (auto &e : Edges){
         ans += sqrt(dist(e.first, e.second));
     }
