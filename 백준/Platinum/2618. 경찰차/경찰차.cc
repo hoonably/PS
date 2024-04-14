@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 typedef long long ll;
 
 /*
@@ -9,8 +8,6 @@ dp[i][i]
 경찰차 2가 마지막으로 j번째 사건 해결했을 경우
 총 거리의 합의 최소값 저장
 */
-
-
 
 int N, M;
 pair<int, int> accident[1001], before[1001][1001];
@@ -27,10 +24,10 @@ int dist(int car, int start, int end){
         }
     }
 
-    int x1 = accident[start].first;
-    int x2 = accident[end].first;
-    int y1 = accident[start].second;
-    int y2 = accident[end].second;
+    // c++17 부터 가능 auto unpacking
+    auto [x1, y1] = accident[start];
+    auto [x2, y2] = accident[end];
+
     return abs(x1-x2)+abs(y1-y2);
 }
 
