@@ -1,60 +1,71 @@
-//비트마스킹 사용
-
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 using namespace std;
-typedef unsigned int uint;
-typedef unsigned long long ull;
+typedef long long ll;
+typedef pair<int,int> pii;
+#define FOR(i,a,b) for(int i=(a);i<=(b);i++)
+#define MAX
 
-int n;
-ull alive, ldiag, rdiag;
-int step[30]{};
-int ans[30]{};
-bool recursive(int m){
-    if(m>n){
+int N;
+ll alive, ldiag, rdiag;
+int Q[30];
+int step[30];
+int ans[30];
+
+bool backtracking(int m){
+    if(m>N){
         return true;
     }
-    ull tmp = alive & ~((ldiag >> m)| (rdiag >> (n-m)));
-    for(ull a;tmp;tmp ^= a){
-        a = tmp & (-tmp);
-        alive ^= a; ldiag ^= a << m; rdiag ^= a << (n-m);
-        if(recursive(m + step[m])) {
+    ll bit = alive & ~((ldiag >> m)| (rdiag >> (N-m)));
+
+    // 최하위 비트부터 모든 비트가 없어질때까지 하나씩 재귀
+    for(ll a; bit!=0; bit ^= a){
+        a = bit & (-bit);  // bit의 최하위 비트만을 가짐
+        alive ^= a;
+        ldiag ^= a << m; 
+        rdiag ^= a << (N-m);
+        if(backtracking(m + step[m])) {
             ans[m] = a;
             return true;
-        } alive ^= a; ldiag ^= a << m; rdiag ^= a << (n-m);
-    } return false;
+        }
+        alive ^= a;
+        ldiag ^= a << m; 
+        rdiag ^= a << (N-m);
+    } 
+    return false;
 }
+
 int main() {
-    cin.tie(NULL);
-    ios_base::sync_with_stdio(false);
-    cin >> n;
-    if(n < 1) return 0;
-    vector<int> q(n);
-    alive = (1 << n) - 1;
-    n--;
-    for(int j = 0; j <= n; ++j) {
-        auto &i = q[j]; cin >> i;
-        if(i){
-            ans[j] = 1 << (i-1);
-            alive ^= 1ull << (i - 1);
-            ldiag |= 1ull << (i - 1 + j);
-            rdiag |= 1ull << (i - 1 + n - j);
+    ios_base::sync_with_stdio(0); cin.tie(0);
+
+    cin >> N;
+
+    alive = (1 << N) - 1;
+    N--;
+
+    for(int j = 0; j <= N; ++j) {
+        cin >> Q[j];
+        if(Q[j]){
+            ans[j] = 1 << (Q[j]-1);
+            alive ^= 1ull << (Q[j] - 1);
+            ldiag |= 1ull << (Q[j] - 1 + j);
+            rdiag |= 1ull << (Q[j] - 1 + N - j);
         }
     }
-    for(int i = 0; i <= n; ++i){
-        if(q[i]) continue;
+
+    for(int i = 0; i <= N; ++i){
+        if(Q[i]) continue;
         int s = 1;
-        while(i + s <= n && q[i+s]) ++s;
+        while(i + s <= N && Q[i+s]) ++s;
         step[i] = s;
     }
+    
     int init = 0;
-    while(init <= n && q[init]) ++init;
+    while(init <= N && Q[init]) ++init;
 
-    bool finished = recursive(init);
-    if(!finished){
+    if(!backtracking(init)){
         cout << -1; return 0;
     }
-    for(int i = 0; i <= n; ++i){
+    for(int i = 0; i <= N; ++i){
         int j = 0;
         while(1 << j < ans[i]) ++j;
         cout << j+1 << ' ';
