@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
+typedef pair<int,int> pii;
 
 /*
 dp[i][i] 
@@ -10,7 +11,7 @@ dp[i][i]
 */
 
 int N, M;
-pair<int, int> accident[1001], before[1001][1001];
+pii accident[1001], before[1001][1001];
 int dp[1001][1001];
 
 int dist(int car, int start, int end){
@@ -101,21 +102,19 @@ int main(){
 
     // 최대값 찾기
     int ans = 1e9;
-    int idx_x, idx_y;
+    pii idx;
     for(int i=0; i<M; i++){
         if (dp[M][i] < ans){
             ans = dp[M][i];
-            idx_x = M;
-            idx_y = i; 
+            idx = {M,i};
         }
         if (dp[i][M] < ans){
             ans = dp[i][M];
-            idx_x = i;
-            idx_y = M;
+            idx = {i,M};
         }
     }
     cout << ans << '\n';
-    backtrace(idx_x, idx_y);
+    backtrace(idx.first, idx.second);
 
     return 0;
 }
