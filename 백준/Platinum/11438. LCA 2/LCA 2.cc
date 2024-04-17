@@ -22,19 +22,17 @@ int MAXK = 16;  // N에 따른 최대 높이
 
 int N, M, n1, n2; 
 vector<int> graph[MAX]; 
-bool visited[MAX]; 
 int depth[MAX];
 int parent[MAX][17];
 
-void makeTree(int curr, int dep) { 
-    visited[curr] = true ;
-    depth[curr] = dep ;  
+// 트리를 만들면서 각각의 parent와 depth 구하기
+void makeTree(int par, int now, int dep) { 
+    depth[now] = dep;
 
-    for (int i = 0 ; i < graph[curr].size(); i++) {
-        int next_node = graph[curr][i]; 
-        if ( visited[next_node] ) continue; 
-        parent[next_node][0] = curr ;
-        makeTree(next_node, dep + 1); 
+    for (int child : graph[now]) {
+        if (child == par) continue;
+        parent[child][0] = now ;
+        makeTree(now, child, dep + 1); 
     }
 }
 
@@ -72,7 +70,7 @@ int main(void) {
         graph[n2].push_back(n1); 
     }
 
-    makeTree(1, 0) ;
+    makeTree(0, 1, 0) ;
     for (int i = 1 ; i <= MAXK; i++) {
         for (int j = 1;  j <= N ; j++) {
             parent[j][i] = parent[parent[j][i-1]][i-1]; 
