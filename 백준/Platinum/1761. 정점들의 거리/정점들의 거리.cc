@@ -19,7 +19,7 @@ const int TREE_HIGH = 16;  // 최대는 log2(40000) = 15.xx
 int MAXK;  // N에 따른 최대 높이
 int parent[TREE_HIGH][MAX];  
 int depth[MAX];
-int dist[TREE_HIGH][MAX];
+int dist[MAX];  // root로부터의 거리
 vector<pii> v[MAX];
 
 // 트리를 만들면서 각각의 parent, depth, 자신의 부모와의 거리 구하기
@@ -27,11 +27,11 @@ void makeTree(int par, int now, int dep, int cost){
 
     parent[0][now] = par;   // 부모 노드 기록 [ 2^0 (1)번째 조상 ]
     depth[now] = dep;  // 현재 노드의 깊이 기록
-    dist[0][now] = cost;  // 부모와의 거리 기록
+    dist[now] = cost;  // 부모와의 거리 기록
 
     for(pii child : v[now]){
         // 부모가 아니라면 자식일 수 밖에 없으므로 재귀
-        if(child.first != par) makeTree(now, child.first, dep+1, child.second);
+        if(child.first != par) makeTree(now, child.first, dep+1, cost + child.second);
     }
 }
 
@@ -40,14 +40,11 @@ void fillParentDist() {
     for (int k = 1; k <= MAXK; k++)
         for (int i = 1; i <= N; i++) {
             parent[k][i] = parent[k-1][parent[k-1][i]];
-            dist[k][i] = dist[k-1][i] + dist[k-1][parent[k-1][i]];
         }
 }
 
-// dist 찾기
-int getDist(int a, int b) {
-    int sum = 0;
-    
+// lca 찾기
+int getLca(int a, int b) {
     if (depth[a] < depth[b]) swap(a, b);
     
     int dif = depth[a] - depth[b];
@@ -55,27 +52,28 @@ int getDist(int a, int b) {
     // a와 b의 높이차를 없애주기 위해
     // a를 높이차 만큼의 부모로 변경
     for(int i=0; dif>0 ; ++i){
-        if(dif%2==1) {
-            sum += dist[i][a];
-            a = parent[i][a];
-        }
+        if(dif%2==1) a = parent[i][a];
         dif >>= 1;
     }
  
-    if (a == b) return sum;
+    if (a == b) return a;
 
     for (int k = MAXK; k >= 0; k--) {
         if (parent[k][a] != parent[k][b]) {
-            sum += (dist[k][a] + dist[k][b]);
             a = parent[k][a];
             b = parent[k][b];
         }
     }
-    sum += dist[0][a] + dist[0][b];
     // 이러면 a와 b의 바로 위의 부모가 같아짐
 
-    return sum;
+    return parent[0][a];
 }
+
+int getDist(int u, int v){
+    // 1->u 거리 + 1->v 거리 - 2*(1->lca 거리)
+	return dist[u] + dist[v] - 2*dist[getLca(u, v)];
+}
+
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
