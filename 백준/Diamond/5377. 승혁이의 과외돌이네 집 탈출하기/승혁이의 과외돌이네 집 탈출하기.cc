@@ -35,24 +35,6 @@ double dist(dot a, dot b){  // 거리의 제곰
 	return dx*dx + dy*dy;
 }
 
-// 선분이 교차하는지
-bool Cross(dot s1, dot e1, dot s2, dot e2){
-    auto cw1 = ccw(s1, e1, s2) * ccw(s1, e1, e2);
-    auto cw2 = ccw(s2, e2, s1) * ccw(s2, e2, e1);
-    if(cw1 == 0 && cw2 == 0){
-        if(e1 < s1) swap(s1, e1);
-        if(e2 < s2) swap(s2, e2);
-        return !(e1 < s2 || e2 < s1);
-    }
-    return cw1 <= 0 && cw2 <= 0;
-}
-
-// 선분 위에 점이 있는지
-bool dotOnLine(dot L1, dot L2, dot dot){
-    if (L1>L2) swap(L1, L2);
-    return ccw(L1, dot, L2) == 0 && L1 <= dot && dot <= L2;
-}
-
 vector<dot> convexHull(vector<dot> &v){
     vector<dot> ret;
     swap(v[0], *min_element(v.begin(), v.end()));
@@ -88,31 +70,6 @@ void solve(){
         cin >> v[i].x >> v[i].y;
     }
     v = convexHull(v);
-
-    // 점이라면
-    if (v.size()==1){
-        cout << sqrt(dist(start, end)) << '\n';
-        return;
-    }
-
-    // 선분이라면
-    if (v.size()==2){
-        // 선분끼리 교차하지 않을 때
-        if (!Cross(start, end, v[0], v[1])){
-            cout << sqrt(dist(start, end)) << '\n';
-            return;
-        }
-        // 선분 위에 start나 end 가 하나라도 있다면 그냥 거리
-        if (dotOnLine(v[0], v[1], start) || dotOnLine(v[0], v[1], end)){
-            cout << sqrt(dist(start, end)) << '\n';
-            return;
-        }
-        // 경로와 선분이 교차할때
-        double case1 = sqrt(dist(start, v[0])) + sqrt(dist(v[0], end));  // 첫번째 점을 지나는 경우
-        double case2 = sqrt(dist(start, v[1])) + sqrt(dist(v[1], end));  // 두번째 점을 지나는 경우
-        cout << min(case1, case2) << '\n';
-        return;
-    }
 
     // 불가능한지 판단 = 볼록다각형 내부에 점 존재
     if(!valid(start, v)){ cout << "IMPOSSIBLE\n"; return; }
