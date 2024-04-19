@@ -11,27 +11,26 @@ typedef pair<int,int> pii;
 
 #define x first
 #define y second
-using dot = pair<double, double>;
+using dot = pair<int, int>;
 
 dot operator + (const dot &a, const dot &b){ return { a.x + b.x, a.y + b.y }; }
 dot operator - (const dot &a, const dot &b){ return { a.x - b.x, a.y - b.y }; }
-double operator * (const dot &a, const dot &b){ return a.x*a.x + a.y*a.y; }
-double operator / (const dot &a, const dot &b){ return a.x*b.y - b.x*a.y; }
-dot operator * (const dot &a, double b){ return { a.x * b, a.y * b }; }
-dot operator / (const dot &a, double b){ return { a.x / b, a.y / b }; }
+int operator * (const dot &a, const dot &b){ return a.x*a.x + a.y*a.y; }
+int operator / (const dot &a, const dot &b){ return a.x*b.y - b.x*a.y; }
+dot operator * (const dot &a, int b){ return { a.x * b, a.y * b }; }
+dot operator / (const dot &a, int b){ return { a.x / b, a.y / b }; }
 
 int n;
-int nxt(int k){ return k+1 == n ? 0 : k+1; }  // 회전하면서 탐색할때 사용
-int prv(int k){ return k == 0 ? n-1 : k-1; }
 
-double ccw(const dot &p1, const dot &p2, const dot &p3){
+int ccw(const dot &p1, const dot &p2, const dot &p3){
+    // 양수라면 반시계방향
     auto res = (p2 - p1) / (p3 - p2);
     return (res > 0) - (res < 0);
 }
 
-double dist(dot a, dot b){  // 거리의 제곰
-	double dx = a.x - b.x;
-	double dy = a.y - b.y;
+int dist(dot a, dot b){  // 거리의 제곰
+	int dx = a.x - b.x;
+	int dy = a.y - b.y;
 	return dx*dx + dy*dy;
 }
 
@@ -59,6 +58,9 @@ bool valid(dot t, vector<dot> &v){
     return flag;
 }
 
+int nxt(int k){ return k+1 == n ? 0 : k+1; }  // 회전하면서 탐색할때 사용
+int prv(int k){ return k == 0 ? n-1 : k-1; }
+
 void solve(){
 
     dot start, end;
@@ -71,7 +73,7 @@ void solve(){
     }
     v = convexHull(v);
 
-    // 불가능한지 판단 = 볼록다각형 내부에 점 존재
+    // 불가능한지 판단 = 볼록다각형 내부에 start나 end 점 존재
     if(!valid(start, v)){ cout << "IMPOSSIBLE\n"; return; }
     if(!valid(end, v)){ cout << "IMPOSSIBLE\n"; return; }
 
@@ -82,16 +84,19 @@ void solve(){
     n = v.size();
 
     int i, j;
+
+    // 순회하면서 각각 반시계 방향이 아닌 인덱스를 찾기
     for(i=1; i<=n&&ccw(v[i-1], v[i%n], start)>0; i++);
     for(j=1; j<=n&&ccw(v[j-1], v[j%n], end)>0; j++);
 
     // 볼록 다각형을 안지나고 그냥 갈 수 있는 경우
+    // => 모두 반시계방향인 경우
     if(i == j || i > n || j > n){ 
         cout << sqrt(dist(start, end)) << "\n"; 
         return; 
     }
 
-    i %= n; j %= n;
+    i %= n; j %= n;  // n이라면 0으로 보정
     
     // start -> i -> j -> end 인 경우
     double t1 = sqrt(dist(start, v[i])) + sqrt(dist(end, v[prv(j)]));
@@ -101,6 +106,7 @@ void solve(){
     double t2 = sqrt(dist(start, v[prv(i)])) + sqrt(dist(end, v[j]));
     for(int k=j; k!=prv(i); k=nxt(k)) t2 += sqrt(dist(v[k], v[nxt(k)]));
 
+    // 두 경우 중 최소값
     cout << min(t1, t2) << '\n';
 }
 
