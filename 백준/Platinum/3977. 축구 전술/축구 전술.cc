@@ -61,10 +61,10 @@ int dfs(int x){
 
 void init(int N){
     id = 0;
-    memset(d, -1, sizeof(d));
-    memset(finished, false, sizeof(finished));
-    memset(SCCID, -1, sizeof(SCCID));
-    memset(indegree, 0, sizeof(indegree));
+    memset(d, -1, sizeof(int)*N);
+    memset(finished, false, sizeof(bool)*N);
+    memset(SCCID, -1, sizeof(int)*N);
+    memset(indegree, 0, sizeof(int)*N);
     for (int i=0; i<N; i++) v[i].clear();
     SCC.clear();
 }
