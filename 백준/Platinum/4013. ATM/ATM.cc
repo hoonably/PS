@@ -12,6 +12,8 @@ SCC안에 있는 ATM은 어차피 사이클을 돌면서 무조건 다 인출할
 SCC를 하나의 노드라고 생각하면
 사이클이 없기 때문에 위상정렬이 가능하다.
 위상정렬을 하면서 dp를 갱신하면 된다.
+
+이 문제에서는 SCC를 굳이 2차원 벡터로 구할 필요가 없다. sccSize와 어떤 SCC에 속하는지만 알면 된다.
 */
 
 // 인수가 idx
@@ -48,11 +50,9 @@ int dfs(int x){
 
     // 부모 노드가 자신인 경우 (사이클인 경우)
     if (parent == d[x]){
-        vector<int> scc;
         while(true){
             int t = s.top();
             s.pop();
-            scc.push_back(t);
             sccID[t] = sccSize;  // 그룹 번호 저장
             finished[t] = true;
             if (t==x) break;
