@@ -14,23 +14,25 @@ SCC를 하나의 노드라고 생각하면
 위상정렬을 하면서 dp를 갱신하면 된다.
 */
 
+// 인수가 idx
 int id;  // 부모값을 초기화 하는 변수
 int d[MAX];  // SCC 부모값을 저장하는 배열
 bool finished[MAX];
-int S, P;
+int sccID[MAX];
+vector<int> graph[MAX];
 
 // 인수가 SCC
 int sccSize;
-int sccID[MAX];
 int sccMoney[MAX];  // SCC에 ATM에 돈이 얼마나 있는지 합
 bool sccRest[MAX];  // 레스토랑이 있는 SCC인지
 int sccIndegree[MAX];  // 진입차수
-
-vector<int> graph[MAX], sccGraph[MAX];
+int sccDp[MAX];
+vector<int> sccGraph[MAX];
 vector<vector<int>> SCC;
 stack<int> s;
 
-int dp[MAX];
+
+int S, P;
 
 // DFS는 총 정점의 갯수만큼 식행 된다.
 int dfs(int x){
@@ -71,8 +73,8 @@ void topology_sort() {
 	}
 
     // 시작 SCC는 무조건 돈 뽑음
-    dp[sccID[S]] = sccMoney[sccID[S]];
-    bool flag = false;  // 시작점 나온 이후부터는 true로 바뀌어 dp 갱신
+    sccDp[sccID[S]] = sccMoney[sccID[S]];
+    bool flag = false;  // 시작점 나온 이후부터는 true로 바뀌어 sccDp 갱신
 
 	for (int rep = 0; rep < sccSize; rep++) {
 		int now = q.front();
@@ -83,7 +85,7 @@ void topology_sort() {
 
 		for (int next : sccGraph[now]) {
             if (flag){
-                dp[next] = max(dp[next], dp[now]+sccMoney[next]);
+                sccDp[next] = max(sccDp[next], sccDp[now]+sccMoney[next]);
             }
 			sccIndegree[next]--;
 			if (sccIndegree[next] == 0)
@@ -124,12 +126,6 @@ void solve(){
         sccMoney[sccID[i]]+=m;
     }
 
-    // for (int i=0; i<sccSize; i++){
-    //     cout << i << "번 SCC : ";
-    //     for (int j : SCC[i]) cout << j << ' ';
-    //     cout << "(money : " << sccMoney[i] << ")\n";
-    // }
-
     // 시작지점과 레스토랑 위치 받기
     cin >> S >> P;
     for (int i=0; i<P; i++){  // 레스토랑이 있는 SCC 체크
@@ -138,12 +134,12 @@ void solve(){
         sccRest[sccID[r]] = true;
     }
 
-    topology_sort();// 위상정렬 하면서 dp 갱신
+    topology_sort();// 위상정렬 하면서 sccDp 갱신
 
     int ans = 0;
     for (int i=0; i<sccSize; i++){  // 레스토랑이 있는 SCC 중 최대값 구하기
         if (sccRest[i]){
-            ans = max(ans, dp[i]);
+            ans = max(ans, sccDp[i]);
         }
     }
     cout << ans;
