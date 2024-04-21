@@ -28,7 +28,6 @@ bool sccRest[MAX];  // 레스토랑이 있는 SCC인지
 int sccIndegree[MAX];  // 진입차수
 int sccDp[MAX];
 vector<int> sccGraph[MAX];
-vector<vector<int>> SCC;
 stack<int> s;
 
 
@@ -54,11 +53,11 @@ int dfs(int x){
             int t = s.top();
             s.pop();
             scc.push_back(t);
-            sccID[t] = SCC.size();  // 그룹 번호 저장
+            sccID[t] = sccSize;  // 그룹 번호 저장
             finished[t] = true;
             if (t==x) break;
         }
-        SCC.push_back(scc);
+        sccSize++;
     }
 
     return parent;  // 자신의 부모 값을 반환
@@ -109,7 +108,6 @@ void solve(){
     for (int i=1; i<=N; i++){
         if (d[i]==0) dfs(i);
     }
-    sccSize = SCC.size();
 
     // SCC 그래프 생성 + 진입차수 갱신
     for (int cur = 1; cur <= N; ++cur) 
