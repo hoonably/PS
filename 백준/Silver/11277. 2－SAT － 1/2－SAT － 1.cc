@@ -1,72 +1,51 @@
-	#include <cstdio>
-#include <vector>
+#include <bits/stdc++.h>
 using namespace std;
- 
-int n, m, ans;
-vector<pair<int, int>> v;
-vector<bool> state;
- 
-void dfs(int depth) {
- 
-	if (depth == n + 1) {
- 
-		bool chk = true;
-		for (int i = 1; i < v.size(); ++i)
-		{
-			bool l, r;
-			if (v[i].first < 0)
-			{
-				l = !state[-v[i].first];
-			}
+typedef long long ll;
+typedef pair<int,int> pii;
+#define MAX
+
+/*
+
+*/
+
+int N, M;
+pair<int, int> clauses[100]; // clause 저장
+bool boolean[20]; // x_n의 값
+
+void bt(int k) {
+	if (k == N + 1) {
+		for (int i = 0;i < M;i++) {
+			bool a, b;
+
+			if (clauses[i].first < 0)
+				a = !boolean[-clauses[i].first];
 			else
-			{
-				l = state[v[i].first];
-			}
- 
-			if (v[i].second < 0) {
- 
-				r = !state[-v[i].second];
-			}
+				a = boolean[clauses[i].first];
+
+			if (clauses[i].second < 0)
+				b = !boolean[-clauses[i].second];
 			else
-			{
-				r = state[v[i].second];
-			}
- 
-			if (l == false && r == false)
-				chk = false;
- 
- 
+				b = boolean[clauses[i].second];
+
+			if ((a || b) == false) return;
 		}
-		if (chk) 
-			ans = 1;
-		
- 
-		return;
+        cout << 1;
+        exit(0);
 	}
- 
-	for (int i = 0; i < 2; ++i) {
-		if (i == 0) {
-			state[depth] = true;
-		}
-		else {
-			state[depth] = false;
-		}
-		dfs(depth + 1);
-	}
+
+	boolean[k] = true;
+	bt(k + 1);
+
+	boolean[k] = false;
+	bt(k + 1);
 }
- 
-int main()
-{
-	scanf("%d %d", &n, &m);
-	v.resize(m + 1);
-	state.resize(n + 1, true);
- 
-	for (int i = 1; i <= m; ++i)
-		scanf("%d %d", &v[i].first, &v[i].second);
- 
-	dfs(1);
- 
-	printf("%d", ans);
- 
-	return 0;
+
+int main() {
+	cin >> N >> M;
+	for (int i = 0; i < M; i++) {
+		cin >> clauses[i].first >> clauses[i].second;
+	}
+
+	bt(1);
+	cout << 0;
 }
