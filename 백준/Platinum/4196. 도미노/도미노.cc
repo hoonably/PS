@@ -10,10 +10,11 @@ SCC를 구하는 타잔 알고리즘(Tarjan's Algorithm) 이지만,
 => indegree가 0인 SCC의 개수가 답
 */
 
+int sccSize;
 int id;  // 부모값을 초기화 하는 변수
 int d[MAX];  // SCC 부모값을 저장하는 배열
 bool finished[MAX];
-int group[MAX];  // 각 도미도(노드)가 몇 번째 SCC에 속하는지 그룹으로 기록하는 배열
+int SCCID[MAX];  // 각 도미도(노드)가 몇 번째 SCC에 속하는지 그룹으로 기록하는 배열
 int indegree[MAX];  // 각 SCC를 하나의 정점으로 간주하고 정점의 진입 차수를 기록하는 배열
 vector<int> v[MAX];
 vector<vector<int>> SCC;
@@ -34,16 +35,14 @@ int dfs(int x){
 
     // 부모 노드가 자신인 경우 (사이클인 경우)
     if (parent == d[x]){
-        vector<int> scc;
         while(true){
             int t = s.top();
             s.pop();
-            scc.push_back(t);
-            group[t] = SCC.size() + 1;  // 그룹 번호 저장
+            SCCID[t] = sccSize;  // 그룹 번호 저장
             finished[t] = true;
             if (t==x) break;
         }
-        SCC.push_back(scc);
+        sccSize++;
     }
 
     return parent;  // 자신의 부모 값을 반환
@@ -51,11 +50,12 @@ int dfs(int x){
 
 void init(int N){
     id = 0;
-    memset(d, -1, sizeof(int)*(N+1));
-    memset(finished, false, sizeof(bool)*(N+1));
-    memset(indegree, 0, sizeof(int)*(N+1));
+    sccSize = 0;
+    memset(d, -1, sizeof(d));
+    memset(finished, false, sizeof(finished));
+    // SCCID는 사실 초기화 할 필요가 없음 모두 다 함수에서 새로 지정이 되므로
+    memset(indegree, 0, sizeof(indegree));
     for (int i=1; i<=N; i++) v[i].clear();
-    SCC.clear();
 }
 
 void solve(){
@@ -79,15 +79,15 @@ void solve(){
         for (int w : v[i]){  // i번 도미노에 연결된 도미노들 중 
             // 서로 다른 그룹이라면 그 그룹의 진입차수 증가시킴
             // 왜냐면 i를 무너뜨리면 w가 속해있는 그룹도 무너지는것이므로
-            if (group[w]!=group[i]){ 
-                indegree[group[w]]++;  
+            if (SCCID[w]!=SCCID[i]){ 
+                indegree[SCCID[w]]++;  
             }
         }
     }
     
     // 이제 indegree(진입차수)가 0인 곳의 개수를 출력
     int ans = 0;
-    for (int i=0; i<SCC.size(); i++){
+    for (int i=0; i<sccSize; i++){
         if (indegree[i]==0) ans++;
     }
     cout << ans << '\n';
