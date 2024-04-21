@@ -84,7 +84,7 @@ int main(){
 
     // Check
     for(int i=2; i<=2*N; i+=2) {
-        if(sccID[i] == sccID[i+1]) {  // 하나의 idx에 A와 !A가 모두 참 : 불가능하단 소리
+        if(sccID[i] == sccID[i^1]) {  // 하나의 idx에 A와 !A가 모두 참 : 불가능하단 소리
             cout << 0 << '\n';
             return 0;
         }
