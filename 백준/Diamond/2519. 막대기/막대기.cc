@@ -7,6 +7,13 @@ typedef pair<int,int> pii;
 /*
 자신의 막대기 3개중 하나만 제거할 수 있기 때문에,
 a막대기를 제거하면 b와 c는 무조건 있어야 한다.
+
+또한 d가 e, f와 만난다면
+d가 제거가 안된다면 e를 제거해야한다.
+e가 제거가 안된다면 d를 제거해야한다.
+
+d가 제거가 안된다면 f를 제거해야한다.
+f가 제거가 안된다면 d를 제거해야한다.
 */
 
 #define x first
@@ -31,12 +38,12 @@ int id, sccSize;
 int d[6*MAX];
 bool finished[6*MAX];
 int sccID[6*MAX];
-
 vector<int> graph[6*MAX];
+
 vector<vector<int>> SCC;
 stack<int> s;
 
-// 램프의 색을 출력하기 위한 배열
+// 제거한 막대기의 번호를 출력하기 위한 배열
 bool visited[6*MAX];
 vector<int> deleteLine;
 
@@ -49,11 +56,12 @@ int ccw(const dot &p1, const dot &p2, const dot &p3){
 bool Cross(dot s1, dot e1, dot s2, dot e2){
     auto cw1 = ccw(s1, e1, s2) * ccw(s1, e1, e2);
     auto cw2 = ccw(s2, e2, s1) * ccw(s2, e2, e1);
-    if(cw1 == 0 && cw2 == 0){
-        if(e1 < s1) swap(s1, e1);
-        if(e2 < s2) swap(s2, e2);
-        return !(e1 < s2 || e2 < s1);
-    }
+    // 세 개의 끝점이 임의의 일직선상에 위치하는 경우는 없다. 
+    // if(cw1 == 0 && cw2 == 0){
+    //     if(e1 < s1) swap(s1, e1);
+    //     if(e2 < s2) swap(s2, e2);
+    //     return !(e1 < s2 || e2 < s1);
+    // }
     return cw1 <= 0 && cw2 <= 0;
 }
 
@@ -135,16 +143,16 @@ int main(){
         }
     }
 
-    // 가능하면 변수들의 R, B 값을 저장하여 출력
+    // 가능하면 제거한 막대기들을 저장하여 오름차순으로 출력
     // 이때 visited 표시는 짝수에만 함
     for (vector<int> scc : SCC) {
         for (int num : scc) {
-            // num의 값이 짝수(R)라면 그에 해당하는 순서의 변수를 R로
+            // num의 값이 짝수라면 남아있는 막대기
             if (num%2==0) {
                 if (visited[num]) continue;
                 visited[num] = true;
             }
-            // num의 값이 홀수라면 지운거니까 답에 넣어줌
+            // num의 값이 홀수라면 제거한 막대기니까 답에 넣어줌
             else {
                 if (visited[num^1]) continue;
                 deleteLine.push_back(num/2);
