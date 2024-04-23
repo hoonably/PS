@@ -15,36 +15,33 @@ int N, M, K;
 ll arr[MAX];
 vector<ll> segTree;
 
-// 아래로 내려가면서 초기화
-ll init(int start, int end, int node) {
+ll init(int node, int start, int end) {
     if (start == end)
         return segTree[node] = arr[start];
-    int mid = (start + end) >> 1;
-    return segTree[node] = init(start, mid, node * 2) 
-    + init(mid + 1, end, (node * 2) + 1);
+    int mid = (start + end) / 2;
+    return segTree[node] = init(node*2, start, mid) 
+    + init(node*2 + 1, mid + 1, end);
 }
 
-// 위로 올라가면서 업데이트
-void update(int start, int end, int target, ll diff, int node){
+void update(int node, int start, int end, int target, ll diff){
     if (target > end || target < start)
         return;
     segTree[node] += diff;
     if (start == end)
         return;
     int mid = (start + end) / 2;
-    update(start, mid, target, diff, node * 2);
-    update(mid + 1, end, target, diff, (node * 2) + 1);
+    update(node*2, start, mid, target, diff);
+    update(node*2 + 1, mid + 1, end, target, diff);
 }
 
-// 
-ll sum(int start, int end, int left, int right, int node){
+ll sum(int node, int start, int end, int left, int right){
     if (left > end || right < start)
         return 0;
     if (left <= start && right >= end)
         return segTree[node];
     int mid = (start + end) / 2;
-    return sum(start, mid, left, right, node * 2) 
-    + sum(mid + 1, end, left, right, (node * 2) + 1);
+    return sum(node*2, start, mid, left, right) 
+    + sum(node*2 + 1, mid + 1, end, left, right);
 }
 
 int main(){
@@ -63,7 +60,7 @@ int main(){
     }
 
     // 트리 생성
-    init(1, N, 1);
+    init(1, 1, N);
 
     for (int i=0; i<M+K; i++){
         ll a, b, c;
@@ -73,11 +70,11 @@ int main(){
         if (a==1){
             ll diff = c - arr[b];  // 새로운 수 - 기존 수
             arr[b] = c;
-            update(1, N, b, diff, 1); 
+            update(1, 1, N, b, diff); 
         }
         // b번째수 ~ C번째 수 합 구하기
         else {
-            cout << sum(1, N, b, c, 1) << "\n";
+            cout << sum(1, 1, N, b, c) << "\n";
         }
     }
     
