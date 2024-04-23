@@ -20,7 +20,8 @@ ll init(int start, int end, int node) {
     if (start == end)
         return segTree[node] = arr[start];
     int mid = (start + end) >> 1;
-    return segTree[node] = init(start, mid, node << 1) + init(mid + 1, end, (node << 1) + 1);
+    return segTree[node] = init(start, mid, node * 2) 
+    + init(mid + 1, end, (node * 2) + 1);
 }
 
 // 위로 올라가면서 업데이트
@@ -30,9 +31,9 @@ void update(int start, int end, int target, ll diff, int node){
     segTree[node] += diff;
     if (start == end)
         return;
-    int mid = (start + end) >> 1;
-    update(start, mid, target, diff, node << 1);
-    update(mid + 1, end, target, diff, (node << 1) + 1);
+    int mid = (start + end) / 2;
+    update(start, mid, target, diff, node * 2);
+    update(mid + 1, end, target, diff, (node * 2) + 1);
 }
 
 // 
@@ -41,8 +42,9 @@ ll sum(int start, int end, int left, int right, int node){
         return 0;
     if (left <= start && right >= end)
         return segTree[node];
-    int mid = (start + end) >> 1;
-    return sum(start, mid, left, right, node << 1) + sum(mid + 1, end, left, right, (node << 1) + 1);
+    int mid = (start + end) / 2;
+    return sum(start, mid, left, right, node * 2) 
+    + sum(mid + 1, end, left, right, (node * 2) + 1);
 }
 
 int main(){
