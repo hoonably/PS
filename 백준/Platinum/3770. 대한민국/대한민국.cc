@@ -11,11 +11,12 @@ swap의 개수 : 자신보다 작은 수의 개수
 */
 
 int N, M, K;
-int arr[MAX];
+pii edges[400'000];  // 고속도로
 
 struct FenwickTree {
     vector<int> tree;
 
+    // 생성자
     FenwickTree(int n) : tree(n+1) {};
 
     int sum(int pos) {
@@ -24,7 +25,6 @@ struct FenwickTree {
             ret += tree[pos];
             pos &= (pos - 1);
         }
-
         return ret;
     }
 
@@ -41,27 +41,22 @@ struct FenwickTree {
 };
 
 ll solve(){
-    vector<pair<int, int>> edges;
-
     int N, M, K;
     cin >> N >> M >> K;
 
-    FenwickTree fwt(1001);
+    FenwickTree fwTree(1001);
 
     for (int i = 0; i < K; i++) {
-        int s, e;
-        cin >> s >> e;
-        edges.push_back({s, e});
+        cin >> edges[i].first >> edges[i].second;
     }
-
-    sort(edges.begin(), edges.end());
+    sort(edges, edges+K);
 
     ll ans = 0;
     for (int i = 0; i < K; i++) {
         if (edges[i].second != M) {
-            ans += fwt.sum(M - edges[i].second);
+            ans += fwTree.sum(M - edges[i].second);
         }
-        fwt.add(M + 1 - edges[i].second, 1);
+        fwTree.add(M + 1 - edges[i].second, 1);
     }
     return ans;
 }
