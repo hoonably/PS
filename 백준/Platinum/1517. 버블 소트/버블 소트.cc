@@ -2,7 +2,7 @@
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii;
-#define MAX 500001
+#define MAX 500'001
 
 /*
 세그먼트 트리로 버블소트할때 swap이 몇번 발생할지
@@ -16,14 +16,14 @@ pair<ll,ll> arr[MAX];
 vector<ll> segTree;
 
 // i > j를 만족하는 것의 개수만 카운트
-ll query(int node, int start, int end, int left, int right){
+ll sum(int node, int start, int end, int left, int right){
     if (left > end || right < start)
         return 0;
     if (left <= start && right >= end)
         return segTree[node];
     int mid = (start + end) / 2;
-    return query(node*2, start, mid, left, right) 
-    + query(node*2 + 1, mid + 1, end, left, right);
+    return sum(node*2, start, mid, left, right) 
+    + sum(node*2 + 1, mid + 1, end, left, right);
 }
 
 // 카운트 후 업데이트
@@ -60,7 +60,8 @@ int main(){
     ll ans = 0;
     for (int i=0; i<N; i++){
         int idx = arr[i].second;
-        ans += query(1, 0, N-1, idx+1, N-1);
+        // idx보다 큰 수의 개수 찾기
+        ans += sum(1, 0, N-1, idx+1, N-1);
         update(1, 0, N-1, idx);
     }
     cout << ans;
