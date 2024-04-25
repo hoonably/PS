@@ -11,7 +11,7 @@ typedef pair<int,int> pii;
 세그먼트 트리로 구간에 있는 수의 갯수를 사용
 */
 
-int segTree[4*MAX];
+vector<int> segTree;
 
 // diff가 1이라면 추가, -1이라면 삭제
 void update(int node, int s, int e, int target, int diff){
@@ -36,10 +36,10 @@ int find(int node, int s, int e, int k) {
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
 
-    // // 트리의 크기
-    // int h = ceil(log2(MAX));  // ceil : 정수로 올림
-    // int treeSize = 1 << (h + 1);
-    // segTree.resize(treeSize);
+    // 트리의 크기
+    int h = ceil(log2(MAX));  // ceil : 정수로 올림
+    int treeSize = 1 << (h + 1);
+    segTree.resize(treeSize);
     
     int N;
     cin >> N;
