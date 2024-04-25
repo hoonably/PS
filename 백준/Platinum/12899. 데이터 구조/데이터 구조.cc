@@ -15,15 +15,14 @@ int segTree[4*MAX];
 
 // diff가 1이라면 추가, -1이라면 삭제
 void update(int node, int s, int e, int target, int diff){
-    if (target > e || target < s) return;
-    if (s == e){
-        segTree[node] += diff;
+    if (target > e || target < s)
         return;
-    }
+    segTree[node] += diff;
+    if (s == e)
+        return;
     int mid = (s + e) / 2;
     update(node*2, s, mid, target, diff);
     update(node*2 + 1, mid + 1, e, target, diff);
-    segTree[node] = segTree[2 * node] + segTree[2 * node + 1];
 }
 
 // k번째 수 찾기
