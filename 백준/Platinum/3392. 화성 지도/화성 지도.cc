@@ -80,15 +80,11 @@ int main(){
     sort(v.begin(), v.end());  // x기준 정렬
     
     int ans = 0;
-    for (int i = 0; i < 2*N; i++) {
-        if (i) ans += (segTree[1] * (v[i].x - v[i - 1].x));
+    update(1, 0, MAX, v[0].y1, v[0].y2-1, v[0].finish);
+    for (int i = 1; i < v.size(); i++) {
+        ans += (segTree[1] * (v[i].x - v[i - 1].x));
         update(1, 0, MAX, v[i].y1, v[i].y2-1, v[i].finish);
     }
-    // update(1, 0, MAX, v[0].y1, v[0].y2, v[0].finish);
-    // for (int i = 1; i < v.size(); i++) {
-    //     ans += (segTree[1] * (v[i].x - v[i-1].x));
-    //     update(1, 0, MAX, v[i].y1, v[i].y2, v[i].finish);
-    // }
     cout << ans;
 
     return 0;
