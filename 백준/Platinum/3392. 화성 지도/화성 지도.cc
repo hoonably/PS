@@ -81,7 +81,7 @@ int main(){
     
     int ans = 0;
     update(1, 0, MAX, v[0].y1, v[0].y2-1, v[0].finish);
-    for (int i = 1; i < v.size(); i++) {
+    for (int i = 1; i < 2*N; i++) {
         ans += (segTree[1] * (v[i].x - v[i - 1].x));
         update(1, 0, MAX, v[i].y1, v[i].y2-1, v[i].finish);
     }
