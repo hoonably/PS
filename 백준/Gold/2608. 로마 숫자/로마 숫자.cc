@@ -31,18 +31,12 @@ public:
         return romannum;
     }
 
-    int roman_to_integer() {
-        string r = this->roman;
+    int roman_to_integer(string r) {
         int len = r.length();
         int result = 0;
         map<char, int> roman_map = {
-            {'I', 1},
-            {'V', 5},
-            {'X', 10},
-            {'L', 50},
-            {'C', 100},
-            {'D', 500},
-            {'M', 1000}
+            {'I', 1}, {'V', 5}, {'X', 10}, {'L', 50}, 
+            {'C', 100}, {'D', 500}, {'M', 1000}
         };
         for (int i = 0; i < len; i++) {
             result += roman_map[r[i]];
@@ -59,23 +53,24 @@ public:
                 result -= 100 + 100; // Subtract 100 for C and add 100 for D or M
             }
         }
-        this->integer = result; // Update integer value
         return result;
     }
 
+    // 합연산
     roman_numeral &operator+=(roman_numeral const &other){
         this->integer += other.integer; // Update integer value
         this->roman = integer_to_roman(this->integer); // Update roman value
         return *this;
     }
 
+    // 아라비아 숫자, 로마 숫자 출력
     friend ostream &operator<<(ostream &out, roman_numeral const &f){
         return out << f.integer << '\n' << f.roman;
     }
 
     friend istream &operator>>(istream &in, roman_numeral &f) {
         in >> f.roman;
-        f.roman_to_integer();
+        f.integer = f.roman_to_integer(f.roman);  // 아라비아 숫자 바로 구해놓기
         return in;
     }
 };
