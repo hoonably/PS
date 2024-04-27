@@ -24,7 +24,7 @@
 
 <p>V형 별자리를 명확하게 정의하면 다음과 같다. 세 별 (s,t,u)가 <b>s.x < t.x < u.x</b>이고 <b>s.y > t.y < u.y</b>이면 V형 별자리이다. 예를 들어 아래의 '정보섬의 밤하늘 참고도'에서 (a,b,c)는 V형 별자리를 이루지만 (d,b,c)는 d.x < b.x가 아니므로 V형 별자리가 아니다. V형 별자리의 개수를 셀 때, 한 별이 여러 별자리에 속할 수 있다.</p>
 
-<p style="text-align: center;"><img alt="" src="https://upload.acmicpc.net/dbf080bd-9e82-4a6b-af2e-4e3043244970/-/preview/"></p>
+<p style="text-align: center;"><img alt="" src=""></p>
 
 <p>답이 매우 커질 수 있으므로 (10<sup>9</sup>+7)로 나눈 나머지를 출력한다.</p>
 
