@@ -34,8 +34,6 @@ int main(){
             st.pop();
         }
     }
-    sort(idxPair.begin(), idxPair.end(),cmp);
-
 
     // 비트마스킹 조합 
 	vector<string> ans;
@@ -56,7 +54,11 @@ int main(){
 		tmp.erase(remove(tmp.begin(), tmp.end(), '.'), tmp.end());
 		ans.emplace_back(tmp);
 	}
-	sort(ans.begin(), ans.end()); 
+
+    // 정렬
+	sort(ans.begin(), ans.end());
+
+    // 중복 제거
     ans.erase(unique(ans.begin(), ans.end()), ans.end());
 
 	for (string answer : ans)
