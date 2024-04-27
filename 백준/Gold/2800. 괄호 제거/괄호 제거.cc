@@ -10,23 +10,16 @@ typedef pair<int,int> pii;
 */
 
 string str;
-int len;
 vector<pii> idxPair;
-bool visited[10];
 int pairCnt;
-
-bool cmp(pii a, pii b){
-    return a.first > b.first;
-}
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
     cin >> str;
-    len = str.length();
 
     stack<int> st;
-    for (int i=0; i<len; i++){
+    for (int i=0; i<str.length(); i++){
         if (str[i]=='(') st.push(i);
         else if (str[i]==')'){
             pairCnt++;
