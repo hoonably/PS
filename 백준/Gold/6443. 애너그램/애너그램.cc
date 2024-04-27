@@ -5,39 +5,50 @@ typedef pair<int,int> pii;
 #define MAX
 
 /*
-
+next_permutation 이용
 */
 
-set<char> s;
-int len;
-int remain[26];
+// set<char> s;
+// int len;
+// int remain[26];
 
-void backtracking(int depth, string res){
-    if (depth==len){
-        cout << res << '\n';
-    }
-    for (char c : s){
-        if (remain[c-'a']==0) continue;
-        remain[c-'a']--;
-        backtracking(depth+1, res+c);
-        remain[c-'a']++;
-    }
-}
+// void backtracking(int depth, string res){
+//     if (depth==len){
+//         cout << res << '\n';
+//     }
+//     for (char c : s){
+//         if (remain[c-'a']==0) continue;
+//         remain[c-'a']--;
+//         backtracking(depth+1, res+c);
+//         remain[c-'a']++;
+//     }
+// }
 
-void init(){
-    memset(remain, 0, sizeof(remain));
-    s.clear();
-}
+// void init(){
+//     memset(remain, 0, sizeof(remain));
+//     s.clear();
+// }
+
+// void solve(){
+//     init();
+//     string str;
+//     cin >> str;
+//     len = str.size();
+//     for (char c : str) {
+//         s.emplace(c);
+//         remain[c-'a']++;
+//     }
+//     backtracking(0,"");
+// }
 
 void solve(){
-    string str;
-    cin >> str;
-    len = str.size();
-    for (char c : str) {
-        s.emplace(c);
-        remain[c-'a']++;
-    }
-    backtracking(0,"");
+    string s;
+    cin >> s;
+    sort(s.begin(), s.end());
+
+    do {
+        cout << s << '\n';
+    } while (next_permutation(s.begin(), s.end()));
 }
 
 int main(){
@@ -46,7 +57,6 @@ int main(){
     int N;
     cin >> N;
     while(N--){
-        init();
         solve();
     }
     
