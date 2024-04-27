@@ -9,8 +9,7 @@ typedef pair<int,int> pii;
 1. 어떤 문자를 K개 포함하는 가장 짧은 문자열의 길이 구하기
 2. 어떤 문자를 K개 포함하는 가장 긴 문자열의 길이 구하기 (양 끝은 K)
 
-슬라이딩 윈도우
-=> 투 포인터 사용
+
 */
 
 void solve(){
@@ -19,26 +18,22 @@ void solve(){
     cin >> W;
     cin >> K;
 
-    vector<int> count(26);  // 문자열 별로 등장 빈도수 기록
-    for (char c : W) count[c-'a']++;
+    // 각 문자가 나오는 위치 저장
+    vector<int> v[26];
+    for (int i = 0; i < W.size(); i++) {
+        v[W[i] - 'a'].push_back(i);
+    }
 
     int mini = 1e9;
     int maxi = -1;
 
-    for (int i = 0; i < W.length(); ++i) {
-        // ⭐ 빈도수가 K 개 미만인 문자들은 문자열도 못 만들므로 패스
-        if (count[W[i] - 'a'] < K)
-            continue;
-
-        int cnt = 0;
-        for (int j = i; j < W.length(); ++j) {  // 연속 문자열의 시작 문자 W[i]
-            if (W[i] == W[j])
-                cnt++;
-            
-            if (cnt == K) {  // 카운트 수가 K 와 같을 때 길이 업데이트
-                mini = min(mini, j - i + 1);
-                maxi = max(maxi, j - i + 1);
-                break;
+    // 각 문자별로 진행
+    // 나온 시작 지점과 K번째 후 지점
+    for (int i = 0; i < 26; i++){
+        if (v[i].size() >= K){
+            for (int j = 0; j <= v[i].size() - K; j++){
+                mini = min(mini, v[i][j + K - 1] - v[i][j] + 1);
+                maxi = max(maxi, v[i][j + K - 1] - v[i][j] + 1);
             }
         }
     }
