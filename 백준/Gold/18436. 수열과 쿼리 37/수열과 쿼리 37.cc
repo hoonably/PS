@@ -10,11 +10,11 @@ typedef pair<int,int> pii;
 */
 
 int N, M;
-ll arr[MAX];
-vector<ll> segTree;
+bool arr[MAX];
+vector<int> segTree;
 
 // 구간합 초기화
-ll init(int node, int s, int e) {
+int init(int node, int s, int e) {
     if (s == e)
         return segTree[node] = arr[s];
     int mid = (s + e) / 2;
@@ -33,7 +33,7 @@ void update(int node, int s, int e, int idx, int diff){
 }
 
 // left~right 구간합
-ll sum(int node, int s, int e, int left, int right){
+int sum(int node, int s, int e, int left, int right){
     if (left > e || right < s)
         return 0;
     if (left <= s && right >= e)
