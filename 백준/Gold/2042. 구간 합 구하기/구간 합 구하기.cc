@@ -15,33 +15,34 @@ int N, M, K;
 ll arr[MAX];
 vector<ll> segTree;
 
-ll init(int node, int start, int end) {
-    if (start == end)
-        return segTree[node] = arr[start];
-    int mid = (start + end) / 2;
-    return segTree[node] = init(node*2, start, mid) 
-    + init(node*2 + 1, mid + 1, end);
+// 구간합 초기화
+ll init(int node, int s, int e) {
+    if (s == e)
+        return segTree[node] = arr[s];
+    int mid = (s + e) / 2;
+    return segTree[node] = init(node*2, s, mid) 
+    + init(node*2 + 1, mid + 1, e);
 }
 
-void update(int node, int start, int end, int target, ll diff){
-    if (target > end || target < start)
-        return;
+// idx 인덱스의 숫자를 diff만큼 변화
+void update(int node, int s, int e, int idx, ll diff){
+    if (idx > e || idx < s) return;
     segTree[node] += diff;
-    if (start == end)
-        return;
-    int mid = (start + end) / 2;
-    update(node*2, start, mid, target, diff);
-    update(node*2 + 1, mid + 1, end, target, diff);
+    if (s == e) return;
+    int mid = (s + e) / 2;
+    update(node*2, s, mid, idx, diff);
+    update(node*2 + 1, mid + 1, e, idx, diff);
 }
 
-ll sum(int node, int start, int end, int left, int right){
-    if (left > end || right < start)
+// left~right 구간합
+ll sum(int node, int s, int e, int left, int right){
+    if (left > e || right < s)
         return 0;
-    if (left <= start && right >= end)
+    if (left <= s && right >= e)
         return segTree[node];
-    int mid = (start + end) / 2;
-    return sum(node*2, start, mid, left, right) 
-    + sum(node*2 + 1, mid + 1, end, left, right);
+    int mid = (s + e) / 2;
+    return sum(node*2, s, mid, left, right) 
+    + sum(node*2 + 1, mid + 1, e, left, right);
 }
 
 int main(){
@@ -52,7 +53,7 @@ int main(){
     // 트리의 크기
     int h = ceil(log2(N+1));  // ceil : 정수로 올림
     int treeSize = 1 << (h + 1);
-    segTree = vector<ll>(treeSize);
+    segTree.resize(treeSize);
 
     // arr[0]=0 으로 설정
     for (int i=1; i<=N; i++){
