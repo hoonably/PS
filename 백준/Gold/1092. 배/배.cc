@@ -2,7 +2,7 @@
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii;
-#define FOR(i,a,b) for(int i=(a);i<(b);i++)
+#define FOR(i,a,box) for(int i=(a);i<(box);i++)
 #define all(v) v.begin(), v.end()
 #define MAX 10000
 
@@ -10,8 +10,8 @@ typedef pair<int,int> pii;
 
 */
 
-bool cmp(int a, int b) {
-    return a > b;
+bool cmp(int a, int box) {
+    return a > box;
 }
 
 int main(){
@@ -44,15 +44,14 @@ int main(){
     // 가장 제한이 작은 크레인이 최대 몇개를 옮길 수 있는지
     while (!box.empty()) {
         cnt++;
+        int idx = 0;
         // 크레인 가장 큰 무게 부터
         for (int i = 0; i < crain.size(); i++) {
-            // 상자 가장 큰 무게 부터
-            for (int j = 0; j < box.size(); j++) {
-                // 옮길 수 있으면 삭제하고 다음 크레인으로
-                if (crain[i] >= box[j]) {
-                    box.erase(box.begin() + j);
-                    break;
-                }
+            while (idx < box.size() && box[idx] > crain[i]) {
+                idx++;
+            }
+            if (idx < box.size()) {
+                box.erase(box.begin() + idx);  // 처리된 박스 제거
             }
         }
     }
