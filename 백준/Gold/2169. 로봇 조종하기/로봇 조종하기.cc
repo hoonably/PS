@@ -15,7 +15,7 @@ const int MOD = 1'000'000'007;
 
 */
 
-int n, m;
+int N, M;
 int arr[1010][1010];
 int dp[1010][1010][3];
 // Down, ->, <-
@@ -25,11 +25,11 @@ int main() {
     ios_base::sync_with_stdio(false);
     // Stream Init
 
-    cin >> n >> m;
+    cin >> N >> M;
 
 
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= M; j++) {
             cin >> arr[i][j];
         }
     }
@@ -37,33 +37,32 @@ int main() {
     memset(dp, -INF, sizeof(dp));
 
     // 첫째줄 초기화
-    dp[0][0][1] = arr[0][0];
-    for (int i = 1; i < m; i++)
-        dp[0][i][1] = dp[0][i - 1][1] + arr[0][i];
+    dp[1][1][1] = arr[1][1];
+    for (int i = 2; i <= M; i++)
+        dp[1][i][1] = dp[1][i - 1][1] + arr[1][i];
     
-    for (int i = 1; i < n; i++) {
-        for (int j = 0; j < m; j++) {
+    for (int i = 2; i <= N; i++) {
+
+        // 아래쪽 갱신
+        for (int j = 1; j <= M; j++) {
             dp[i][j][0] = arr[i][j];
             dp[i][j][0] += max({ dp[i - 1][j][0] ,dp[i - 1][j][1] ,dp[i - 1][j][2] });
         }
-        // Down
 
-
-        for (int j = 1; j < m; j++) {
+        // 오른쪽 방향으로 가는것 갱신
+        for (int j = 2; j <= M; j++) {
             dp[i][j][1] = arr[i][j];
             dp[i][j][1] += max(dp[i][j - 1][0], dp[i][j - 1][1]);
         }
-        // ->
 
-        for (int j = m - 2; j >= 0; j--) {
+        // 왼쪽 방향으로 가는것 갱신
+        for (int j = M - 1; j >= 1; j--) {
             dp[i][j][2] = arr[i][j];
             dp[i][j][2] += max(dp[i][j + 1][0], dp[i][j + 1][2]);
         }
-        // <-
     }
-    // DP
 
-    cout << max(dp[n - 1][m - 1][0], dp[n - 1][m - 1][1]);
+    cout << max(dp[N][M][0], dp[N][M][1]);
 
     return 0;
 }
@@ -123,7 +122,7 @@ int main() {
 //     //     for (int j=1; j<=M; j++){
 //     //         cout << dp[i][j] << ' ';
 //     //     }
-//     //     cout << '\n';
+//     //     cout << '\N';
 //     // }
 
 //     cout << dp[N][M];
