@@ -26,29 +26,26 @@ int N, K;
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
-    cin >> N >> K;
+	cin >> N >> K;
+    if (N <= K) {
+        cout << "0";
+        return 0;
+    }
 
-	int cnt = 0;
-	while(true){
-		int bottle = N + cnt;
-		
-        // 2의 제곱수들로 나눈 나머지 구하기
-        int count = 0;
-		while(bottle != 0){
-			if(bottle % 2 == 1){
-				count++;
-			}
-			bottle /= 2;
-		}
-		
-		if(count <= K){
-			break;
-		}
+    int tmp;
+    for (int i = 0; i < K; i++) {
+        tmp = 1;
+        while ((N + 1) / 2 > tmp)
+            tmp *= 2;
+        N -= tmp;
 
-        cnt++;
-	}
-
-	cout << cnt;
+        // K개로 만들 수 있음
+        if (K - (i + 1) >= N){
+            cout << "0";
+            return 0;
+        }
+    }
+    cout << tmp - N << '\n';
     
     return 0;
 }
