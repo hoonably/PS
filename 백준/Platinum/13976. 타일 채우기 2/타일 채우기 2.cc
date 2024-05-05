@@ -45,11 +45,8 @@ dp[N+2] = 4*dp[N] - dp[N-2]
 [ dp[x] ]    [1  0] [dp[x-2]]
 
 제곱 연산
-[ dp[N] ]  = [4 -1] N [dp[2]]
-[dp[N-2]]    [1  0]   [dp[0]]
-
-[ dp[N] ]  = [4 -1] N [3]
-[dp[N-2]]    [1  0]   [1]
+[dp[N+2]]  = [4 -1] N/2 [3]
+[ dp[N] ]    [1  0]     [1]
 */
 
 #define MAX 
@@ -108,8 +105,8 @@ int main(){
         return 0;
     }
 
-    // [ dp[N] ]  = [4 -1] N/2 [3]
-    // [dp[N-2]]    [1  0]     [1]
+    // [dp[N+2]]  = [4 -1] N/2 [3]
+    // [ dp[N] ]    [1  0]     [1]
 
     matrix base = { {{4,-1}, {1,0}} };
     matrix ans = { {3},{1} };
@@ -117,10 +114,8 @@ int main(){
     base = power(base, N/2);
     ans = base * ans;
 
-    cout << ans[1][0];
-    
-    // cout << ans[0][0] << ' ' << ans[0][1] << '\n'
-    // cout << ans[1][0] << ' ' << ans[1][1];
+    // cout << ans[0][0];  // 이건 N+2 항
+    cout << ans[1][0];  // 이게 N항
 
     return 0;
 }
