@@ -71,7 +71,7 @@ matrix operator*(matrix &A, matrix &B) {
                 temp[i][j] += A[i][k] * B[k][j];
                 temp[i][j] %= MOD;
             }
-            // temp[i][j] %= MOD;
+            temp[i][j] = (temp[i][j]+MOD) % MOD;  // 음수 모듈러 연산 방지
         }
     }
     return temp;
@@ -108,30 +108,19 @@ int main(){
         return 0;
     }
 
-    matrix A = {{4, -1}, {1, 0}};
-    matrix initial = {{1, 0}, {1, 0}};
-    matrix ans = {{1, 0}, {0, 1}};
-    N /= 2;
-    while (N) {
-        if (N & 1) ans = ans * A;
-        A = A * A;
-        N /= 2;
-    }
-    ans = ans * initial;
-    cout << (ans[0][0]+MOD) % MOD;
-
     // [ dp[N] ]  = [4 -1] N/2 [3]
     // [dp[N-2]]    [1  0]     [1]
 
-    // matrix base = { {{0,1},{-1,4}} };
-    // matrix ans = { {1},{3} };
+    matrix base = { {{4,-1}, {1,0}} };
+    matrix ans = { {3},{1} };
     
-    // base = power(base, N/2);
-    // ans = base * ans;
+    base = power(base, N/2);
+    ans = base * ans;
 
-    // cout << (ans[0][0]+MOD) % MOD;
+    cout << ans[1][0];  // 음수 모듈러 연산 방지
     
-    // cout << ans[0][0] << ' ' << ans[0][1] << '\N' << ans[1][0] << ' ' << ans[1][1];
+    // cout << ans[0][0] << ' ' << ans[0][1] << '\n'
+    // cout << ans[1][0] << ' ' << ans[1][1];
 
     return 0;
 }
