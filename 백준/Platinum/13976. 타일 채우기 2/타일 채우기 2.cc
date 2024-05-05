@@ -48,8 +48,8 @@ dp[N+2] = 4*dp[N] - dp[N-2]
 [ dp[N] ]  = [4 -1] N [dp[2]]
 [dp[N-2]]    [1  0]   [dp[0]]
 
-[ dp[N] ]  = [4 -1] N [1 0]
-[dp[N-2]]    [1  0]     [1 0]
+[ dp[N] ]  = [4 -1] N [3]
+[dp[N-2]]    [1  0]   [1]
 */
 
 #define MAX 
@@ -102,7 +102,7 @@ int main(){
     ll N;
     cin >> N;
 
-    // 홀수개의 타일을 채울 수 없음
+    // 홀수개의 타일은 절대 채울 수 없음
     if (N%2==1) {
         cout << "0";
         return 0;
@@ -117,7 +117,7 @@ int main(){
     base = power(base, N/2);
     ans = base * ans;
 
-    cout << ans[1][0];  // 음수 모듈러 연산 방지
+    cout << ans[1][0];
     
     // cout << ans[0][0] << ' ' << ans[0][1] << '\n'
     // cout << ans[1][0] << ' ' << ans[1][1];
