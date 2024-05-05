@@ -38,7 +38,7 @@ int dpf(int idx, int bit) {
     // 수정하는 부분
     int &ret = dp[idx][bit];
 
-    if (~ret) return ret;  // 이미 저장되어있다면 넘김
+    if (ret!=-1) return ret;  // 이미 저장되어있다면 넘김
 
     ret = 0;
     if (bit & 1) ret = dpf(idx + 1, bit >> 1);
