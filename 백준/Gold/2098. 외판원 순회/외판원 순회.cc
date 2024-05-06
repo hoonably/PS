@@ -14,32 +14,34 @@ int N;
 int W[16][16];
 int dp[16][1 << 16];
 
-int memo(int bt, int idx){
+int dpf(int bit, int now){
     // 다시 원래의 도시로 돌아오는 순회 여행 경로
     // 이기 때문에 0번 으로 돌아오는 것까지 생각해야한다.
-    if (bt == (1<<N)-1){ //탐색 완료
-        if(W[idx][0] == 0) //이동불가능
+    if (bit == (1<<N)-1){ //탐색 완료
+        if(W[now][0] == 0) //이동불가능
             return 1e9;
-        return W[idx][0];
+        return W[now][0];
     }
+
+    int &ret = dp[now][bit];
 
     // 이미 정해진 값이라면 PASS
-    if (dp[idx][bt] != -1) return dp[idx][bt];
+    if (ret != -1) return ret;
     
-    dp[idx][bt] = 1e9;
+    ret = 1e9;
     
     // 현재 안켜져있는 비트에 대해 재귀로 최소값 다지기
-    for (int i = 0; i < N; ++i){
+    for (int nxt = 0; nxt < N; ++nxt){
 
         // 갈 수 없는 경우
-        if (W[idx][i]==0) continue;
+        if (W[now][nxt]==0) continue;
 
-        // i번 비트가 0이라면 켜주고 재귀
-        if (!(bt & (1 << i)))
-            dp[idx][bt] = min(dp[idx][bt], W[idx][i] + memo(bt | (1 << i), i));
+        // 다음번 비트가 0이라면 켜주고 재귀
+        if ((bit & (1 << nxt))==0)
+            ret = min(ret, W[now][nxt] + dpf(bit | (1 << nxt), nxt));
     }
 
-    return dp[idx][bt];
+    return ret;
 }
 
 int main(){
@@ -54,7 +56,7 @@ int main(){
 
     memset(dp, -1, sizeof(dp));
  
-    cout << memo(1, 0);
+    cout << dpf(1, 0);
     
     
     return 0;
