@@ -13,60 +13,52 @@ const ll LINF = 0x7f7f7f7f7f7f7f7f;
 const int MOD = 1'000'000'007;
 
 /* -----------------------------------------------------
-하루에 한개의 과제를 할 수 있을때, 
-마감일과 점수가 주어진다.
-점수를 최대로 얻으려고 하면 몇까지 얻을 수 있는가?
+https://www.acmicpc.net/problem/2109
+
+우선순위 큐 사용
+우선순위 큐 사용 안하고 풀면 10배로 느림
+
+하루에 한개의 강연을 할 수 있을때, 
+마감일과 강연료가 주어진다.
+강연료를 최대로 얻으려고 하면 얼마나 얻을 수 있는가?
 */
 
 #define MAX 10001
 
 int N;
-pii HW[MAX];  // {마감일, 점수}
-int cost[MAX];  // cost[마감일] = 점수
-
-bool cmp(pii a, pii b){
-    return a.second < b.second;
-}  // 기간이 짧은 순서로 정렬
+priority_queue<int, vector<int>, greater<int>> pq;
+vector<pii> v;
+int ans;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
-    cin >> N;
-    FOR(i,0,N){
-        // 강연료, 기간 받기
-        cin >> HW[i].first >> HW[i].second;
-    }
+	cin>>N;
 
-    sort(HW, HW+N, cmp);
-    for (int i=0; i<N; i++){
-        auto [money, day] = HW[i];
+    int p, d;
+	for(int i=0;i<N;i++) {
+		cin >> p >> d;
+		v.push_back({d,p});  // 정렬 위해 기간 먼저
+	}
+	
+    // 마감기간 오름차순 정렬
+	sort(v.begin(), v.end());
+	
+    // 우선순위 큐에 넣기
+	for(pii i: v){
+		pq.push(i.second);
 
-        pii mini = {0,1e9};  // 점수가 가장 낮은 날, 점수
-        while(day>0){
-            // 비어있는 날이 있다면
-            if (cost[day]==0) {
-                cost[day] = money;
-                break;
-            }
-            // 점수 가장 낮은 날, 그때 점수 저장
-            if (cost[day]<mini.second){
-                mini = {day, cost[day]};
-            }
-            day--;
-        }
+        // 기간 내에 일정 수가 마감기간보다 커진다면
+        // 가장 가치가 작은 값 방출
+		if (pq.size()>i.first) pq.pop();
+	}
+	
+	while(!pq.empty()) {
+		ans+=pq.top();
+		pq.pop();
+	}
 
-        // 빈 자리가 없고, 최솟값보다 크다면 그 자리에 갱신
-        if(day==0 && mini.second < money){
-            cost[mini.first] = money;
-        }
-    }
-
-    int ans = 0;
-    for (int i=1; i<MAX; i++){
-        // cout << cost[i] << ' ';
-        ans += cost[i];
-    }
-    cout << ans;
+	cout << ans;
     
     return 0;
 }
