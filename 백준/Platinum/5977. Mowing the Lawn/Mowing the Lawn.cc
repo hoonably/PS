@@ -32,7 +32,7 @@ dp[i] = max(S[i] - S[j] + dp[j - 1]) ( i - K <= j <= i )
 
 int N, K;
 deque<int> dq;
-int A[MAX];
+int num;
 ll S[MAX];
 ll dp[MAX];
 
@@ -48,8 +48,8 @@ int main(){
 
     // 배열 받기, 연속합 생성
     for (int i=1; i<=N; i++){
-        cin >> A[i];
-        S[i] = S[i-1] + A[i];
+        cin >> num;
+        S[i] = S[i-1] + num;
     }
     
     for (int i=1; i<=N; i++){
