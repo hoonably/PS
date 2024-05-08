@@ -13,17 +13,9 @@ const ll LINF = 0x7f7f7f7f7f7f7f7f;
 const int MOD = 1'000'000'007;
 
 /* -----------------------------------------------------
-https://www.acmicpc.net/problem/11375
+https://www.acmicpc.net/problem/10850
 이분 매칭
 
-N명의 직원, M개의 일이 주어지고,
-각 직원이 할 수 있는 일의 번호가 주어졌을 때
-
-최대 몇개의 일을 할 수 있는가?
-
-풀이 방법
-- 직원 1명당 DFS를 1번씩 돌린다.
-dfs 내부에서 그 일이 다른 사람으로 배정되었다면 배정
 */
 
 #define MAX 1000
