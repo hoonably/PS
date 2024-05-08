@@ -29,38 +29,18 @@ const int dy[] = {1, -1};
 
 int N, M;
 bool board[MAX][MAX];
-int idCnt;  // id 카운트
-int cnt0;  // 오른아래 방향 id 개수
-int id[MAX][MAX][2];
+int diag1[MAX][MAX]; // to the right down
+int diag2[MAX][MAX]; // to the right up
+int cnt1, cnt2;  // 오른아래 방향 id 개수
 
-void makeGroup(int dir){
-	for(int i=1; i<=N; i++){
-		for(int j=1; j<=N; j++){
-			if(board[i][j]) continue;
-			if(id[i][j][dir]) continue;
-			int nx = i;
-            int ny = j;
-			id[i][j][dir] = ++idCnt;
-			while(true){
-				nx += dx[dir], ny += dy[dir];
-				if(ny < 1 || nx > N || ny > N) break;
-				if(board[nx][ny]) break;
-				if(id[nx][ny][dir]) break;
-				id[nx][ny][dir] = idCnt;
-			}
-		}
-	}
-}
-
-set<int> g[MAX*MAX];
+vector<int> adj[MAX*MAX];
 bool visited[MAX*MAX];  // match 했는가?
 int par[MAX*MAX];
 
 bool match(int cur){
-    for(int next : g[cur]){
-        if (visited[next]) continue;
-        visited[next] = true;
-		if (par[next] == 0 || match(par[next])) {
+	visited[cur] = true;
+    for(int next : adj[cur]){
+		if (par[next] == 0 || !visited[par[next]] && match(par[next])) {
 			par[next] = cur;
 			return true;
 		}
@@ -70,7 +50,7 @@ bool match(int cur){
 
 int bipartite_match() {
     int ret = 0;
-    for (int i=1; i<=cnt0; i++) {
+    for (int i=1; i<=cnt1; i++) {
         memset(visited, 0, sizeof(visited));
         if (match(i)) ret++;
     }
@@ -84,17 +64,29 @@ int main(){
 	for(int i=0; i<M; i++){
 		int a, b; 
         cin >> a >> b;
-		board[a][b] = true;
+		board[a][b] = 1;
 	}
 
-	makeGroup(0);
-    cnt0 = idCnt;
-	makeGroup(1);
+    for (int i = 2; i<=2*N; i++){
+		cnt1++;
+        for (int j = 1; i-j>=1; j++){
+            if (board[j][i-j] == 0) diag1[j][i-j] = cnt1;
+            else cnt1++;
+        }
+    }
+
+    for (int i = -N+1; i<=N-1; i++){
+		cnt2++;
+        for (int j = 1; j-i<=N; j++){
+            if (board[j][j-i] == 0) diag2[j][j-i] = cnt2;
+            else cnt2++;
+        }
+    }
 
 	for(int i=1; i<=N; i++){
 		for(int j=1; j<=N; j++){
 			if(board[i][j]) continue;
-			g[id[i][j][0]].insert(id[i][j][1]);
+			adj[diag1[i][j]].push_back(diag2[i][j]);
 		}
 	}
 
