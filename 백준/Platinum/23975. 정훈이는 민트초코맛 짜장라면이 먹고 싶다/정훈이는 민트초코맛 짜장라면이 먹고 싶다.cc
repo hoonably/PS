@@ -23,22 +23,22 @@ int ramen[MAX];
 int parent[MAX];
 vector<pii> graph[MAX];
 
-int getFirstCon(int num) {
-    // 짜장라면이 남아있다면
+int getParent(int num) {
+    // 짜장라면이 남아있다면 본인 편의점
 	if (ramen[num]) return num;
-    // 짜장라면이 안남아있다면
-	return parent[num] = getFirstCon(parent[num]);
+    // 짜장라면이 안남아있다면 남아있는 부모 편의점
+	return parent[num] = getParent(parent[num]);
 }
 
-void dijkstra(int start){
+void dijkstra(){
 
     vector<int> dist(N + 1, INF);  // INF로 선언과 동시에 초기화
     priority_queue<pii> pq;  // 우선순위 큐 선언
 
-    dist[start] = 0;
-    parent[1] = 0;  // 이거때매 틀렸었음
-    
-    pq.push({0, start});  // 우선순위 큐에 넣기 (힙큐이므로 순서 중요!!)
+    dist[1] = 0;
+    parent[1] = 0;  // 이거 안해서 틀렸었음
+
+    pq.push({0, 1});  // 우선순위 큐에 넣기 (힙큐이므로 순서 중요!!)
 
     while (!pq.empty()) {
         int cur_dist = -pq.top().first;
@@ -92,7 +92,7 @@ int main() {
 	}
 
     // 다익스트라
-    dijkstra(1);
+    dijkstra();
 
     // 
 	ramen[0] = 1;
@@ -108,7 +108,7 @@ int main() {
         }
 
 		else {
-			int sel = getFirstCon(s);
+			int sel = getParent(s);
 
             // 경로상의 편의점 모두 재고 없음
 			if (sel == 0) {
