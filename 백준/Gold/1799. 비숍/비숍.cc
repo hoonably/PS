@@ -23,7 +23,7 @@ https://www.acmicpc.net/problem/2570
 최대 독립 집합의 크기를 구하면 된다.
 */
 
-#define MAX 101
+#define MAX 20
 
 int N, M;
 bool board[MAX][MAX];  // 장애물
@@ -61,9 +61,7 @@ int main(){
 	cin >> N;
 	for(int i=1; i<=N; i++){
         for (int j=1; j<=N; j++){
-            int num;
-            cin >> num;
-            board[i][j]=num^1;
+            cin >> board[i][j];
         }
 	}
 
@@ -71,7 +69,7 @@ int main(){
     for (int i = 2; i<=2*N; i++){
 		cnt1++;
         for (int j = 1; i-j>=1; j++){
-            if (board[j][i-j] == 0) diag1[j][i-j] = cnt1;
+            if (board[j][i-j] == 1) diag1[j][i-j] = cnt1;
         }
     }
 
@@ -79,13 +77,13 @@ int main(){
     for (int i = -N+1; i<=N-1; i++){
 		cnt2++;
         for (int j = 1; j-i<=N; j++){
-            if (board[j][j-i] == 0) diag2[j][j-i] = cnt2;;
+            if (board[j][j-i] == 1) diag2[j][j-i] = cnt2;;
         }
     }
 
 	for(int i=1; i<=N; i++){
 		for(int j=1; j<=N; j++){
-			if(board[i][j]) continue;
+			if(board[i][j]==0) continue;
 			adj[diag1[i][j]].push_back(diag2[i][j]);
 		}
 	}
