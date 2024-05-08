@@ -48,8 +48,8 @@ bool dfs(int cur){
     visited[cur] = true;
 
     for(int small : eat[cur]){
-        // work에 대한 사람이 아직 없다면 그 일 매칭
-        // dfs 결과 그 사람이 다른곳으로 배정이 되었다면 매칭완료
+        // 아직 안먹혔다면 먹음
+        // dfs 결과 그걸 먹었던 애가 다른 것을 먹을 수 있다면 뺏어먹음
 		if (eated[small] == 0 || dfs(eated[small])) {
 			eated[small] = cur;
 			return true;
