@@ -4,15 +4,14 @@
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii; typedef pair<ll,ll> pll;
-typedef tuple<int,int,int> tiii; typedef tuple<int,int,int,int> tiiii;
-const int dx[6] = { 1,0,0,-1,0,0 };
-const int dy[6] = { 0,1,-1,0,0,0 };
-const int dz[6] = { 0,0,0,0,1,-1 };
+typedef tuple<int,int,int> tiii;
 const int INF = 0x7f7f7f7f;
 const ll LINF = 0x7f7f7f7f7f7f7f7f;
 const int MOD = 1'000'000'007;
 
 /* -----------------------------------------------------
+https://www.acmicpc.net/problem/13460
+
 상하좌우로 기울여서
 R이 O로 들어가야함.
 동시에 R, B 가 들어가면 안됨
@@ -26,10 +25,11 @@ int N, M;
 char board[MAX][MAX];
 bool visited[MAX][MAX][MAX][MAX];  // 빨간 구슬, 파란구슬
 
-// const int dx[6] = { 1,0,0,-1,0,0 };
-// const int dy[6] = { 0,1,-1,0,0,0 };
+// 아래, 위, 오른, 왼
+const int dx[] = { 1,-1,0,0 };
+const int dy[] = { 0,0,1,-1 };
 
-tiiii go(int dir, int rx, int ry, int bx, int by){
+tuple<int,int,int,int> go(int dir, int rx, int ry, int bx, int by){
 
     int nrx=rx, nry=ry, nbx=bx, nby=by;
     // Red
@@ -66,17 +66,17 @@ tiiii go(int dir, int rx, int ry, int bx, int by){
             else nrx -= dx[dir];
         }
         // 위로 올라간거라면 아래있던걸 한단계 전으로
-        else if (dir==3){
+        else if (dir==1){
             if (bx>rx) nbx -= dx[dir];
             else nrx -= dx[dir];
         }
         // 오른쪽으로 간거라면 왼쪽에 있던걸 한단계 전으로
-        else if (dir==1){
+        else if (dir==2){
             if (by<ry) nby -= dy[dir];
             else nry -= dy[dir];
         }
         // 왼쪽으로 간거라면 오른쪽에 있던걸 한단계 전으로
-        else if (dir==2){
+        else if (dir==3){
             if (by>ry) nby -= dy[dir];
             else nry -= dy[dir];
         }
