@@ -26,17 +26,16 @@ bool done[MAX];  // 사이클 체크 완료
 
 int cnt;  // 사이클이 되는 사람 카운트
 
-void hasCycle(int node) {
-
+void dfs(int node) {
+    // 방문은 dfs 재귀 전에 돌아가면서 계속 체크됨
 	visited[node] = true;
 	int next = graph[node];
 
-	
 	if (!visited[next]) {
-		hasCycle(next);
+		dfs(next);
 	}
 
-    // 방문하지 않았는데 done이라면 사이클 완성
+    // 방문하지 않았는데 사이클이 아니었다면 사이클 완성
 	else if (!done[next]) {
 		// 자기 자신을 포함한 팀의 멤버를 카운트
         while(next!=node){
@@ -45,6 +44,8 @@ void hasCycle(int node) {
         }
 		cnt++;
 	}
+
+    // done은 dfs재귀가 모두 끝난 후에 체크
 	done[node] = true;
 }
 
@@ -63,7 +64,7 @@ void solve(){
 
     for (int i=1; i<=n; i++){
         if (!visited[i]){
-            hasCycle(i);
+            dfs(i);
         }
     }
 
