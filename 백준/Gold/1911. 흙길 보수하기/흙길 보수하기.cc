@@ -38,11 +38,16 @@ int main(){
     for(int i=0; i<N; i++){
         
         now = max(now, puddle[i].first);
+
+        int cnt = (puddle[i].second + L - 1 - now) / L;
+
+        ans += cnt;
+        now += L*cnt;
         
-        while(now < puddle[i].second){
-            now += L;
-            ans++;
-        }
+        // while(now < puddle[i].second){
+        //     now += L;
+        //     ans++;
+        // }
     }
 
     cout << ans;
