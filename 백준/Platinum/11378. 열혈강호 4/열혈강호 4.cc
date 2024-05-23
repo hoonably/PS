@@ -62,6 +62,8 @@ class FordFulkerson{
 
 		void setSource(int t){ s = t; }
 		void setSink(int t){ e = t; }
+
+        // edge 만들기
 		void addEdge(int start, int end, int cap, bool directed){
 			adjList[start].push_back(end);
 			adjList[end].push_back(start);
@@ -116,31 +118,34 @@ int main(){
     int N, M, K;
 	cin >> N >> M >> K;
 	int s = 2001, e = 2003, bridge = 2002;
-	FordFulkerson flow(2003, s, e);
+	FordFulkerson ff(2003, s, e);
 
-    // 사람 => 일 연결
-	for(int i=1; i<=N; i++){
+	for(int human=1; human<=N; human++){
 
-		flow.addEdge(s, i, 1, 1);
-		flow.addEdge(bridge, i, K, 1);
+        // 시작 => human 연결
+		ff.addEdge(s, human, 1, true);
 
+        // bridge => human 연결
+		ff.addEdge(bridge, human, K, true);
+
+        // human => 일 연결
 		int cnt; 
         cin >> cnt;
 		while(cnt--){
 			int t;
             cin >> t;
             // i번 사람이 t번 일을 할 수 있음
-            flow.addEdge(i, 1000+t, 1, 1);
+            ff.addEdge(human, 1000+t, 1, true);
 		}
 	}
-	flow.addEdge(s, bridge, K, 1);
+	ff.addEdge(s, bridge, K, 1);
 
     // 일 => 종료 연결
 	for(int work=1; work<=M; work++) {
-        flow.addEdge(1000+work, e, 1, 1);
+        ff.addEdge(1000+work, e, 1, 1);
     }
 
-	cout << flow.maxFlow();
+	cout << ff.maxFlow();
     
     return 0;
 }
