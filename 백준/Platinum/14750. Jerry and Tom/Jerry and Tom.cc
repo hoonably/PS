@@ -61,37 +61,30 @@ struct MaximumFlow
 	};
 	vector<vector<Edge>> graph;
 	vector<int> work, level;
-	int N, src, sink;
+	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
 
 	// 생성자
-	MaximumFlow(int N, int src, int sink) : N(N), src(src), sink(sink) {
+	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
 		graph.resize(N);
 		work.resize(N);
 		level.resize(N);
 	}
 
-
-	void add_edge(int from, int to, int cap) {
+	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 유방향
+	void add_edge(int from, int to, int cap, int caprev = 0) {
 		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, cap);
-		graph[from].back().rev = graph[to].size() - 1;
-		graph[to].back().rev = graph[from].size() - 1;
-	}
-	
-    void add_diedge(int from, int to, int cap) {
-		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, 0);
+		graph[to].emplace_back(to, from, caprev);
 		graph[from].back().rev = graph[to].size() - 1;
 		graph[to].back().rev = graph[from].size() - 1;
 	}
 	void add_edge_from_source(int to, int cap) {
-		add_edge(src, to, cap);
+		add_edge(SRC, to, cap);
 	}
 	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, sink, cap);
+		add_edge(from, SINK, cap);
 	}
 	int dfs(int c, int minFlow = INT_MAX) {
-		if (c == sink) {
+		if (c == SINK) {
 			return minFlow;
 		}
 		int flow;
@@ -111,8 +104,8 @@ struct MaximumFlow
 		while(true) {
 			int flow = 0;
 			fill(level.begin(), level.end(), -1);
-			q.push(src);
-			level[src] = 0;
+			q.push(SRC);
+			level[SRC] = 0;
 			while (!q.empty()) {
 				int c = q.front();
 				q.pop();
@@ -124,7 +117,7 @@ struct MaximumFlow
 				}
 			}
 			fill(work.begin(), work.end(), 0);
-			while (int temp = dfs(src)) {
+			while (int temp = dfs(SRC)) {
 				flow += temp;
 			}
 			if (flow == 0) {
@@ -143,7 +136,7 @@ int main(){
     int n, k, h, m;
     cin >> n >> k >> h >> m;
 
-    // 최대 유량 (구멍 0~49, 쥐: 50~299, src: 301, sink: 302)
+    // 최대 유량 (구멍 0~49, 쥐: 50~299, SRC: 301, SINK: 302)
     MaximumFlow mf(303, 301, 302);
 
     // 집 모서리 점 좌표 받기
@@ -170,7 +163,7 @@ int main(){
     }
 
     for(int i=0; i<m; i++){
-        // 쥐 => sink (용량 1)
+        // 쥐 => SINK (용량 1)
         mf.add_edge_to_sink(50 + i, 1);
     }
 
@@ -198,7 +191,7 @@ int main(){
             // 나머지 아무것도 교차 안한다면 graph에 추가
             if (overlap<=maximum){
                 // i번 구멍 => j번 쥐
-                mf.add_diedge(i, 50 + j, 1);
+                mf.add_edge(i, 50 + j, 1);
             }
         }
     }
