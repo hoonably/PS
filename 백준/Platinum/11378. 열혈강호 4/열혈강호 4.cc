@@ -30,122 +30,115 @@ https://kibbomi.tistory.com/46
 
 #define MAX 
 
+struct MaximumFlow
+{
+	struct Edge
+	{
+		int from, to, cap, rev;
+		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
+	};
+	vector<vector<Edge>> graph;
+	vector<int> work, level;
+	int N, src, sink;
+
+	// 생성자
+	MaximumFlow(int N, int src, int sink) : N(N), src(src), sink(sink) {
+		graph.resize(N);
+		work.resize(N);
+		level.resize(N);
+	}
 
 
-class FordFulkerson{
-	private:
-		vector<vector<int>> flow, capacity, adjList;
-		int s, e, N; //source, sink, verties
-	public:
-		FordFulkerson(){ N = 0, s = -1, e = -1; }
-
-		FordFulkerson(int N){
-			this->N = N;
-			flow.resize(N+1), capacity.resize(N+1), adjList.resize(N+1);
-			for(int i=0; i<=N; i++){
-				flow[i].resize(N+1);
-				capacity[i].resize(N+1);
+	void add_edge(int from, int to, int cap) {
+		graph[from].emplace_back(from, to, cap);
+		graph[to].emplace_back(to, from, cap);
+		graph[from].back().rev = graph[to].size() - 1;
+		graph[to].back().rev = graph[from].size() - 1;
+	}
+	
+    void add_diedge(int from, int to, int cap) {
+		graph[from].emplace_back(from, to, cap);
+		graph[to].emplace_back(to, from, 0);
+		graph[from].back().rev = graph[to].size() - 1;
+		graph[to].back().rev = graph[from].size() - 1;
+	}
+	void add_edge_from_source(int to, int cap) {
+		add_edge(src, to, cap);
+	}
+	void add_edge_to_sink(int from, int cap) {
+		add_edge(from, sink, cap);
+	}
+	int dfs(int c, int MF = INT_MAX) {
+		if (c == sink) {
+			return MF;
+		}
+		int flow;
+		for (int &i = work[c]; i < graph[c].size(); i++) {
+			auto &e = graph[c][i];
+			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, MF)))) {
+				e.cap -= flow;
+				graph[e.to][e.rev].cap += flow;
+				return flow;
 			}
-			s = -1, e = -1;
 		}
-
-        // source와 sink가 있는 경우
-		FordFulkerson(int N, int source, int sink){
-			this->N = N;
-			flow.resize(N+1), capacity.resize(N+1), adjList.resize(N+1);
-			for(int i=0; i<=N; i++){
-				flow[i].resize(N+1);
-				capacity[i].resize(N+1);
-			}
-			s = source, e = sink;
-		}
-
-		void setSource(int t){ s = t; }
-		void setSink(int t){ e = t; }
-
-        // edge 만들기
-		void addEdge(int start, int end, int cap, bool directed){
-			adjList[start].push_back(end);
-			adjList[end].push_back(start);
-			capacity[start][end] += cap;
-			if(!directed) capacity[end][start] += cap;
-		}
-
-		int maxFlow(){
-            int ret = 0;
-			// if(s==-1 || e==-1) return -1;  // 오류 방지
-			vector<int> par(N+1);
-
-			while(true){
-				fill(par.begin(), par.end(), -1);
-
-				queue<int> q;
-                q.push(s);
-				while(!q.empty()){
-					int now = q.front(); q.pop();
-					for(auto nxt : adjList[now]){
-						if(par[nxt] == -1 && capacity[now][nxt]-flow[now][nxt] > 0){
-							q.push(nxt); par[nxt] = now;
-							if(nxt == e) break;
-						}
+		return 0;
+	}
+	int flow() {
+		int ret = 0;
+		queue<int> q;
+		while(true) {
+			int flow = 0;
+			fill(level.begin(), level.end(), -1);
+			q.push(src);
+			level[src] = 0;
+			while (!q.empty()) {
+				int c = q.front();
+				q.pop();
+				for (auto &e : graph[c]) {
+					if (e.cap > 0 && level[e.to] == -1) {
+						level[e.to] = level[e.from] + 1;
+						q.push(e.to);
 					}
 				}
-
-                // 종료
-				if(par[e] == -1) break;
-
-                // 거꾸로 최소 유량 탐색
-				int minFlow = INF;
-				for(int i=e; i!=s; i = par[i]){
-					int a = par[i], b = i;
-					minFlow = min(minFlow, capacity[a][b] - flow[a][b]);
-				}
-				ret += minFlow;
-
-                // 최소 유량 처리
-				for(int i=e; i!=s; i = par[i]){
-					flow[par[i]][i] += minFlow; 
-                    flow[i][par[i]] -= minFlow;
-				}
 			}
-			return ret;
+			fill(work.begin(), work.end(), 0);
+			while (int temp = dfs(src)) {
+				flow += temp;
+			}
+			if (flow == 0) {
+				break;
+			}
+			ret += flow;
 		}
+		return ret;
+	}
 };
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
-    int N, M, K;
-	cin >> N >> M >> K;
-	int s = 2001, e = 2003, bridge = 2002;
-	FordFulkerson ff(2003, s, e);
+	int N, M, K;
+    cin >> N >> M >> K;
+	MaximumFlow mf(2005, 2001, 2002);
 
-	for(int human=1; human<=N; human++){
 
-        // 시작 => human 연결
-		ff.addEdge(s, human, 1, true);
+    mf.add_edge_from_source(2000, K);
 
-        // bridge => human 연결
-		ff.addEdge(bridge, human, K, true);
-
-        // human => 일 연결
-		int cnt; 
-        cin >> cnt;
-		while(cnt--){
-			int t;
-            cin >> t;
-            // i번 사람이 t번 일을 할 수 있음
-            ff.addEdge(human, 1000+t, 1, true);
-		}
-	}
-	ff.addEdge(s, bridge, K, 1);
-
-    // 일 => 종료 연결
-	for(int work=1; work<=M; work++) {
-        ff.addEdge(1000+work, e, 1, 1);
+    for (int i=1; i<=N; i++) {
+        int x;
+		cin >> x;
+        for (int j=0; j<x; j++) {
+            int to;
+			cin >> to;
+            mf.add_diedge(i, to+N, 1);
+        }
+        mf.add_diedge(2000, i, K);
+        mf.add_edge_from_source(i, 1);
     }
-
-	cout << ff.maxFlow();
+    for (int i=1; i<=M; i++) {
+		mf.add_edge_to_sink(i+N, 1);
+	}
+    cout << mf.flow();
     
     return 0;
 }
