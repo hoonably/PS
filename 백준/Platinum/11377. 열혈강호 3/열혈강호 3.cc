@@ -118,6 +118,7 @@ int main(){
             mf.add_edge(i, work+N, 1);
         }
 
+		// 열혈강호 4랑 다른 점 : 최대 두개의 일 하는거니까 이 brunch와 사람을 잇는 용량이 1
 		// brunch => 사람 (용량 1)
         mf.add_edge(2000, i, 1);
 
