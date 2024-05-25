@@ -15,92 +15,86 @@ const int MOD = 1'000'000'007;
 /* -----------------------------------------------------
 https://www.acmicpc.net/problem/17412
 네트워크 플로우
-에드몬드 카프 알고리즘
-시간 복잡도 : O(VE^2)
-
 
 */
 
-#define MAX 401
+#define MAX
 
-class FordFulkerson{
-	private:
-		vector<vector<int>> flow, capacity, adjList;
-		int s, e, N; //source, sink, verties
-	public:
-		FordFulkerson(){ N = 0, s = -1, e = -1; }
+struct MaximumFlow
+{
+	struct Edge
+	{
+		int from, to, cap, rev;
+		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
+	};
+	vector<vector<Edge>> graph;
+	vector<int> work, level;
+	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
 
-		FordFulkerson(int N){
-			this->N = N;
-			flow.resize(N+1), capacity.resize(N+1), adjList.resize(N+1);
-			for(int i=0; i<=N; i++){
-				flow[i].resize(N+1);
-				capacity[i].resize(N+1);
+	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
+	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
+		graph.resize(N+10);
+		work.resize(N+10);
+		level.resize(N+10);
+	}
+
+	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
+	void add_edge(int from, int to, int cap, int caprev = 0) {
+		graph[from].emplace_back(from, to, cap);
+		graph[to].emplace_back(to, from, caprev);
+		graph[from].back().rev = graph[to].size() - 1;
+		graph[to].back().rev = graph[from].size() - 1;
+	}
+	void add_edge_from_source(int to, int cap) {
+		add_edge(SRC, to, cap);
+	}
+	void add_edge_to_sink(int from, int cap) {
+		add_edge(from, SINK, cap);
+	}
+	int dfs(int c, int minFlow = INT_MAX) {
+		if (c == SINK) {
+			return minFlow;
+		}
+		int flow;
+		for (int &i = work[c]; i < graph[c].size(); i++) {
+			auto &e = graph[c][i];
+			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
+				e.cap -= flow;
+				graph[e.to][e.rev].cap += flow;
+				return flow;
 			}
-			s = -1, e = -1;
 		}
-
-        // source와 sink가 주어진 경우
-		FordFulkerson(int N, int source, int sink){
-			this->N = N;
-			flow.resize(N+1), capacity.resize(N+1), adjList.resize(N+1);
-			for(int i=0; i<=N; i++){
-				flow[i].resize(N+1);
-				capacity[i].resize(N+1);
-			}
-			s = source, e = sink;
-		}
-
-		void setSource(int t){ s = t; }
-		void setSink(int t){ e = t; }
-
-        // edge 만들기
-		void addEdge(int start, int end, int cap, bool directed){
-			adjList[start].push_back(end);
-			adjList[end].push_back(start);
-			capacity[start][end] += cap;
-			if(!directed) capacity[end][start] += cap;  // 무방향 그래프
-		}
-
-		int maxFlow(){
-            int ret = 0;
-			// if(s==-1 || e==-1) return -1;  // 오류 방지
-			vector<int> par(N+1);
-
-			while(true){
-				fill(par.begin(), par.end(), -1);
-
-				queue<int> q;
-                q.push(s);
-				while(!q.empty()){
-					int now = q.front(); q.pop();
-					for(auto nxt : adjList[now]){
-						if(par[nxt] == -1 && capacity[now][nxt]-flow[now][nxt] > 0){
-							q.push(nxt); par[nxt] = now;
-							if(nxt == e) break;
-						}
+		return 0;
+	}
+	int flow() {
+		int ret = 0;
+		queue<int> q;
+		while(true) {
+			int flow = 0;
+			fill(level.begin(), level.end(), -1);
+			q.push(SRC);
+			level[SRC] = 0;
+			while (!q.empty()) {
+				int c = q.front();
+				q.pop();
+				for (auto &e : graph[c]) {
+					if (e.cap > 0 && level[e.to] == -1) {
+						level[e.to] = level[e.from] + 1;
+						q.push(e.to);
 					}
 				}
-
-                // 종료
-				if(par[e] == -1) break;
-
-                // 거꾸로 최소 유량 탐색
-				int minFlow = INF;
-				for(int i=e; i!=s; i = par[i]){
-					int a = par[i], b = i;
-					minFlow = min(minFlow, capacity[a][b] - flow[a][b]);
-				}
-				ret += minFlow;
-
-                // 최소 유량 처리
-				for(int i=e; i!=s; i = par[i]){
-					flow[par[i]][i] += minFlow; 
-                    flow[i][par[i]] -= minFlow;
-				}
 			}
-			return ret;
+			fill(work.begin(), work.end(), 0);
+			while (int temp = dfs(SRC)) {
+				flow += temp;
+			}
+			if (flow == 0) {
+				break;
+			}
+			ret += flow;
 		}
+		return ret;
+	}
 };
 
 int main(){
@@ -109,15 +103,15 @@ int main(){
 	int N, P;
     cin >> N >> P;
 
-	FordFulkerson ff(N, 1, 2);
+	MaximumFlow mf(N, 1, 2);
 
     for(int i=0; i<P; i++){
         int a, b;
         cin >> a >> b;
-		ff.addEdge(a, b, 1, 1);
+		mf.add_edge(a, b, 1);
     }
 
-    cout << ff.maxFlow();
+    cout << mf.flow();
     
     return 0;
 }
