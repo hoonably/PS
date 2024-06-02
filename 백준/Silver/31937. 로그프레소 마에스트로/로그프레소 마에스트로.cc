@@ -21,12 +21,12 @@ const int MOD = 1'000'000'007;
 int N, M, K;
 
 bool virus[1001];
-int send[1001][1001];  // 최초로 i->j로 보낸 시각
+bool virus2[1001];
 vector<tiii> sends;
 
 bool check(int start){
     int cnt = 1;
-    vector<bool> virus2(N+1, false);
+    memset(virus2, false, sizeof(virus2));
     virus2[start] = true;
 
     for (tiii send : sends){
