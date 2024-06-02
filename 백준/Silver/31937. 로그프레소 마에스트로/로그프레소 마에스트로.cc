@@ -22,15 +22,15 @@ int N, M, K;
 
 bool virus[1001];
 bool virus2[1001];
-vector<tiii> sends;
+tiii sends[10000];
 
 bool check(int start){
     int cnt = 1;
     memset(virus2, false, sizeof(virus2));
     virus2[start] = true;
 
-    for (tiii send : sends){
-        auto [t,a,b] = send;
+    for (int i=0; i<M; i++){
+        auto [t,a,b] = sends[i];
 
         // 보내는 컴퓨터가 감염되어있다면
         if (virus2[a]) {
@@ -66,9 +66,9 @@ int main(){
     for (int i=0; i<M; i++){
         int t, a, b;
         cin >> t >> a >> b;
-        sends.push_back({t,a,b});
+        sends[i] = {t,a,b};
     }
-    sort(all(sends));
+    sort(sends, sends+M);
 
     // 브루트 포스
     for (int i=1; i<=N; i++){
