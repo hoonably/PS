@@ -18,11 +18,18 @@ const int MOD = 1'000'000'007;
 
 #define MAX 
 
+struct info{
+    int t, a, b;
+    bool operator<(const info &info2) const {
+        return t < info2.t;
+    }
+};
+
 int N, M, K;
 
 bool virus[1001];
 bool virus2[1001];
-tiii sends[10000];
+info sends[10000];
 
 bool check(int start){
     int cnt = 1;
@@ -30,7 +37,8 @@ bool check(int start){
     virus2[start] = true;
 
     for (int i=0; i<M; i++){
-        auto [t,a,b] = sends[i];
+        int a = sends[i].a;
+        int b = sends[i].b;
 
         // 보내는 컴퓨터가 감염되어있다면
         if (virus2[a]) {
@@ -65,8 +73,7 @@ int main(){
     // 파일 전송 로그
     for (int i=0; i<M; i++){
         int t, a, b;
-        cin >> t >> a >> b;
-        sends[i] = {t,a,b};
+        cin >> sends[i].t >> sends[i].a >> sends[i].b;
     }
     sort(sends, sends+M);
 
