@@ -37,18 +37,16 @@ bool check(int start){
     virus2[start] = true;
 
     for (int i=0; i<M; i++){
-        int a = sends[i].a;
-        int b = sends[i].b;
 
         // 보내는 컴퓨터가 감염되어있다면
-        if (virus2[a]) {
+        if (virus2[sends[i].a]) {
 
             // 원래 감염 안된거였으면 종료
-            if (virus[b]==false) return false;
+            if (virus[sends[i].b]==false) return false;
 
-            if (virus2[b]==false){
+            if (virus2[sends[i].b]==false){
                 cnt++;
-                virus2[b]=true;
+                virus2[sends[i].b]=true;
             }
         }
     }
@@ -64,15 +62,14 @@ int main(){
     cin >> N >> M >> K;
 
     // 감염된 컴퓨터
+    int num;
     for (int i=0; i<K; i++){
-        int num;
         cin >> num;
         virus[num] = true; 
     }
 
     // 파일 전송 로그
     for (int i=0; i<M; i++){
-        int t, a, b;
         cin >> sends[i].t >> sends[i].a >> sends[i].b;
     }
     sort(sends, sends+M);
