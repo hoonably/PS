@@ -30,15 +30,13 @@ int main(){
     
     cin >> N;
 
-    int ans = 0;
     for(int i=1; i<=N; i++){
         int num;
         cin >> num;
         dp[num] = dp[num-1] + 1;
-        ans = max(ans, dp[num]);
     }
 
-    cout << N-ans;
+    cout << N - *max_element(dp+1, dp+N+1);
 
     return 0;
 }
