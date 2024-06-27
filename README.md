@@ -5,9 +5,6 @@
 
 
 
-- [Baekjoon Online Judge](https://www.acmicpc.net/){:target="_blank"}
-
-- [백준 hoonably 프로필](https://www.acmicpc.net/user/hoonably){:target="_blank"}
-
-- [solved.ac hoonalby 프로필](https://solved.ac/profile/hoonably){:target="_blank"}
-
+- <a href="https://www.acmicpc.net/" target="_blank">Baekjoon Online Judge</a>
+- <a href="https://www.acmicpc.net/user/hoonably" target="_blank">백준 hoonably 프로필</a>
+- <a href="https://solved.ac/profile/hoonably" target="_blank">solved.ac hoonalby 프로필</a>
