@@ -9,5 +9,5 @@
 
 - [백준 hoonably 프로필](https://www.acmicpc.net/user/hoonably)
 
-- [solved.ac 프로필](https://solved.ac/profile/hoonably)
+- [solved.ac hoonalby 프로필](https://solved.ac/profile/hoonably)
 
