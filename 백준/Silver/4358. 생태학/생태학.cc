@@ -28,14 +28,7 @@ int main(){
     
     while(getline(cin, str)){
         cnt++;  // 나무 개수
-
-        // 기존 map에 없다면
-        if (trees.find(str)==trees.end()){
-            trees[str] = 1;
-        }
-        else{
-            trees[str]++;
-        }
+        trees[str]++;
     }
 
     cout << fixed;
