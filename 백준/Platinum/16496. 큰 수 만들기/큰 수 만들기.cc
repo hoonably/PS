@@ -29,27 +29,21 @@ int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
     cin >> N;
-    int zero = 0;  // 0의 개수
+    v.resize(N);
     for(int i=0; i<N; i++){
-        string num;
-        cin >> num;
-        if (num != "0") v.push_back(num);
-        else zero++;
-    }
-
-    // 0밖에 없었다면
-    if (v.size()==0) {
-        cout << '0';
-        return 0;
+        cin >> v[i];
     }
 
     sort(all(v), compare);
 
-    for(string s : v){
-        cout << s;
+    // 0밖에 없는 경우 정렬 후 앞에 0임
+    if (v[0]=="0") {
+        cout << "0";
+        return 0;
     }
-    for(int i=0; i<zero; i++){
-        cout << '0';
+
+    for(int i=0; i<N; i++){
+        cout << v[i];
     }
     
     return 0;
