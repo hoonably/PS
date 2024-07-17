@@ -15,6 +15,8 @@ const int MOD = 1'000'000'007;
 /* -----------------------------------------------------
 https://www.acmicpc.net/problem/2365
 row의 합을 왼쪽 노드로, col의 합을 오른쪽 노드로 분리
+이분탐색을 이용해 maxFlow가 모든 숫자의 합일때
+모든 flow(edge 연결값)의 최대값이 가장 작도록 하는 Ans 탐색
 */
 
 #define MAX
@@ -49,7 +51,7 @@ struct FordFulkerson{
 	}
 
 	// flow 초기화
-	void init(){
+	void initFlow(){
 		fill(flow.begin(), flow.end(), vector<int> (N+10,0));
 	}
 
@@ -92,8 +94,7 @@ struct FordFulkerson{
 	}
 };
 
-int row[51], col[51];
-int rowSum, colSum;
+int sum;  // 총 숫자의 합
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -105,15 +106,16 @@ int main(){
 
 	// 가로합
 	for(int i=1; i<=N; i++){
-		cin >> row[i];
-		ff.add_edge_from_source(i, row[i]);
-		rowSum+=row[i];
+		int rowSum;
+		cin >> rowSum;
+		ff.add_edge_from_source(i, rowSum);
+		sum+=rowSum;
 	}
 	// 세로합
 	for(int i=1; i<=N; i++){
-		cin >> col[i];
-		ff.add_edge_to_sink(i+50, col[i]);
-		colSum+=col[i];
+		int colSum;
+		cin >> colSum;
+		ff.add_edge_to_sink(i+50, colSum);
 	}
 
 	// row => col 잇기
@@ -123,12 +125,14 @@ int main(){
 		}
 	}
 
+	// 숫자판에 들어가는 최대 숫자의 값을 최소로 해야하므로
+	// 최대로 흐를 수 있는 유량 중 최소값을 이분탐색으로 찾기
 	int Left = 0, Right = 10000, Mid, Ans;
 	while(Left <= Right) {
 		Mid = (Left + Right)/2;
 
 		// flow를 모두 0으로 초기화
-		ff.init();
+		ff.initFlow();
 
 		// 모든 사이 용량을 mid로 맞춰줌
 		for(int i=1; i<=N; i++){
@@ -137,9 +141,10 @@ int main(){
 			}
 		}
 
-		if(ff.maxFlow() == rowSum) {
+		if(ff.maxFlow() == sum) {
 			Ans = Mid;
 			Right = Mid-1;
+			// 최소값을 찾아야하므로 마치지 않고 더 진행
 		}
 
 		else Left = Mid+1;
@@ -147,19 +152,18 @@ int main(){
 
 	cout << Ans << '\n';
 
-
-    for(int i=1; i<=N; i++)
-        for(int j=1; j<=N; j++) ff.capacity[i][j+50] = Ans;
-
-	ff.init();
+	// Ans 였을 때로 cap 맞춰주기
+    for(int i=1; i<=N; i++){
+        for(int j=1; j<=N; j++) {
+			ff.capacity[i][j+50] = Ans;
+		}
+	}
+	ff.initFlow();
 	ff.maxFlow();
     for(int i=1; i<=N; i++) {
         for(int j=1; j<=N; j++) cout << ff.flow[i][j+50] << ' ';
         cout << '\n';
     }
-
-
-	
     
     return 0;
 }
