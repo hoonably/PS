@@ -21,27 +21,30 @@ https://everenew.tistory.com/182
 
 #define MAX 
 
-struct FordFulkerson{
-	vector<vector<int>> flow, capacity, parent;
-	int SRC, SINK, N; //source, sink, verties(+10)
+struct MaximumFlow
+{
+	struct Edge
+	{
+		int from, to, cap, rev;
+		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
+	};
+	vector<vector<Edge>> graph;
+	vector<int> work, level;
+	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
 
 	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
-	FordFulkerson(int N, int source, int sink) : N(N+10), SRC(source), SINK(sink) {
-		flow.resize(N+10), capacity.resize(N+10), parent.resize(N+10);
-		for(int i=0; i<N+10; i++){
-			flow[i].resize(N+10);
-			capacity[i].resize(N+10);
-		}
+	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
+		graph.resize(N+10);
+		work.resize(N+10);
+		level.resize(N+10);
 	}
-	void setSource(int t){ SRC = t; }
-	void setSink(int t){ SINK = t; }
 
 	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
 	void add_edge(int from, int to, int cap, int caprev = 0) {
-		parent[from].emplace_back(to);
-		parent[to].emplace_back(from);
-		capacity[from][to] += cap;
-		capacity[to][from] += caprev;
+		graph[from].emplace_back(from, to, cap);
+		graph[to].emplace_back(to, from, caprev);
+		graph[from].back().rev = graph[to].size() - 1;
+		graph[to].back().rev = graph[from].size() - 1;
 	}
 	void add_edge_from_source(int to, int cap) {
 		add_edge(SRC, to, cap);
@@ -49,46 +52,47 @@ struct FordFulkerson{
 	void add_edge_to_sink(int from, int cap) {
 		add_edge(from, SINK, cap);
 	}
-
-	// flow 초기화
-	void init(){
-		fill(flow.begin(), flow.end(), vector<int> (N,0));
+	int dfs(int c, int minFlow = INT_MAX) {
+		if (c == SINK) {
+			return minFlow;
+		}
+		int flow;
+		for (int &i = work[c]; i < graph[c].size(); i++) {
+			auto &e = graph[c][i];
+			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
+				e.cap -= flow;
+				graph[e.to][e.rev].cap += flow;
+				return flow;
+			}
+		}
+		return 0;
 	}
-
-	int maxFlow(){
+	int maxFlow() {
 		int ret = 0;
-		vector<int> par(N+1);
-
-		while(true){
-			fill(par.begin(), par.end(), -1);
-
-			queue<int> q;
+		queue<int> q;
+		while(true) {
+			int flow = 0;
+			fill(level.begin(), level.end(), -1);
 			q.push(SRC);
-			while(!q.empty()){
-				int now = q.front(); q.pop();
-				for(auto nxt : parent[now]){
-					if(par[nxt] == -1 && capacity[now][nxt]-flow[now][nxt] > 0){
-						q.push(nxt); par[nxt] = now;
-						if(nxt == SINK) break;
+			level[SRC] = 0;
+			while (!q.empty()) {
+				int c = q.front();
+				q.pop();
+				for (auto &e : graph[c]) {
+					if (e.cap > 0 && level[e.to] == -1) {
+						level[e.to] = level[e.from] + 1;
+						q.push(e.to);
 					}
 				}
 			}
-
-			// 종료
-			if(par[SINK] == -1) break;
-
-			// 거꾸로 최소 유량 탐색
-			int minFlow = INF;
-			for(int i=SINK; i!=SRC; i = par[i]){
-				minFlow = min(minFlow, capacity[par[i]][i] - flow[par[i]][i]);
+			fill(work.begin(), work.end(), 0);
+			while (int temp = dfs(SRC)) {
+				flow += temp;
 			}
-			ret += minFlow;
-
-			// 최소 유량 처리
-			for(int i=SINK; i!=SRC; i = par[i]){
-				flow[par[i]][i] += minFlow; 
-				flow[i][par[i]] -= minFlow;
+			if (flow == 0) {
+				break;
 			}
+			ret += flow;
 		}
 		return ret;
 	}
@@ -98,7 +102,7 @@ void solve(){
     int n, m;
     cin >> n >> m;
 
-    FordFulkerson ff(2500, 2501, 2502);
+    MaximumFlow ff(2500, 2501, 2502);
 
     int totalSum = 0;
     bool isRed = true;
