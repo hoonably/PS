@@ -30,52 +30,43 @@ https://kibbomi.tistory.com/46
 
 #define MAX 
 
-struct MaximumFlow
-{
-	struct Edge
-	{
+struct Dinic {
+	struct Edge {
 		int from, to, cap, rev;
 		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
 	};
 	vector<vector<Edge>> graph;
 	vector<int> work, level;
-	int N, src, sink;
+	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
 
-	// 생성자
-	MaximumFlow(int N, int src, int sink) : N(N), src(src), sink(sink) {
-		graph.resize(N);
-		work.resize(N);
-		level.resize(N);
+	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
+	Dinic(int N, int SRC, int SINK) : N(N+10), SRC(SRC), SINK(SINK) {
+		graph.resize(N+10);
+		work.resize(N+10);
+		level.resize(N+10);
 	}
 
-
-	void add_edge(int from, int to, int cap) {
+	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
+	void add_edge(int from, int to, int cap, int caprev = 0) {
 		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, cap);
-		graph[from].back().rev = graph[to].size() - 1;
-		graph[to].back().rev = graph[from].size() - 1;
-	}
-	
-    void add_diedge(int from, int to, int cap) {
-		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, 0);
+		graph[to].emplace_back(to, from, caprev);
 		graph[from].back().rev = graph[to].size() - 1;
 		graph[to].back().rev = graph[from].size() - 1;
 	}
 	void add_edge_from_source(int to, int cap) {
-		add_edge(src, to, cap);
+		add_edge(SRC, to, cap);
 	}
 	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, sink, cap);
+		add_edge(from, SINK, cap);
 	}
-	int dfs(int c, int MF = INT_MAX) {
-		if (c == sink) {
-			return MF;
+	int dfs(int c, int minFlow = INT_MAX) {
+		if (c == SINK) {
+			return minFlow;
 		}
 		int flow;
 		for (int &i = work[c]; i < graph[c].size(); i++) {
 			auto &e = graph[c][i];
-			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, MF)))) {
+			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
 				e.cap -= flow;
 				graph[e.to][e.rev].cap += flow;
 				return flow;
@@ -83,14 +74,14 @@ struct MaximumFlow
 		}
 		return 0;
 	}
-	int flow() {
+	int maxFlow() {
 		int ret = 0;
 		queue<int> q;
 		while(true) {
 			int flow = 0;
 			fill(level.begin(), level.end(), -1);
-			q.push(src);
-			level[src] = 0;
+			q.push(SRC);
+			level[SRC] = 0;
 			while (!q.empty()) {
 				int c = q.front();
 				q.pop();
@@ -102,7 +93,7 @@ struct MaximumFlow
 				}
 			}
 			fill(work.begin(), work.end(), 0);
-			while (int temp = dfs(src)) {
+			while (int temp = dfs(SRC)) {
 				flow += temp;
 			}
 			if (flow == 0) {
@@ -119,26 +110,33 @@ int main(){
     
 	int N, M, K;
     cin >> N >> M >> K;
-	MaximumFlow mf(2005, 2001, 2002);
+	Dinic mf(2005, 2001, 2002);
 
-
+	// brunch 생성
     mf.add_edge_from_source(2000, K);
 
     for (int i=1; i<=N; i++) {
         int x;
 		cin >> x;
         for (int j=0; j<x; j++) {
-            int to;
-			cin >> to;
-            mf.add_diedge(i, to+N, 1);
+            int work;
+			cin >> work;
+			// 사람 => 일 (용량 1)
+            mf.add_edge(i, work+N, 1);
         }
-        mf.add_diedge(2000, i, K);
+
+		// brunch => 사람 (용량 K)
+        mf.add_edge(2000, i, K);
+
+		// source => 사람 (용량 1)
         mf.add_edge_from_source(i, 1);
     }
-    for (int i=1; i<=M; i++) {
-		mf.add_edge_to_sink(i+N, 1);
+
+    for (int iwork=1; iwork<=M; iwork++) {
+		// 일 => Sink
+		mf.add_edge_to_sink(iwork+N, 1);
 	}
-    cout << mf.flow();
+    cout << mf.maxFlow();
     
     return 0;
 }
