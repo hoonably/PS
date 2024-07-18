@@ -17,6 +17,10 @@ https://www.acmicpc.net/problem/2365
 row의 합을 왼쪽 노드로, col의 합을 오른쪽 노드로 분리
 이분탐색을 이용해 maxFlow가 모든 숫자의 합일때
 모든 flow(edge 연결값)의 최대값이 가장 작도록 하는 Ans 탐색
+
+이 문제는 간선 수가 많지 않아서 
+포드 풀커슨 방법 사용하고 자유롭게 flow 변경 
+O((V+E)F)
 */
 
 #define MAX
@@ -102,26 +106,26 @@ int main(){
 	int N;
     cin >> N;
 
-	FordFulkerson ff(100, 101, 102);
+	FordFulkerson mf(100, 101, 102);
 
 	// 가로합
 	for(int i=1; i<=N; i++){
 		int rowSum;
 		cin >> rowSum;
-		ff.add_edge_from_source(i, rowSum);
+		mf.add_edge_from_source(i, rowSum);
 		sum+=rowSum;
 	}
 	// 세로합
 	for(int i=1; i<=N; i++){
 		int colSum;
 		cin >> colSum;
-		ff.add_edge_to_sink(i+50, colSum);
+		mf.add_edge_to_sink(i+50, colSum);
 	}
 
 	// row => col 잇기
 	for(int i=1; i<=N; i++){
         for(int j=1; j<=N; j++){
-            ff.add_edge(i,j+50,0);
+            mf.add_edge(i,j+50,0);
 		}
 	}
 
@@ -132,16 +136,16 @@ int main(){
 		Mid = (Left + Right)/2;
 
 		// flow를 모두 0으로 초기화
-		ff.initFlow();
+		mf.initFlow();
 
 		// 모든 사이 용량을 mid로 맞춰줌
 		for(int i=1; i<=N; i++){
 			for(int j=1; j<=N; j++) {
-				ff.capacity[i][j+50] = Mid;
+				mf.capacity[i][j+50] = Mid;
 			}
 		}
 
-		if(ff.maxFlow() == sum) {
+		if(mf.maxFlow() == sum) {
 			Ans = Mid;
 			Right = Mid-1;
 			// 최소값을 찾아야하므로 마치지 않고 더 진행
@@ -155,13 +159,13 @@ int main(){
 	// Ans 였을 때로 cap 맞춰주기
     for(int i=1; i<=N; i++){
         for(int j=1; j<=N; j++) {
-			ff.capacity[i][j+50] = Ans;
+			mf.capacity[i][j+50] = Ans;
 		}
 	}
-	ff.initFlow();
-	ff.maxFlow();
+	mf.initFlow();
+	mf.maxFlow();
     for(int i=1; i<=N; i++) {
-        for(int j=1; j<=N; j++) cout << ff.flow[i][j+50] << ' ';
+        for(int j=1; j<=N; j++) cout << mf.flow[i][j+50] << ' ';
         cout << '\n';
     }
     
