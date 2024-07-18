@@ -23,10 +23,8 @@ E = 25,000개 F는 최대 500,000만이라 O(EF), O(VE^2) 둘다 택도 없음
 
 #define MAX 
 
-struct MaximumFlow
-{
-	struct Edge
-	{
+struct Dinic {
+	struct Edge {
 		int from, to, cap, rev;
 		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
 	};
@@ -35,8 +33,8 @@ struct MaximumFlow
 	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
 
 	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
-	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
-		graph.resize(N+10);
+	Dinic(int N, int SRC, int SINK) : N(N+10), SRC(SRC), SINK(SINK) {
+	 	graph.resize(N+10);
 		work.resize(N+10);
 		level.resize(N+10);
 	}
@@ -106,7 +104,7 @@ int main(){
     int N;
     cin >> N;
 
-    MaximumFlow mf(500, 501, 502);
+    Dinic mf(N, N+1, N+2);
 
     for (int i=1; i<=N; i++){
         int num;
