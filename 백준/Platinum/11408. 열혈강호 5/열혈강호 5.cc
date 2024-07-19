@@ -34,25 +34,19 @@ struct MCMF{
 	void setSource(int t){ SRC = t; }
 	void setSink(int t){ SINK = t; }
 
-	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
-	void add_edge(int from, int to, int cap, int caprev = 0) {
+	void add_edge(int from, int to, int cap, int c) {
 		parent[from].emplace_back(to);
 		parent[to].emplace_back(from);
 		capacity[from][to] += cap;
-		capacity[to][from] += caprev;
+		cost[from][to] = c;
+        cost[to][from] = -c;
 	}
 	void add_edge_from_source(int to, int cap) {
-		add_edge(SRC, to, cap);
+		add_edge(SRC, to, cap, 0);
 	}
 	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, SINK, cap);
+		add_edge(from, SINK, cap, 0);
 	}
-
-    // 비용
-    void add_cost(int from, int to, int c){
-        cost[from][to] = c;
-        cost[to][from] = -c;
-    }
 
 	// flow 초기화
 	void init(){
@@ -78,7 +72,6 @@ struct MCMF{
 				int now = q.front(); q.pop();
                 inQ[now] = false;
 				for (auto nxt : parent[now]){
-                    // par[nxt] == -1 && 
 					if (capacity[now][nxt]-flow[now][nxt] > 0 && c[nxt] > c[now] + cost[now][nxt]){
 						c[nxt] = c[now] + cost[now][nxt];
                         par[nxt] = now;
@@ -124,10 +117,8 @@ int main(){
         for (int j=0; j<x; j++) {
             int work, cost;
 			cin >> work >> cost;
-			// 사람 => 일 (용량 1)
-            mf.add_edge(i, work+N, 1);
-            // 거리 cost, -cost로 설정
-            mf.add_cost(i, work+N, cost);
+			// 사람 => 일 (용량 1, 비용 cost)
+            mf.add_edge(i, work+N, 1, cost);
         }
 
 		// source => 사람 (용량 1)
