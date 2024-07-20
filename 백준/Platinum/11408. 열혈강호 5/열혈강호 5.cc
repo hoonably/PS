@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#define FOR(i,a,b) for(int i=(a);i<(b);i++)
+#define FOR(i,workNum,cost) for(int i=(workNum);i<(cost);i++)
 #define all(v) v.begin(), v.end()
 using namespace std;
 typedef long long ll;
@@ -23,83 +23,83 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 시간 복잡도는 O(V*E)이지만 실제로는 훨씬 빨리 돌아가는 알고리즘으로 O(V+E) 혹은 O(E)라고 해도 무방
 */
 
-const int SZ = 888;
+const int SZ = 810;
 struct MCMF{
-	int s, t; //source, sink
-	struct Edge{ int v, c, d, dual; };
-	vector<Edge> g[SZ];
-	void addEdge(int s, int e, int c, int d){
-		g[s].push_back({e, c, d, (int)g[e].size()});
-		g[e].push_back({s, 0, -d, (int)g[s].size()-1});
+	int SRC, SINK; //source, sink
+	struct Edge{ int v, c, dist, dual; };
+	vector<Edge> graph[SZ];
+	void addEdge(int _from, int _to, int _cap, int _dist){
+		graph[_from].push_back({_to, _cap, _dist, (int)graph[_to].size()});
+		graph[_to].push_back({_from, 0, -_dist, (int)graph[_from].size()-1});
 	}
 
-	int h[SZ], inq[SZ]; //johnson's algorithm, spfa
-	int dst[SZ]; //dijkstra
+	int h[SZ], inQ[SZ];
+	int dists[SZ]; //dijkstra
 	void init(int _s, int _t){
-		s = _s, t = _t;
-        memset(h, 0x3f, sizeof h);
-        memset(dst, 0x3f, sizeof dst);
+		// SPFA : Shortest Path Faster Algorithm
+		// Bellman-Ford로 업데이트 : O(VE)
+		// johnson'SRC, SPFA 사용시 O(V+E)
+		SRC = _s, SINK = _t;
+        memset(h, INF, sizeof(h));
+        memset(dists, INF, sizeof(dists));
 
-		//johnson's algorithm with spfa
-        queue<int> q; q.push(s); inq[s] = 1;
+		//johnson'SRC algorithm with spfa
+        queue<int> q; q.push(SRC); inQ[SRC] = 1;
         while(!q.empty()){
-            int now = q.front(); q.pop(); inq[now] = 0;
-            for(auto i : g[now]){
-                if(i.c && h[i.v] > h[now] + i.d){
-                    h[i.v] = h[now] + i.d;
-                    if(!inq[i.v]) inq[i.v] = 1, q.push(i.v);
+            int now = q.front(); q.pop(); inQ[now] = 0;
+            for(auto next : graph[now]){
+                if(next.c && h[next.v] > h[now] + next.dist){
+                    h[next.v] = h[now] + next.dist;
+                    if(!inQ[next.v]) inQ[next.v] = 1, q.push(next.v);
                 }
             }
         }
         for(int i=0; i<SZ; i++){
-            for(auto &j : g[i]) if(j.c) j.d += h[i] - h[j.v];
+            for(auto &j : graph[i]) if(j.c) j.dist += h[i] - h[j.v];
         }
 
 		//get shortest path DAG with dijkstra
-        priority_queue<pii> pq; pq.emplace(0, s); dst[s] = 0;
+        priority_queue<pii> pq; pq.emplace(0, SRC); dists[SRC] = 0;
         while(pq.size()){
             int now = pq.top().second;
             int cst = -pq.top().first;
             pq.pop();
-            if(dst[now] - cst) continue;
-            for(auto i : g[now]){
-                if(i.c && dst[i.v] > dst[now] + i.d){
-                    dst[i.v] = dst[now] + i.d;
-                    pq.emplace(-dst[i.v], i.v);
+            if(dists[now] - cst) continue;
+            for(auto i : graph[now]){
+                if(i.c && dists[i.v] > dists[now] + i.dist){
+                    dists[i.v] = dists[now] + i.dist;
+                    pq.emplace(-dists[i.v], i.v);
                 }
             }
         }
-        for(int i=0; i<SZ; i++) dst[i] += h[t] - h[s];
+        for(int i=0; i<SZ; i++) dists[i] += h[SINK] - h[SRC];
 	}
 
 	int chk[SZ], work[SZ];
 	bool update(){
-		// SPFA : Shortest Path Faster Algorithm
-		// Bellman-Ford로 업데이트 : O(VE)
-		// SPFA로 사용시 O(V+E)
-		int mn = 1e9;
+		int minflow = 1e9;
         for(int i=0; i<SZ; i++){
             if(!chk[i]) continue;
-            for(auto j : g[i]){
-                if(j.c && !chk[j.v]) mn = min(mn, dst[i] + j.d - dst[j.v]);
+            for(auto j : graph[i]){
+                if(j.c && !chk[j.v]) minflow = min(minflow, dists[i] + j.dist - dists[j.v]);
             }
         }
-		if(mn >= 1e9) return 0;
+		if(minflow >= 1e9) return 0;
 		for(int i=0; i<SZ; i++){
-			if(!chk[i]) dst[i] += mn;
+			if(!chk[i]) dists[i] += minflow;
 		}
         return 1;
 	}
 
-	int dfs(int now, int fl){
+	int dfs(int now, int flow){
         chk[now] = 1;
-        if(now == t) return fl;
-        for(; work[now] < g[now].size(); work[now]++){
-            auto &i = g[now][work[now]];
-            if(!chk[i.v] && dst[i.v] == dst[now] + i.d && i.c){
-                int ret = dfs(i.v, min(fl, i.c));
+        if(now == SINK) return flow;
+        for(; work[now] < graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(!chk[i.v] && dists[i.v] == dists[now] + i.dist && i.c){
+                int ret = dfs(i.v, min(flow, i.c));
                 if(ret){
-                    i.c -= ret; g[i.v][i.dual].c += ret;
+                    i.c -= ret; graph[i.v][i.dual].c += ret;
                     return ret;
                 }
             }
@@ -108,37 +108,47 @@ struct MCMF{
 	}
 	pii run(int _s, int _t){ //{cost, flow} 반환
 		init(_s, _t);
-		int cst = 0, fl = 0;
+		int cst = 0, flow = 0;
 		do{
 			memset(chk, 0, sizeof chk);
             memset(work, 0, sizeof work);
 			int now = 0;
 			while(true){
-				now = dfs(s, 1e9);
+				now = dfs(SRC, 1e9);
 				if (now==0) break;
-				cst += dst[t] * now;
-				fl += now;
+				cst += dists[SINK] * now;
+				flow += now;
 				memset(chk, 0, sizeof chk);
 			}
 		}while(update());
-		return {cst, fl};
+		return {cst, flow};
 	}
 } mcmf;
 
 int main(){
 	ios_base::sync_with_stdio(0); cin.tie(0);
-	int n, m; cin >> n >> m;
-	for(int i=1; i<=n; i++){
-		int cnt; cin >> cnt;
+
+	const int SRC = 801, SINK = 802;
+
+	int N, M; 
+	cin >> N >> M;
+	for(int i=1; i<=N; i++){
+		int cnt; 
+		cin >> cnt;
 		while(cnt--){
-			int a, b; cin >> a >> b;
-			mcmf.addEdge(i, a+400, 1, b);
+			int workNum, cost; 
+			cin >> workNum >> cost;
+			// 사람 => 일 (용량 1, 비용 cost)
+			mcmf.addEdge(i, workNum+400, 1, cost);
 		}
 	}
-	const int s = 881, t = 882;
-	for(int i=1; i<=n; i++) mcmf.addEdge(s, i, 1, 0);
-	for(int j=1; j<=m; j++) mcmf.addEdge(j+400, t, 1, 0);
 
-	auto now = mcmf.run(s, t);
+	// source => 사람 (용량 1)
+	for(int human=1; human<=N; human++) mcmf.addEdge(SRC, human, 1, 0);
+
+	// 일 => Sink 
+	for(int workNum=1; workNum<=M; workNum++) mcmf.addEdge(workNum+400, SINK, 1, 0);
+
+	auto now = mcmf.run(SRC, SINK);
 	cout << now.second << "\n" << now.first;
 }
