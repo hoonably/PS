@@ -130,7 +130,7 @@ struct MCMF{
 	}
 }mcmf;
 
-int A[301], H[301];
+tiii P[301];
 
 int main(){
 	ios_base::sync_with_stdio(0); cin.tie(0);
@@ -138,39 +138,30 @@ int main(){
 	int N;
 	cin >> N;
 
-    // 실력 받기 (단, 가장 높은 애 기록)
-    int MaxA = -1, maxIdx = -1;
-    for (int i=1; i<=N; i++){
-        cin >> A[i];
-        if (A[i] > MaxA){
-            MaxA = A[i];
-            maxIdx = i;
+    // 실력 받기
+    for (int i=1; i<=N; i++) cin >> get<0>(P[i]);
+    // 피로도 받기
+    for (int i=1; i<=N; i++) cin >> get<1>(P[i]);
+    // 최대 경기 수 받기
+    for (int i=1; i<=N; i++) cin >> get<2>(P[i]);
+
+    // 순위 순으로 정렬
+    sort(P+1, P+N+1);
+
+    for (int i=1; i<=N-1; i++) mcmf.addEdge(SRC, i, 1, 0);
+
+    // 그래프 생성 j가 i를 이김
+    for (int i=1; i<=N-1; i++){
+        for (int j=i+1; j<=N; j++){
+                int fun = (get<0>(P[i])^get<0>(P[j])) - (get<1>(P[i])+get<1>(P[j]));
+                mcmf.addEdge(i, j+300, 1, -fun);
         }
     }
 
-    // 피로도 받기
-    for (int i=1; i<=N; i++){
-        cin >> H[i];
-    }
-
-    // 최대 경기 수 받기
     // out=>sink 횟수 결정
     for (int i=1; i<=N; i++){
-        int L;
-        cin >> L;
-        if (i==maxIdx) mcmf.addEdge(i+300, SINK, L, 0);
-        else mcmf.addEdge(i+300, SINK, L-1, 0);
-    }
-
-    // 그래프 생성
-    for (int i=1; i<=N; i++){
-        mcmf.addEdge(SRC, i, 1, 0);
-        for (int j=1; j<=N; j++){
-            if (A[i]<A[j]){  // j가 i를 이길때
-                int fun = (A[i]^A[j]) - (H[i]+H[j]);
-                mcmf.addEdge(i, j+300, 1, -fun);
-            }
-        }
+        if (i==N) mcmf.addEdge(i+300, SINK, get<2>(P[i]), 0);  // 모두 이길 수 있는 애
+        else mcmf.addEdge(i+300, SINK, get<2>(P[i])-1, 0);  // 나머지
     }
 
 	pii ans = mcmf.run(SRC, SINK);
