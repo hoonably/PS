@@ -25,129 +25,159 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 흰색 정점이 있는 곳을 SRC와 연결하고 흰색 동전이 있는 곳을 SINK로 연결해서 나오는 MCMF
 */
 
-int vertex_num, edge_num;
-int adj[502][502];
-int capacity[1002][1002];
-int flow[1002][1002];
-int cost[1002][1002];
+const int SZ = 1010;
+struct MCMF{
+	int SRC, SINK; //source, sink
+	struct Edge{ int to, cap, cost, rev; };
+	vector<Edge> graph[SZ];
+	void addEdge(int _from, int _to, int _cap, int _cost){
+		graph[_from].push_back({_to, _cap, _cost, (int)graph[_to].size()});
+		graph[_to].push_back({_from, 0, -_cost, (int)graph[_from].size()-1});
+	}
 
-void floyd(){
-    for(int k=1;k<=vertex_num;k++)
-        for(int i=1;i<=vertex_num;i++)
-            for(int j=1;j<=vertex_num;j++)
-                adj[i][j] = min(adj[i][j],adj[i][k]+adj[k][j]);
-}
+	int h[SZ], inQ[SZ];
+	int dists[SZ]; //dijkstra
+	void init(int _s, int _t){
+		// SPFA : Shortest Path Faster Algorithm
+		// Bellman-Ford로 업데이트 : O(VE)
+		// johnson'SRC, SPFA 사용시 O(V+E)
+		SRC = _s, SINK = _t;
+        memset(h, INF, sizeof(h));
+        memset(dists, INF, sizeof(dists));
+		// memset(inQ, 0, sizeof(inQ));
 
-void clear(queue<int> &q){
-    queue<int> empty;
-    swap(empty,q);
+		//johnson'SRC algorithm with spfa
+        queue<int> q; q.push(SRC); inQ[SRC] = 1;
+        while(!q.empty()){
+            int now = q.front(); q.pop(); inQ[now] = 0;
+            for(auto next : graph[now]){
+                if(next.cap && h[next.to] > h[now] + next.cost){
+                    h[next.to] = h[now] + next.cost;
+                    if(!inQ[next.to]) inQ[next.to] = 1, q.push(next.to);
+                }
+            }
+        }
+        for(int i=0; i<SZ; i++){
+            for(auto &j : graph[i]) if(j.cap) j.cost += h[i] - h[j.to];
+        }
+
+		//get shortest path DAG with dijkstra
+        priority_queue<pii> pq; pq.emplace(0, SRC); dists[SRC] = 0;
+        while(pq.size()){
+            int now = pq.top().second;
+            int retCost = -pq.top().first;
+            pq.pop();
+            if(dists[now] - retCost) continue;
+            for(auto i : graph[now]){
+                if(i.cap && dists[i.to] > dists[now] + i.cost){
+                    dists[i.to] = dists[now] + i.cost;
+                    pq.emplace(-dists[i.to], i.to);
+                }
+            }
+        }
+        for(int i=0; i<SZ; i++) dists[i] += h[SINK] - h[SRC];
+	}
+
+	int chk[SZ], work[SZ];
+	bool update(){
+		int minflow = 1e9;
+        for(int i=0; i<SZ; i++){
+            if(!chk[i]) continue;
+            for(auto j : graph[i]){
+                if(j.cap && !chk[j.to]) minflow = min(minflow, dists[i] + j.cost - dists[j.to]);
+            }
+        }
+		if(minflow >= 1e9) return 0;
+		for(int i=0; i<SZ; i++){
+			if(!chk[i]) dists[i] += minflow;
+		}
+        return 1;
+	}
+
+	int dfs(int now, int flow){
+        chk[now] = 1;
+        if(now == SINK) return flow;
+        for(; work[now] < graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(!chk[i.to] && dists[i.to] == dists[now] + i.cost && i.cap){
+                int ret = dfs(i.to, min(flow, i.cap));
+                if(ret){
+                    i.cap -= ret; graph[i.to][i.rev].cap += ret;
+                    return ret;
+                }
+            }
+        }
+        return 0;
+	}
+	pii run(int _s, int _t){ //{최소비용, 최대유량} 반환
+		init(_s, _t);
+		int retCost = 0, retFlow = 0;
+		do{
+			memset(chk, 0, sizeof chk);
+            memset(work, 0, sizeof work);
+			int now = 0;
+			while(true){
+				now = dfs(SRC, 1e9);
+				if (now==0) break;
+				retCost += dists[SINK] * now;
+				retFlow += now;
+				memset(chk, 0, sizeof chk);
+			}
+		}while(update());
+		return {retCost, retFlow};
+	}
+};
+
+void solve(){
+
+	const int SRC = 1001, SINK = 1002;
+
+    int N, M;
+    cin >> N >> M;
+
+	MCMF mcmf;
+
+    // 간선 받기
+    for (int i=1; i<=M; i++) {
+        int x, y;
+        cin >> x >> y;
+		mcmf.addEdge(x, y, INF, 1);
+		mcmf.addEdge(y, x, INF, 1);
+    }
+
+    // 정점의 색 받기
+    for (int i=1; i<=N; i++){
+        int color;
+        cin >> color;
+
+		// 흰색인 경우 Source와 연결
+		if (color==1){
+			mcmf.addEdge(SRC, i, 1, 0);
+		}
+    }
+
+    // 동전의 색 받기
+    for (int i=1; i<=N; i++){
+        int color;
+        cin >> color;
+		// 흰색인 경우 Sink와 연결
+		if (color==1){
+			mcmf.addEdge(i, SINK, 1, 0);
+		}
+    }
+
+    pii ans = mcmf.run(SRC, SINK);
+    cout << ans.first << '\n';
 }
 
 int main(){
+    ios_base::sync_with_stdio(0); cin.tie(0);
 
     int T;
-    scanf("%d",&T);
-    
+    cin >> T;
     while(T--){
-        scanf("%d %d",&vertex_num,&edge_num);
-
-        memset(capacity,0,sizeof(capacity));
-        memset(cost,0x6f,sizeof(cost));
-        memset(flow,0,sizeof(flow));
-        memset(adj,0x0f,sizeof(adj));
-
-        for(int i=1;i<=vertex_num;i++)
-            adj[i][i]=0;
-
-        int a,b;
-        for(int i=0;i<edge_num;i++){
-            scanf("%d %d",&a,&b);
-            adj[a][b]=1;
-            adj[b][a]=1;
-        }
-
-        floyd();
-
-        int src=0, sink=1001;
-        vector<vector<int> > graph(1002);
-        for(int i=1;i<=vertex_num;i++){
-            scanf("%d",&a);
-            if(a){
-                graph[src].push_back(i);
-                graph[i].push_back(src);    // 양방향 엣지.
-                capacity[src][i] = 1;
-                cost[src][i] = 0;
-            }
-        }
-        for(int i=501;i<=500+vertex_num;i++){
-            scanf("%d",&a);
-            if(a){
-                for(int j=0;j<graph[src].size();j++){
-                    int before = graph[src][j];
-                    graph[before].push_back(i);
-                    graph[i].push_back(before);
-                    capacity[before][i] = 0x6fffffff;
-                    cost[before][i] = adj[before][i-500];
-                    cost[i][before] = -cost[before][i];
-                }
-                graph[i].push_back(sink);
-                graph[sink].push_back(i);
-                capacity[i][sink] = 1;
-                cost[i][sink] = 0;
-            }
-        }
-
-        int result=0;
-        while(1){
-
-            vector<int> parent(1002,-1);
-            parent[src]=src;
-
-            vector<int> dist(1002,0x6fffffff);
-            dist[src] = 0;
-            
-            queue<int> q;
-            q.push(src);
-
-            vector<bool> inQueue(1002,false);
-            inQueue[src]=true;
-
-            while(!q.empty()){
-                int here = q.front(); q.pop();
-                inQueue[here]=false;
-
-                for(int i=0;i<graph[here].size();i++){
-                    int next = graph[here][i];
-                    if(dist[next]>dist[here]+cost[here][next]
-                        && capacity[here][next]-flow[here][next]>0){
-                        dist[next] = dist[here]+cost[here][next];
-                        parent[next] = here;
-                        if(!inQueue[next]){
-                            q.push(next);
-                            inQueue[next] = true;
-                        }
-                    }
-                }
-            }
-
-            if(parent[sink]==-1) break;
-
-            int amount=0x6fffffff;
-            for(int p=sink;p!=src;p=parent[p])
-                amount = min(amount,capacity[parent[p]][p]-flow[parent[p]][p]);
-
-            for(int p=sink;p!=src;p=parent[p]){
-                flow[parent[p]][p] += amount;
-                flow[p][parent[p]] -= amount;
-                result += amount*cost[parent[p]][p];
-            }
-
-            clear(q);
-        }
-        printf("%d\n", result);
-        graph.clear();
+        solve();
     }
-
-
+    
     return 0;
 }
