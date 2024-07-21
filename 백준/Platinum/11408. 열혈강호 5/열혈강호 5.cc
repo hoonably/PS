@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #define FOR(i,workNum,cost) for(int i=(workNum);i<(cost);i++)
-#define all(v) v.begin(), v.end()
+#define all(to) to.begin(), to.end()
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii; typedef pair<ll,ll> pll;
@@ -23,14 +23,20 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 시간 복잡도는 O(V*E)이지만 실제로는 훨씬 빨리 돌아가는 알고리즘으로 O(V+E) 혹은 O(E)라고 해도 무방
 */
 
-const int SZ = 810;
+const int SZ = 810, SRC = 801, SINK = 802;
+
 struct MCMF{
 	int SRC, SINK; //source, sink
-	struct Edge{ int v, c, dist, dual; };
+	struct Edge{ int to, cap, cost, rev; };
 	vector<Edge> graph[SZ];
-	void addEdge(int _from, int _to, int _cap, int _dist){
-		graph[_from].push_back({_to, _cap, _dist, (int)graph[_to].size()});
-		graph[_to].push_back({_from, 0, -_dist, (int)graph[_from].size()-1});
+	void addEdge(int _from, int _to, int _cap, int _cost){
+		graph[_from].push_back({_to, _cap, _cost, (int)graph[_to].size()});
+		graph[_to].push_back({_from, 0, -_cost, (int)graph[_from].size()-1});
+	}
+
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++)
+			graph[i].clear();
 	}
 
 	int h[SZ], inQ[SZ];
@@ -48,27 +54,27 @@ struct MCMF{
         while(!q.empty()){
             int now = q.front(); q.pop(); inQ[now] = 0;
             for(auto next : graph[now]){
-                if(next.c && h[next.v] > h[now] + next.dist){
-                    h[next.v] = h[now] + next.dist;
-                    if(!inQ[next.v]) inQ[next.v] = 1, q.push(next.v);
+                if(next.cap && h[next.to] > h[now] + next.cost){
+                    h[next.to] = h[now] + next.cost;
+                    if(!inQ[next.to]) inQ[next.to] = 1, q.push(next.to);
                 }
             }
         }
         for(int i=0; i<SZ; i++){
-            for(auto &j : graph[i]) if(j.c) j.dist += h[i] - h[j.v];
+            for(auto &j : graph[i]) if(j.cap) j.cost += h[i] - h[j.to];
         }
 
 		//get shortest path DAG with dijkstra
         priority_queue<pii> pq; pq.emplace(0, SRC); dists[SRC] = 0;
         while(pq.size()){
             int now = pq.top().second;
-            int cst = -pq.top().first;
+            int retCost = -pq.top().first;
             pq.pop();
-            if(dists[now] - cst) continue;
+            if(dists[now] - retCost) continue;
             for(auto i : graph[now]){
-                if(i.c && dists[i.v] > dists[now] + i.dist){
-                    dists[i.v] = dists[now] + i.dist;
-                    pq.emplace(-dists[i.v], i.v);
+                if(i.cap && dists[i.to] > dists[now] + i.cost){
+                    dists[i.to] = dists[now] + i.cost;
+                    pq.emplace(-dists[i.to], i.to);
                 }
             }
         }
@@ -81,7 +87,7 @@ struct MCMF{
         for(int i=0; i<SZ; i++){
             if(!chk[i]) continue;
             for(auto j : graph[i]){
-                if(j.c && !chk[j.v]) minflow = min(minflow, dists[i] + j.dist - dists[j.v]);
+                if(j.cap && !chk[j.to]) minflow = min(minflow, dists[i] + j.cost - dists[j.to]);
             }
         }
 		if(minflow >= 1e9) return 0;
@@ -94,21 +100,21 @@ struct MCMF{
 	int dfs(int now, int flow){
         chk[now] = 1;
         if(now == SINK) return flow;
-        for(; work[now] < graph[now].size(); work[now]++){
+        for(; work[now] < (int)graph[now].size(); work[now]++){
             auto &i = graph[now][work[now]];
-            if(!chk[i.v] && dists[i.v] == dists[now] + i.dist && i.c){
-                int ret = dfs(i.v, min(flow, i.c));
+            if(!chk[i.to] && dists[i.to] == dists[now] + i.cost && i.cap){
+                int ret = dfs(i.to, min(flow, i.cap));
                 if(ret){
-                    i.c -= ret; graph[i.v][i.dual].c += ret;
+                    i.cap -= ret; graph[i.to][i.rev].cap += ret;
                     return ret;
                 }
             }
         }
         return 0;
 	}
-	pii run(int _s, int _t){ //{cost, flow} 반환
+	pii run(int _s, int _t){ //{최소비용, 최대유량} 반환
 		init(_s, _t);
-		int cst = 0, flow = 0;
+		int retCost = 0, retFlow = 0;
 		do{
 			memset(chk, 0, sizeof chk);
             memset(work, 0, sizeof work);
@@ -116,21 +122,19 @@ struct MCMF{
 			while(true){
 				now = dfs(SRC, 1e9);
 				if (now==0) break;
-				cst += dists[SINK] * now;
-				flow += now;
+				retCost += dists[SINK] * now;
+				retFlow += now;
 				memset(chk, 0, sizeof chk);
 			}
 		}while(update());
-		return {cst, flow};
+		return {retCost, retFlow};
 	}
-} mcmf;
+}mcmf;
 
 int main(){
 	ios_base::sync_with_stdio(0); cin.tie(0);
 
-	const int SRC = 801, SINK = 802;
-
-	int N, M; 
+	int N, M;
 	cin >> N >> M;
 	for(int i=1; i<=N; i++){
 		int cnt; 
@@ -149,6 +153,6 @@ int main(){
 	// 일 => Sink 
 	for(int workNum=1; workNum<=M; workNum++) mcmf.addEdge(workNum+400, SINK, 1, 0);
 
-	auto now = mcmf.run(SRC, SINK);
-	cout << now.second << "\n" << now.first;
+	pii ans = mcmf.run(SRC, SINK);
+	cout << ans.second << "\n" << ans.first;
 }
