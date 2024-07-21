@@ -145,7 +145,7 @@ int main(){
     // 최대 경기 수 받기
     for (int i=1; i<=N; i++) cin >> get<2>(P[i]);
 
-    // 순위 순으로 정렬
+    // 실력이 낮은 순으로 정렬
     sort(P+1, P+N+1);
 
     for (int i=1; i<=N-1; i++) mcmf.addEdge(SRC, i, 1, 0);
@@ -158,10 +158,11 @@ int main(){
         }
     }
 
-    // out=>sink 횟수 결정
+    // out=>sink 횟수 결정 (여기가 어려움)
     for (int i=1; i<=N; i++){
         if (i==N) mcmf.addEdge(i+300, SINK, get<2>(P[i]), 0);  // 모두 이길 수 있는 애
-        else mcmf.addEdge(i+300, SINK, get<2>(P[i])-1, 0);  // 나머지
+        // 나머지는 무조건 한게임은 지므로 게임 할 수 있는 횟수보다 1 빼기
+        else mcmf.addEdge(i+300, SINK, get<2>(P[i])-1, 0);
     }
 
 	pii ans = mcmf.run(SRC, SINK);
