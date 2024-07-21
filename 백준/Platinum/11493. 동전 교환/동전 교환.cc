@@ -35,6 +35,12 @@ struct MCMF{
 		graph[_to].push_back({_from, 0, -_cost, (int)graph[_from].size()-1});
 	}
 
+	void initGraph(){
+		// 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<=SZ; i++)
+			graph[i].clear();
+	}
+
 	int h[SZ], inQ[SZ];
 	int dists[SZ]; //dijkstra
 	void init(int _s, int _t){
@@ -126,16 +132,16 @@ struct MCMF{
 		}while(update());
 		return {retCost, retFlow};
 	}
-};
+}mcmf;
 
 void solve(){
+
+	mcmf.initGraph();
 
 	const int SRC = 1001, SINK = 1002;
 
     int N, M;
     cin >> N >> M;
-
-	MCMF mcmf;
 
     // 간선 받기
     for (int i=1; i<=M; i++) {
