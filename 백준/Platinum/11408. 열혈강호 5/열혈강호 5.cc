@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#define FOR(i,workNum,cost) for(int i=(workNum);i<(cost);i++)
-#define all(to) to.begin(), to.end()
+#define FOR(i,a,b) for(int i=(a);i<(b);i++)
+#define all(v) v.begin(), v.end()
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii; typedef pair<ll,ll> pll;
@@ -23,136 +23,107 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 시간 복잡도는 O(V*E)이지만 실제로는 훨씬 빨리 돌아가는 알고리즘으로 O(V+E) 혹은 O(E)라고 해도 무방
 */
 
+#define MAX 
+
 const int SZ = 810, SRC = 801, SINK = 802;
 
 struct MCMF{
-	int SRC, SINK; //source, sink
-	struct Edge{ int to, cap, cost, rev; };
-	vector<Edge> graph[SZ];
-	void addEdge(int _from, int _to, int _cap, int _cost){
-		graph[_from].push_back({_to, _cap, _cost, (int)graph[_to].size()});
-		graph[_to].push_back({_from, 0, -_cost, (int)graph[_from].size()-1});
+	int flow[SZ][SZ], capacity[SZ][SZ], cost[SZ][SZ];
+	vector<int> parent[SZ];
+
+	void add_edge(int from, int to, int cap, int c) {
+		parent[from].emplace_back(to);
+		parent[to].emplace_back(from);
+		capacity[from][to] += cap;
+		cost[from][to] = c;
+        cost[to][from] = -c;
 	}
 
-	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
-		for (int i=0; i<SZ; i++)
-			graph[i].clear();
+	void init(){
+		memset(flow, 0, sizeof(flow));
+		memset(capacity, 0, sizeof(capacity));
+		memset(cost, 0, sizeof(cost));
 	}
 
-	int h[SZ], inQ[SZ];
-	int dists[SZ]; //dijkstra
-	void init(int _s, int _t){
-		// SPFA : Shortest Path Faster Algorithm
-		// Bellman-Ford로 업데이트 : O(VE)
-		// johnson'SRC, SPFA 사용시 O(V+E)
-		SRC = _s, SINK = _t;
-        memset(h, INF, sizeof(h));
-        memset(dists, INF, sizeof(dists));
+    // SPFA를 사용한 MCMF
+	pii getMCMF(){
+		int retCost = 0, retFlow=0;
+		vector<int> par(SZ), c(SZ);
+        vector<bool> inQ(SZ);
 
-		//johnson'SRC algorithm with spfa
-        queue<int> q; q.push(SRC); inQ[SRC] = 1;
-        while(!q.empty()){
-            int now = q.front(); q.pop(); inQ[now] = 0;
-            for(auto next : graph[now]){
-                if(next.cap && h[next.to] > h[now] + next.cost){
-                    h[next.to] = h[now] + next.cost;
-                    if(!inQ[next.to]) inQ[next.to] = 1, q.push(next.to);
-                }
-            }
-        }
-        for(int i=0; i<SZ; i++){
-            for(auto &j : graph[i]) if(j.cap) j.cost += h[i] - h[j.to];
-        }
+		while(true){
+			fill(par.begin(), par.end(), -1);
+            fill(c.begin(), c.end(), INF);
 
-		//get shortest path DAG with dijkstra
-        priority_queue<pii> pq; pq.emplace(0, SRC); dists[SRC] = 0;
-        while(pq.size()){
-            int now = pq.top().second;
-            int retCost = -pq.top().first;
-            pq.pop();
-            if(dists[now] - retCost) continue;
-            for(auto i : graph[now]){
-                if(i.cap && dists[i.to] > dists[now] + i.cost){
-                    dists[i.to] = dists[now] + i.cost;
-                    pq.emplace(-dists[i.to], i.to);
-                }
-            }
-        }
-        for(int i=0; i<SZ; i++) dists[i] += h[SINK] - h[SRC];
-	}
+            c[SRC] = 0;
+            inQ[SRC] = true;
 
-	int chk[SZ], work[SZ];
-	bool update(){
-		int minflow = 1e9;
-        for(int i=0; i<SZ; i++){
-            if(!chk[i]) continue;
-            for(auto j : graph[i]){
-                if(j.cap && !chk[j.to]) minflow = min(minflow, dists[i] + j.cost - dists[j.to]);
-            }
-        }
-		if(minflow >= 1e9) return 0;
-		for(int i=0; i<SZ; i++){
-			if(!chk[i]) dists[i] += minflow;
-		}
-        return 1;
-	}
-
-	int dfs(int now, int flow){
-        chk[now] = 1;
-        if(now == SINK) return flow;
-        for(; work[now] < (int)graph[now].size(); work[now]++){
-            auto &i = graph[now][work[now]];
-            if(!chk[i.to] && dists[i.to] == dists[now] + i.cost && i.cap){
-                int ret = dfs(i.to, min(flow, i.cap));
-                if(ret){
-                    i.cap -= ret; graph[i.to][i.rev].cap += ret;
-                    return ret;
-                }
-            }
-        }
-        return 0;
-	}
-	pii run(int _s, int _t){ //{최소비용, 최대유량} 반환
-		init(_s, _t);
-		int retCost = 0, retFlow = 0;
-		do{
-			memset(chk, 0, sizeof chk);
-            memset(work, 0, sizeof work);
-			int now = 0;
-			while(true){
-				now = dfs(SRC, 1e9);
-				if (now==0) break;
-				retCost += dists[SINK] * now;
-				retFlow += now;
-				memset(chk, 0, sizeof chk);
+			queue<int> q;
+			q.push(SRC);
+			while(!q.empty()){
+				int now = q.front(); q.pop();
+                inQ[now] = false;
+				for (auto nxt : parent[now]){
+					if (capacity[now][nxt]-flow[now][nxt] > 0 && c[nxt] > c[now] + cost[now][nxt]){
+						c[nxt] = c[now] + cost[now][nxt];
+                        par[nxt] = now;
+                        if (!inQ[nxt]) {
+                            q.push(nxt);
+                            inQ[nxt] = true;
+                        }
+					}
+				}
 			}
-		}while(update());
-		return {retCost, retFlow};
+
+			// 종료
+			if(par[SINK] == -1) break;
+
+			// 거꾸로 최소 유량 탐색
+			int minFlow = INF;
+			for(int i=SINK; i!=SRC; i = par[i]){
+				minFlow = min(minFlow, capacity[par[i]][i] - flow[par[i]][i]);
+			}
+			// 최소 유량 처리
+			for(int i=SINK; i!=SRC; i = par[i]){
+                retCost += minFlow * cost[par[i]][i];  // 최소 비용
+				flow[par[i]][i] += minFlow; 
+				flow[i][par[i]] -= minFlow;
+			}
+            retFlow++;
+		}
+		return {retCost,retFlow};  // {최소비용, 최대유량}
 	}
 }mcmf;
 
 int main(){
-	ios_base::sync_with_stdio(0); cin.tie(0);
+    ios_base::sync_with_stdio(0); cin.tie(0);
+    
+    int N, M;
+    cin >> N >> M;
 
-	int N, M;
-	cin >> N >> M;
-	for(int i=1; i<=N; i++){
-		int cnt; 
-		cin >> cnt;
-		while(cnt--){
-			int workNum, cost; 
-			cin >> workNum >> cost;
+	// mcmf.init();
+
+    for (int i=1; i<=N; i++) {
+        int x;
+		cin >> x;
+        for (int j=0; j<x; j++) {
+            int work, cost;
+			cin >> work >> cost;
 			// 사람 => 일 (용량 1, 비용 cost)
-			mcmf.addEdge(i, workNum+400, 1, cost);
-		}
+            mcmf.add_edge(i, work+N, 1, cost);
+        }
+
+		// source => 사람 (용량 1)
+        mcmf.add_edge(SRC, i, 1, 0);
+    }
+
+    for (int iwork=1; iwork<=M; iwork++) {
+		// 일 => Sink
+		mcmf.add_edge(iwork+N, SINK, 1, 0);
 	}
 
-	// source => 사람 (용량 1)
-	for(int human=1; human<=N; human++) mcmf.addEdge(SRC, human, 1, 0);
-
-	// 일 => Sink 
-	for(int workNum=1; workNum<=M; workNum++) mcmf.addEdge(workNum+400, SINK, 1, 0);
-
-	pii ans = mcmf.run(SRC, SINK);
-	cout << ans.second << "\n" << ans.first;
+    pii ans = mcmf.getMCMF();
+    cout << ans.second << '\n' << ans.first << '\n';
+    
+    return 0;
 }
