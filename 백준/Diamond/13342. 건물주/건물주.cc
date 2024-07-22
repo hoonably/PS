@@ -25,10 +25,16 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 
 const int SZ = 110, SRC = 101, SINK = 102;
 
-class MCMF {
-public:
+struct MCMF {
 	using edge = tuple<int, ll, ll, ll>;
-	MCMF(int SZ) : G(SZ), d(SZ), last(SZ), vst(SZ) { }
+
+	vector<edge> E;
+	vector<int> G[SZ];
+	ll d[SZ];
+	int last[SZ];
+	bool vst[SZ];
+	ll tcost{};
+
 	void addEdge(int u, int v, ll w, ll c, bool d = true) {
 		G[u].push_back(E.size());
 		E.push_back({v, w, 0, c});
@@ -41,7 +47,7 @@ public:
 	pair<ll, ll> run(int s, int t) {
 		ll mf{}, mcost{};
 		while (spfa(s, t)) {
-			fill(last.begin(), last.end(), 0);
+			memset(last, 0, sizeof(last));
 			while (ll f = dfs(s, t)) {
 				mf += f;
 				mcost = min(mcost, tcost);
@@ -51,7 +57,7 @@ public:
 	}
 private:
 	bool spfa(int s, int t) {
-		fill(d.begin(), d.end(), INF);
+		fill(d, d+SZ, INF);
 		queue<int> q;
 		d[s] = 0, vst[s] = true;
 		q.push(s);
@@ -76,7 +82,7 @@ private:
 			return f;
 		}
 		vst[u] = true;
-		for (int &i = last[u]; i < G[u].size(); ++i) {
+		for (int &i = last[u]; i < (int)G[u].size(); ++i) {
 			auto &[v, cap, flow, cost] = E[G[u][i]];
 			if (!vst[v] && d[v] == d[u] + cost && flow < cap) {
 				if (ll pushed = dfs(v, t, min(f, cap - flow))) {
@@ -92,13 +98,7 @@ private:
 		vst[u] = false;
 		return 0;
 	}
-	vector<edge> E;
-	vector<vector<int>> G;
-	vector<ll> d;
-	vector<int> last;
-	deque<bool> vst;
-	ll tcost{};
-}mcmf(SZ);
+}mcmf;
 
 int Car[50], A[51];
 int dist[50][50];
@@ -144,7 +144,8 @@ int main(){
 		for (int j = 0; j < M; ++j) {
 			// 나중에 걸어가는 거리 더해줄거라 빼줌
 			int cost = W * dist[A[j]][Car[i]] + D * dist[Car[i]][A[j + 1]] - W * dist[A[j]][A[j + 1]];
-			mcmf.addEdge(i, j+50, 1, cost);
+			if (cost<0) mcmf.addEdge(i, j+50, 1, cost);
+			// cost가 0보다 적어야 차타는게 용이한거임
 		}
 	}
 
