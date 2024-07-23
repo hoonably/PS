@@ -165,7 +165,5 @@ int main(){
 		mcmf.addEdge(j+50, SINK, 1, 0);
 	}
 
-	ll ans = mcmf.run().first;
-
-	cout << ans << "\n";
+	cout << mcmf.run().first << "\n";
 }
