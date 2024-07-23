@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#define FOR(i,workNum,cost) for(int i=(workNum);i<(cost);i++)
-#define all(to) to.begin(), to.end()
+#define FOR(i,a,b) for(int i=(a);i<(b);i++)
+#define all(v) v.begin(), v.end()
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii; typedef pair<ll,ll> pll;
@@ -25,80 +25,93 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 
 const int SZ = 110, SRC = 101, SINK = 102;
 
-struct MCMF {
-	using edge = tuple<int, ll, ll, ll>;
+struct MCMF{  // use Dinic
+	struct Edge{ int to, cap, cost, rev; };
+	vector<Edge> graph[SZ];
+	void addEdge(int _from, int _to, int _cap, int _cost){
+		graph[_from].push_back({_to, _cap, _cost, (int)graph[_to].size()});
+		graph[_to].push_back({_from, 0, -_cost, (int)graph[_from].size()-1});
+	}
 
-	vector<edge> E;
-	vector<int> G[SZ];
-	ll d[SZ];
-	int last[SZ];
-	bool vst[SZ];
-	ll tcost{};
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++)
+			graph[i].clear();
+	}
 
-	void addEdge(int u, int v, ll w, ll c, bool d = true) {
-		G[u].push_back(E.size());
-		E.push_back({v, w, 0, c});
-		G[v].push_back(E.size());
-		E.push_back({u, 0, 0, -c});
-		if (!d) {
-			addEdge(v, u, w, c);
+	bool inQ[SZ];
+	int dists[SZ]; //dijkstra
+    bool spfa() {
+        memset(dists, 0x3f, sizeof(dists));  // = 0x3f3f3f3f = 106,119,567
+        memset(inQ, false, sizeof(inQ));
+        queue<int> q;
+        q.push(SRC);
+        inQ[SRC] = true;
+        dists[SRC] = 0;
+        while (q.size()) {
+            int now = q.front();
+            q.pop();
+            inQ[now] = false;
+            for (auto i: graph[now]) {
+                if (i.cap && dists[i.to] > dists[now] + i.cost) {
+                    dists[i.to] = dists[now] + i.cost;
+                    if (!inQ[i.to]) inQ[i.to] = true, q.push(i.to);
+                }
+            }
+        }
+        return dists[SINK] < 1e9;
+    }
+
+	bool chk[SZ];
+	int work[SZ];
+	bool update(){
+		int minflow = 1e9;
+        for(int i=0; i<SZ; i++){
+            if(!chk[i]) continue;
+            for(auto j : graph[i]){
+                if(j.cap && !chk[j.to])
+					minflow = min(minflow, dists[i] + j.cost - dists[j.to]);
+            }
+        }
+		if(minflow >= 1e9) return 0;
+		for(int i=0; i<SZ; i++){
+			if(!chk[i]) dists[i] += minflow;
 		}
+        return 1;
 	}
-	pair<ll, ll> run(int s, int t) {
-		ll mf{}, mcost{};
-		while (spfa(s, t)) {
-			memset(last, 0, sizeof(last));
-			while (ll f = dfs(s, t)) {
-				mf += f;
-				mcost = min(mcost, tcost);
-			}
-		}
-		return {mcost, mf};
+
+	int dfs(int now, int flow){
+        chk[now] = true;
+        if(now == SINK) return flow;
+        for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(!chk[i.to] && dists[i.to] == dists[now] + i.cost && i.cap){
+                int ret = dfs(i.to, min(flow, i.cap));
+                if(ret){
+                    i.cap -= ret; graph[i.to][i.rev].cap += ret;
+                    return ret;
+                }
+            }
+        }
+        return 0;
 	}
-private:
-	bool spfa(int s, int t) {
-		fill(d, d+SZ, INF);
-		queue<int> q;
-		d[s] = 0, vst[s] = true;
-		q.push(s);
-		while (q.size()) {
-			int u = q.front(); q.pop();
-			vst[u] = false;
-			for (int idx : G[u]) {
-				auto &[v, cap, flow, cost] = E[idx];
-				if (d[v] > d[u] + cost && flow < cap) {
-					d[v] = d[u] + cost;
-					if (!vst[v]) {
-						vst[v] = true;
-						q.push(v);
-					}
-				}
-			}
-		}
-		return d[t] < INF;
-	}
-	ll dfs(int u, int t, ll f = INF) {
-		if (u == t) {
-			return f;
-		}
-		vst[u] = true;
-		for (int &i = last[u]; i < (int)G[u].size(); ++i) {
-			auto &[v, cap, flow, cost] = E[G[u][i]];
-			if (!vst[v] && d[v] == d[u] + cost && flow < cap) {
-				if (ll pushed = dfs(v, t, min(f, cap - flow))) {
-					tcost += pushed * cost;
-					flow += pushed;
-					auto &rflow = get<2>(E[G[u][i] ^ 1]);
-					rflow -= pushed;
-					vst[u] = false;
-					return pushed;
-				}
-			}
-		}
-		vst[u] = false;
-		return 0;
-	}
-}mcmf;
+
+    pair<int, int> run() {
+        int cost = 0, flow = 0;
+        while (spfa()) {
+            memset(chk, 0, sizeof chk);
+            memset(work, 0, sizeof work);
+            int now = 0;
+            while (true) {
+				now = dfs(SRC, 1e9);
+				if (now==0) break;
+                cost += dists[SINK] * now;
+                flow += now;
+                memset(chk, 0, sizeof chk);
+            }
+        }
+        return {cost, flow};
+    }
+} mcmf;
 
 int Car[50], A[51];
 int dist[50][50];
@@ -134,31 +147,25 @@ int main(){
 			for (int j=0; j<N; j++)
 				dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j]);
 
-	// SRC => 차고 연결
-	for (int i = 0; i < C; ++i) {
+	// SRC => 도시 연결
+	for (int i = 0; i < M; ++i) {
 		mcmf.addEdge(SRC, i, 1, 0);
 	}
 
-	// C개의 차고에서 M개의 방문도시 잇기
-	for (int i = 0; i < C; ++i) {
-		for (int j = 0; j < M; ++j) {
-			// 나중에 걸어가는 거리 더해줄거라 빼줌
-			int cost = W * dist[A[j]][Car[i]] + D * dist[Car[i]][A[j + 1]] - W * dist[A[j]][A[j + 1]];
-			if (cost<0) mcmf.addEdge(i, j+50, 1, cost);
-			// cost가 0보다 적어야 차타는게 용이한거임
+	// M개의 방문도시에서 차를 타는 경우
+	for(int i=0; i<M; i++) {
+		mcmf.addEdge(i, SINK, 1, dist[A[i]][A[i+1]] * W);
+		for(int j=0; j<C; j++) {
+			mcmf.addEdge(i, j+50, 1, dist[A[i]][Car[j]] * W + dist[Car[j]][A[i+1]] * D);
 		}
 	}
 
-	// 방문도시 => Sink 연결
-	for (int j = 0; j < M; ++j) {
+	// 차고 => Sink 연결
+	for (int j = 0; j < C; ++j) {
 		mcmf.addEdge(j+50, SINK, 1, 0);
 	}
 
-	ll ans = mcmf.run(SRC, SINK).first;
+	ll ans = mcmf.run().first;
 
-	// 0 => A[1] => A[2] => A[M-1] 기본적으로 걸어가는 거리
-	for (int j = 0; j < M; ++j) {
-		ans += W * dist[A[j]][A[j + 1]];
-	}
 	cout << ans << "\n";
 }
