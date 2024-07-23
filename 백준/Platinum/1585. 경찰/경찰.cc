@@ -110,12 +110,9 @@ struct MCMF{  // use Dinic
         }
         return 0;
 	}
-
-	int run(int N){ // 따로 바꿔줌 cnt 이용
+	pii run(){ //{최소비용, 최대유량} 반환
 		init();
 		int retCost = 0, retFlow = 0;
-
-		int cnt = 0;
 		do{
 			memset(chk, 0, sizeof chk);
             memset(work, 0, sizeof work);
@@ -126,14 +123,11 @@ struct MCMF{  // use Dinic
 				retCost += dists[SINK] * now;
 				retFlow += now;
 				memset(chk, 0, sizeof chk);
-				cnt++;
 			}
 		}while(update());
-		// cout << cnt << '\n';
-		if (cnt<N) return -1;
-		return retCost;
+		return {retCost, retFlow};
 	}
-}mcmf1, mcmf2;
+}mcmf;
 
 int s[51], e[51];
 
@@ -154,41 +148,55 @@ int main(){
 
 	// SRC => start
 	for (int i=1; i<=N; i++){
-		mcmf1.addEdge(SRC, i, 1, 0);
-		mcmf2.addEdge(SRC, i, 1, 0);
+		mcmf.addEdge(SRC, i, 1, 0);
 	}
 
 	// end => SINK
 	for (int i=1; i<=N; i++){
-		mcmf1.addEdge(i+50, SINK, 1, 0);
-		mcmf2.addEdge(i+50, SINK, 1, 0);
+		mcmf.addEdge(i+50, SINK, 1, 0);
 	}
 
-	int cnt = 0;  // N개의 정보를 만들 수 있는가?
 	for (int i=1; i<=N; i++){
 		for (int j=1; j<=N; j++){
-
 			if (e[j]<=s[i]) continue;  // 매칭 불가능
-
 			int over =  T - (e[j]-s[i]);
 			if (over>0){
-				cnt++;
 				over = min(over*over, F);  // 최대 F
-				mcmf1.addEdge(i, j+50, 1, over);
-				mcmf2.addEdge(i, j+50, 1, -over);
+				mcmf.addEdge(i, j+50, 1, over);
 			}
-			else{
-				mcmf1.addEdge(i, j+50, 1, 0);
-				mcmf2.addEdge(i, j+50, 1, 0);
-			}
+			else mcmf.addEdge(i, j+50, 1, 0);
 		}
 	}
 
-	int ans = mcmf1.run(N);
-	if (ans==-1) {
+	auto ans = mcmf.run();
+
+	// 최대 유량이 N보다 작다면
+	if (ans.second<N) {
 		cout << "-1";
 		return 0;
 	}
 
-	cout << ans << ' ' << -mcmf2.run(N);
+	mcmf.initGraph();
+
+	// SRC => start
+	for (int i=1; i<=N; i++)
+		mcmf.addEdge(SRC, i, 1, 0);
+
+	// end => SINK
+	for (int i=1; i<=N; i++)
+		mcmf.addEdge(i+50, SINK, 1, 0);
+
+	for (int i=1; i<=N; i++){
+		for (int j=1; j<=N; j++){
+			if (e[j]<=s[i]) continue;  // 매칭 불가능
+			int over =  T - (e[j]-s[i]);
+			if (over>0){
+				over = min(over*over, F);  // 최대 F
+				mcmf.addEdge(i, j+50, 1, -over);
+			}
+			else mcmf.addEdge(i, j+50, 1, 0);
+		}
+	}
+
+	cout << ans.first << ' ' << -mcmf.run().first;
 }
