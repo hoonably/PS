@@ -19,87 +19,62 @@ https://www.acmicpc.net/problem/1420
 in -> out 가중치를 1로 설정 (사용된 정점은 더 이상 지나갈 수 없으므로, 더 이상 증가 경로에 포함되지 않는다.)
 out -> in 가중치를 1로 설정
 
-
+그래프가 방대해 디닉 알고리즘 사용
 */
 
-#define MAX 
+const int SZ = 20010, SRC = 20001, SINK = 20002;
 
-struct MaximumFlow
-{
-	struct Edge
-	{
-		int from, to, cap, rev;
-		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
-	};
-	vector<vector<Edge>> graph;
-	vector<int> work, level;
-	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
+struct NetworkFlow{  // use Dinic
 
-	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
-	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
-		graph.resize(N+10);
-		work.resize(N+10);
-		level.resize(N+10);
-	}
+	using FlowType = int;
+
+	struct Edge{ int to, rev; FlowType cap; };
+	vector<Edge> graph[SZ];
+	int level[SZ], work[SZ];
 
 	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
-	void add_edge(int from, int to, int cap, int caprev = 0) {
-		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, caprev);
-		graph[from].back().rev = graph[to].size() - 1;
-		graph[to].back().rev = graph[from].size() - 1;
+	void addEdge(int _from, int _to, FlowType _cap, FlowType _caprev = 0){
+		graph[_from].push_back({_to, (int)graph[_to].size(), _cap});
+		graph[_to].push_back({_from, (int)graph[_from].size()-1, -_caprev});
 	}
-	void add_edge_from_source(int to, int cap) {
-		add_edge(SRC, to, cap);
+
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++) graph[i].clear();
 	}
-	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, SINK, cap);
-	}
-	int dfs(int c, int minFlow = INT_MAX) {
-		if (c == SINK) {
-			return minFlow;
-		}
-		int flow;
-		for (int &i = work[c]; i < graph[c].size(); i++) {
-			auto &e = graph[c][i];
-			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
-				e.cap -= flow;
-				graph[e.to][e.rev].cap += flow;
-				return flow;
-			}
-		}
-		return 0;
-	}
-	int flow() {
-		int ret = 0;
-		queue<int> q;
-		while(true) {
-			int flow = 0;
-			fill(level.begin(), level.end(), -1);
-			q.push(SRC);
-			level[SRC] = 0;
-			while (!q.empty()) {
-				int c = q.front();
-				q.pop();
-				for (auto &e : graph[c]) {
-					if (e.cap > 0 && level[e.to] == -1) {
-						level[e.to] = level[e.from] + 1;
-						q.push(e.to);
-					}
-				}
-			}
-			fill(work.begin(), work.end(), 0);
-			while (int temp = dfs(SRC)) {
-				flow += temp;
-			}
-			if (flow == 0) {
-				break;
-			}
-			ret += flow;
-		}
-		return ret;
-	}
-};
+
+    bool BFS(int SRC, int SINK){
+        memset(level, 0, sizeof(level));
+        queue<int> q; q.push(SRC); level[SRC] = 1;
+        while(!q.empty()){
+            int now = q.front(); q.pop();
+            for(const auto &i : graph[now]){
+                if(!level[i.to] && i.cap) q.push(i.to), level[i.to] = level[now] + 1;
+            }
+        }
+        return level[SINK];
+    }
+    FlowType DFS(int now, int SINK, FlowType flow){
+        if(now == SINK) return flow;
+		for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(level[i.to] != level[now] + 1 || !i.cap) continue;
+            FlowType ret = DFS(i.to, SINK, min(flow, i.cap));
+            if(!ret) continue;
+            i.cap -= ret;
+            graph[i.to][i.rev].cap += ret;
+            return ret;
+        }
+        return 0;
+    }
+    FlowType maxFlow(int s = SRC, int t = SINK){
+        FlowType ret = 0, minFlow;
+        while(BFS(s, t)){
+            memset(work, 0, sizeof(work));
+            while((minFlow = DFS(s, t, INF))) ret += minFlow;
+        }
+        return ret;
+    }
+} nf;
 
 char board[100][100];
 
@@ -109,38 +84,42 @@ int main(){
     int N, M;
     cin >> N >> M;
 
-	// 아직 source, sink 안정해짐
-    MaximumFlow mf(2*N*M, 0, 0);
-
     for (int i=0; i<N; i++){
 		for(int j=0; j<M; j++){
 			cin >> board[i][j];
 		}
     }
 
+	int src=0, sink=0;
+
     for(int i=0;i<N;i++){
         for(int j=0;j<M;j++){
             if(board[i][j]=='#') continue;
-            if(board[i][j]=='K')  mf.SRC=2*(i*M+j)+1;
-            if(board[i][j]=='H')  mf.SINK=2*(i*M+j);
+
+			// Source와 sink 정함
+            if(board[i][j]=='K')  src = 2*(i*100+j)+1;
+            if(board[i][j]=='H')  sink = 2*(i*100+j);
             
-			// 자기자신
-            mf.add_edge(2*(i*M+j), 2*(i*M+j)+1, 1);
+			// 자기자신 in -> out
+            nf.addEdge(2*(i*100+j), 2*(i*100+j)+1, 1);
             
+			// 아래쪽으로 갈 수 있다면
             if(i<N-1 && board[i+1][j]!='#'){
-                mf.add_edge(2*(i*M+j)+1, 2*((i+1)*M+j), INF);
-                mf.add_edge(2*((i+1)*M+j)+1, 2*(i*M+j), INF);
+                nf.addEdge(2*(i*100+j)+1, 2*((i+1)*100+j), INF);
+                nf.addEdge(2*((i+1)*100+j)+1, 2*(i*100+j), INF);
             }
-                       
+			// 위쪽으로 갈 수 있다면
             if(j<M-1 && board[i][j+1]!='#'){
-                mf.add_edge(2*(i*M+j)+1, 2*(i*M+j+1), INF);
-                mf.add_edge(2*(i*M+j+1)+1, 2*(i*M+j), INF);
+                nf.addEdge(2*(i*100+j)+1, 2*(i*100+j+1), INF);
+                nf.addEdge(2*(i*100+j+1)+1, 2*(i*100+j), INF);
             }
         }
     }
 
-	int ans = mf.flow();
-	if (ans>4) cout << "-1";
+	int ans = nf.maxFlow(src, sink);
+
+	// 4개로도 못막는다면 둘이 붙어있다는거임
+	if (ans>4) cout << "-1";  // 둘이 붙어있는 경우임
 	else cout << ans;
     
     return 0;
