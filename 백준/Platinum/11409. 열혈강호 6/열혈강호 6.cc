@@ -37,8 +37,7 @@ struct MCMF{  // use Dinic
 	}
 
 	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
-		for (int i=0; i<SZ; i++)
-			graph[i].clear();
+		for (int i=0; i<SZ; i++) graph[i].clear();
 	}
 
 	bool inQ[SZ];
@@ -51,8 +50,7 @@ struct MCMF{  // use Dinic
         inQ[SRC] = true;
         dists[SRC] = 0;
         while (q.size()) {
-            int now = q.front();
-            q.pop();
+            int now = q.front(); q.pop();
             inQ[now] = false;
             for (auto i: graph[now]) {
                 if (i.cap && dists[i.to] > dists[now] + i.cost) {
@@ -61,27 +59,11 @@ struct MCMF{  // use Dinic
                 }
             }
         }
-        return dists[SINK] < 1e9;
+        return dists[SINK] < 0x3f3f3f3f;  // dist[SINK]가 갱신되었다면 true
     }
 
 	bool chk[SZ];
 	int work[SZ];
-	bool update(){
-		int minflow = 1e9;
-        for(int i=0; i<SZ; i++){
-            if(!chk[i]) continue;
-            for(auto j : graph[i]){
-                if(j.cap && !chk[j.to])
-					minflow = min(minflow, dists[i] + j.cost - dists[j.to]);
-            }
-        }
-		if(minflow >= 1e9) return 0;
-		for(int i=0; i<SZ; i++){
-			if(!chk[i]) dists[i] += minflow;
-		}
-        return 1;
-	}
-
 	int dfs(int now, int flow){
         chk[now] = true;
         if(now == SINK) return flow;
