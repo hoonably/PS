@@ -17,88 +17,63 @@ https://www.acmicpc.net/problem/2316
 네트워크 플로우
 
 기존의 그래프에서 in과 out으로 정점을 분할한다.
-in -> out 가중치를 1로 설정
-out -> in 가중치를 INF로 설정
+in -> out 가중치를 1로 설정 (사용된 정점은 더 이상 지나갈 수 없으므로, 더 이상 증가 경로에 포함되지 않는다.)
+out -> in 가중치를 1로 설정
 */
 
-#define MAX
+const int SZ = 810, SRC = 801, SINK = 802;
 
-struct MaximumFlow
-{
-	struct Edge
-	{
-		int from, to, cap, rev;
-		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
-	};
-	vector<vector<Edge>> graph;
-	vector<int> work, level;
-	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
+struct NetworkFlow{  // use Dinic
 
-	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
-	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
-		graph.resize(N+10);
-		work.resize(N+10);
-		level.resize(N+10);
-	}
+	using FlowType = int;
+
+	struct Edge{ int to, rev; FlowType cap; };
+	vector<Edge> graph[SZ];
+	int level[SZ], work[SZ];
 
 	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
-	void add_edge(int from, int to, int cap, int caprev = 0) {
-		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, caprev);
-		graph[from].back().rev = graph[to].size() - 1;
-		graph[to].back().rev = graph[from].size() - 1;
+	void addEdge(int _from, int _to, FlowType _cap, FlowType _caprev = 0){
+		graph[_from].push_back({_to, (int)graph[_to].size(), _cap});
+		graph[_to].push_back({_from, (int)graph[_from].size()-1, -_caprev});
 	}
-	void add_edge_from_source(int to, int cap) {
-		add_edge(SRC, to, cap);
+
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++) graph[i].clear();
 	}
-	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, SINK, cap);
-	}
-	int dfs(int c, int minFlow = INT_MAX) {
-		if (c == SINK) {
-			return minFlow;
-		}
-		int flow;
-		for (int &i = work[c]; i < graph[c].size(); i++) {
-			auto &e = graph[c][i];
-			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
-				e.cap -= flow;
-				graph[e.to][e.rev].cap += flow;
-				return flow;
-			}
-		}
-		return 0;
-	}
-	int flow() {
-		int ret = 0;
-		queue<int> q;
-		while(true) {
-			int flow = 0;
-			fill(level.begin(), level.end(), -1);
-			q.push(SRC);
-			level[SRC] = 0;
-			while (!q.empty()) {
-				int c = q.front();
-				q.pop();
-				for (auto &e : graph[c]) {
-					if (e.cap > 0 && level[e.to] == -1) {
-						level[e.to] = level[e.from] + 1;
-						q.push(e.to);
-					}
-				}
-			}
-			fill(work.begin(), work.end(), 0);
-			while (int temp = dfs(SRC)) {
-				flow += temp;
-			}
-			if (flow == 0) {
-				break;
-			}
-			ret += flow;
-		}
-		return ret;
-	}
-};
+
+    bool BFS(int SRC, int SINK){
+        memset(level, 0, sizeof(level));
+        queue<int> q; q.push(SRC); level[SRC] = 1;
+        while(!q.empty()){
+            int now = q.front(); q.pop();
+            for(const auto &i : graph[now]){
+                if(!level[i.to] && i.cap) q.push(i.to), level[i.to] = level[now] + 1;
+            }
+        }
+        return level[SINK];
+    }
+    FlowType DFS(int now, int SINK, FlowType flow){
+        if(now == SINK) return flow;
+		for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(level[i.to] != level[now] + 1 || !i.cap) continue;
+            FlowType ret = DFS(i.to, SINK, min(flow, i.cap));
+            if(!ret) continue;
+            i.cap -= ret;
+            graph[i.to][i.rev].cap += ret;
+            return ret;
+        }
+        return 0;
+    }
+    FlowType maxFlow(int s = SRC, int t = SINK){
+        FlowType ret = 0, minFlow;
+        while(BFS(s, t)){
+            memset(work, 0, sizeof(work));
+            while((minFlow = DFS(s, t, INF))) ret += minFlow;
+        }
+        return ret;
+    }
+} nf;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -107,22 +82,23 @@ int main(){
     cin >> N >> P;
 
 	// out은 400 더하기
-	// source out = 401 / sink in = 2
-	MaximumFlow mf(800, 401, 2);
 
-	// 각자 자신의 수 in => out 간선 1로 생성 (중복 방지)
+	// 각자 자신의 수 in => out 간선 1로 생성
 	for(int i=1; i<=N; i++){
-		mf.add_edge(i, i+400, 1);
+		nf.addEdge(i, i+400, 1);
 	}
 
+	// 도로 out -> in 양방향
     for(int i=0; i<P; i++){
         int a, b;
         cin >> a >> b;
-		mf.add_edge(a+400, b, INF);
-		mf.add_edge(b+400, a, INF);
+		nf.addEdge(a+400, b, 1);
+		nf.addEdge(b+400, a, 1);
     }
 
-    cout << mf.flow();
+	// 1->2 이므로 401->2 임
+	// source out = 401 / sink in = 2
+    cout << nf.maxFlow(401, 2);
     
     return 0;
 }
