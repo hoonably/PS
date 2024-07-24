@@ -30,10 +30,10 @@ struct NetworkFlow{  // use Dinic
 
 	struct Edge{ int to, rev; FlowType cap; };
 	vector<Edge> graph[SZ];
-	int Level[SZ], Work[SZ];
+	int level[SZ], work[SZ];
 
 	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
-	void addEdge(int _from, int _to, int _cap, int _caprev = 0){
+	void addEdge(int _from, int _to, FlowType _cap, FlowType _caprev = 0){
 		graph[_from].push_back({_to, (int)graph[_to].size(), _cap});
 		graph[_to].push_back({_from, (int)graph[_from].size()-1, -_caprev});
 	}
@@ -42,35 +42,35 @@ struct NetworkFlow{  // use Dinic
 		for (int i=0; i<SZ; i++) graph[i].clear();
 	}
 
-    bool BFS(int S, int T){
-        memset(Level, 0, sizeof Level);
-        queue<int> Q; Q.push(S); Level[S] = 1;
-        while(Q.size()){
-            int now = Q.front(); Q.pop();
+    bool BFS(int SRC, int SINK){
+        memset(level, 0, sizeof(level));
+        queue<int> q; q.push(SRC); level[SRC] = 1;
+        while(!q.empty()){
+            int now = q.front(); q.pop();
             for(const auto &i : graph[now]){
-                if(!Level[i.to] && i.cap) Q.push(i.to), Level[i.to] = Level[now] + 1;
+                if(!level[i.to] && i.cap) q.push(i.to), level[i.to] = level[now] + 1;
             }
         }
-        return Level[T];
+        return level[SINK];
     }
-    FlowType DFS(int now, int T, FlowType tot){
-        if(now == T) return tot;
-        for(int &_i=Work[now]; _i<graph[now].size(); _i++){
-            Edge &i = graph[now][_i];
-            if(Level[i.to] != Level[now] + 1 || !i.cap) continue;
-            FlowType fl = DFS(i.to, T, min(tot, i.cap));
-            if(!fl) continue;
-            i.cap -= fl;
-            graph[i.to][i.rev].cap += fl;
-            return fl;
+    FlowType DFS(int now, int SINK, FlowType flow){
+        if(now == SINK) return flow;
+		for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(level[i.to] != level[now] + 1 || !i.cap) continue;
+            FlowType ret = DFS(i.to, SINK, min(flow, i.cap));
+            if(!ret) continue;
+            i.cap -= ret;
+            graph[i.to][i.rev].cap += ret;
+            return ret;
         }
         return 0;
     }
-    FlowType maxFlow(int S, int T){
+    FlowType maxFlow(int SRC, int SINK){
         FlowType ret = 0, tmp;
-        while(BFS(S, T)){
-            memset(Work, 0, sizeof Work);
-            while((tmp = DFS(S, T, INF))) ret += tmp;
+        while(BFS(SRC, SINK)){
+            memset(work, 0, sizeof(work));
+            while((tmp = DFS(SRC, SINK, INF))) ret += tmp;
         }
         return ret;
     }
