@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #define FOR(now,a,b) for(int now=(a);now<(b);now++)
-#define all(v) v.begin(), v.end()
+#define all(to) to.begin(), to.end()
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii; typedef pair<ll,ll> pll;
@@ -16,86 +16,65 @@ const int MOD = 1'000'000'007;
 https://www.acmicpc.net/problem/17412
 네트워크 플로우
 
+디닉 알고리즘 사용으로 빠르게 풀기
+ O(V^2*E)
 */
 
 #define MAX
 
-struct MaximumFlow
-{
-	struct Edge
-	{
-		int from, to, cap, rev;
-		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
-	};
-	vector<vector<Edge>> graph;
-	vector<int> work, level;
-	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
+const int SZ = 410, SRC = 401, SINK = 402;
 
-	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
-	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
-		graph.resize(N+10);
-		work.resize(N+10);
-		level.resize(N+10);
-	}
+struct NetworkFlow{  // use Dinic
+
+	using FlowType = int;
+
+	struct Edge{ int to, rev; FlowType cap; };
+	vector<Edge> graph[SZ];
+	int Level[SZ], Work[SZ];
 
 	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
-	void add_edge(int from, int to, int cap, int caprev = 0) {
-		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, caprev);
-		graph[from].back().rev = graph[to].size() - 1;
-		graph[to].back().rev = graph[from].size() - 1;
+	void addEdge(int _from, int _to, int _cap, int _caprev = 0){
+		graph[_from].push_back({_to, (int)graph[_to].size(), _cap});
+		graph[_to].push_back({_from, (int)graph[_from].size()-1, -_caprev});
 	}
-	void add_edge_from_source(int to, int cap) {
-		add_edge(SRC, to, cap);
+
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++) graph[i].clear();
 	}
-	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, SINK, cap);
-	}
-	int dfs(int c, int minFlow = INT_MAX) {
-		if (c == SINK) {
-			return minFlow;
-		}
-		int flow;
-		for (int &i = work[c]; i < graph[c].size(); i++) {
-			auto &e = graph[c][i];
-			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
-				e.cap -= flow;
-				graph[e.to][e.rev].cap += flow;
-				return flow;
-			}
-		}
-		return 0;
-	}
-	int flow() {
-		int ret = 0;
-		queue<int> q;
-		while(true) {
-			int flow = 0;
-			fill(level.begin(), level.end(), -1);
-			q.push(SRC);
-			level[SRC] = 0;
-			while (!q.empty()) {
-				int c = q.front();
-				q.pop();
-				for (auto &e : graph[c]) {
-					if (e.cap > 0 && level[e.to] == -1) {
-						level[e.to] = level[e.from] + 1;
-						q.push(e.to);
-					}
-				}
-			}
-			fill(work.begin(), work.end(), 0);
-			while (int temp = dfs(SRC)) {
-				flow += temp;
-			}
-			if (flow == 0) {
-				break;
-			}
-			ret += flow;
-		}
-		return ret;
-	}
-};
+
+    bool BFS(int S, int T){
+        memset(Level, 0, sizeof Level);
+        queue<int> Q; Q.push(S); Level[S] = 1;
+        while(Q.size()){
+            int now = Q.front(); Q.pop();
+            for(const auto &i : graph[now]){
+                if(!Level[i.to] && i.cap) Q.push(i.to), Level[i.to] = Level[now] + 1;
+            }
+        }
+        return Level[T];
+    }
+    FlowType DFS(int now, int T, FlowType tot){
+        if(now == T) return tot;
+        for(int &_i=Work[now]; _i<graph[now].size(); _i++){
+            Edge &i = graph[now][_i];
+            if(Level[i.to] != Level[now] + 1 || !i.cap) continue;
+            FlowType fl = DFS(i.to, T, min(tot, i.cap));
+            if(!fl) continue;
+            i.cap -= fl;
+            graph[i.to][i.rev].cap += fl;
+            return fl;
+        }
+        return 0;
+    }
+    FlowType maxFlow(int S, int T){
+        FlowType ret = 0, tmp;
+        while(BFS(S, T)){
+            memset(Work, 0, sizeof Work);
+            while((tmp = DFS(S, T, INF))) ret += tmp;
+        }
+        return ret;
+    }
+} nf;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -103,15 +82,13 @@ int main(){
 	int N, P;
     cin >> N >> P;
 
-	MaximumFlow mf(N, 1, 2);
-
     for(int i=0; i<P; i++){
         int a, b;
         cin >> a >> b;
-		mf.add_edge(a, b, 1);
+		nf.addEdge(a, b, 1);
     }
 
-    cout << mf.flow();
+    cout << nf.maxFlow(1, 2);
     
     return 0;
 }
