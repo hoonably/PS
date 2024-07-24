@@ -19,7 +19,59 @@ https://www.acmicpc.net/problem/14750
 그 이후는 네트워크 플로우
 */
 
-#define MAX 
+const int SZ = 310, SRC = 301, SINK = 302;
+
+struct NetworkFlow{  // use Dinic
+
+	using FlowType = int;
+
+	struct Edge{ int to, rev; FlowType cap; };
+	vector<Edge> graph[SZ];
+	int level[SZ], work[SZ];
+
+	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
+	void addEdge(int _from, int _to, FlowType _cap, FlowType _caprev = 0){
+		graph[_from].push_back({_to, (int)graph[_to].size(), _cap});
+		graph[_to].push_back({_from, (int)graph[_from].size()-1, -_caprev});
+	}
+
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++) graph[i].clear();
+	}
+
+    bool BFS(int SRC, int SINK){
+        memset(level, 0, sizeof(level));
+        queue<int> q; q.push(SRC); level[SRC] = 1;
+        while(!q.empty()){
+            int now = q.front(); q.pop();
+            for(const auto &i : graph[now]){
+                if(!level[i.to] && i.cap) q.push(i.to), level[i.to] = level[now] + 1;
+            }
+        }
+        return level[SINK];
+    }
+    FlowType DFS(int now, int SINK, FlowType flow){
+        if(now == SINK) return flow;
+		for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(level[i.to] != level[now] + 1 || !i.cap) continue;
+            FlowType ret = DFS(i.to, SINK, min(flow, i.cap));
+            if(!ret) continue;
+            i.cap -= ret;
+            graph[i.to][i.rev].cap += ret;
+            return ret;
+        }
+        return 0;
+    }
+    FlowType maxFlow(int s = SRC, int t = SINK){
+        FlowType ret = 0, minFlow;
+        while(BFS(s, t)){
+            memset(work, 0, sizeof(work));
+            while((minFlow = DFS(s, t, INF))) ret += minFlow;
+        }
+        return ret;
+    }
+} nf;
 
 #define x first
 #define y second
@@ -52,82 +104,7 @@ bool isOverlapped(pll A, pll B, pll C, pll D) {
     else return false;  //CCW가 같은 방향이 있음
 }
 
-struct MaximumFlow
-{
-	struct Edge
-	{
-		int from, to, cap, rev;
-		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
-	};
-	vector<vector<Edge>> graph;
-	vector<int> work, level;
-	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
-
-	// 생성자
-	MaximumFlow(int N, int SRC, int SINK) : N(N), SRC(SRC), SINK(SINK) {
-		graph.resize(N);
-		work.resize(N);
-		level.resize(N);
-	}
-
-	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 유방향
-	void add_edge(int from, int to, int cap, int caprev = 0) {
-		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, caprev);
-		graph[from].back().rev = graph[to].size() - 1;
-		graph[to].back().rev = graph[from].size() - 1;
-	}
-	void add_edge_from_source(int to, int cap) {
-		add_edge(SRC, to, cap);
-	}
-	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, SINK, cap);
-	}
-	int dfs(int c, int minFlow = INT_MAX) {
-		if (c == SINK) {
-			return minFlow;
-		}
-		int flow;
-		for (int &i = work[c]; i < graph[c].size(); i++) {
-			auto &e = graph[c][i];
-			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
-				e.cap -= flow;
-				graph[e.to][e.rev].cap += flow;
-				return flow;
-			}
-		}
-		return 0;
-	}
-	int flow() {
-		int ret = 0;
-		queue<int> q;
-		while(true) {
-			int flow = 0;
-			fill(level.begin(), level.end(), -1);
-			q.push(SRC);
-			level[SRC] = 0;
-			while (!q.empty()) {
-				int c = q.front();
-				q.pop();
-				for (auto &e : graph[c]) {
-					if (e.cap > 0 && level[e.to] == -1) {
-						level[e.to] = level[e.from] + 1;
-						q.push(e.to);
-					}
-				}
-			}
-			fill(work.begin(), work.end(), 0);
-			while (int temp = dfs(SRC)) {
-				flow += temp;
-			}
-			if (flow == 0) {
-				break;
-			}
-			ret += flow;
-		}
-		return ret;
-	}
-};
+pll walls[1000], holes[51], mouses[251];
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -136,43 +113,39 @@ int main(){
     int n, k, h, m;
     cin >> n >> k >> h >> m;
 
-    // 최대 유량 (구멍 0~49, 쥐: 50~299, SRC: 301, SINK: 302)
-    MaximumFlow mf(303, 301, 302);
+    // 최대 유량 (구멍 1~50, 쥐: 51~300, SRC: 301, SINK: 302)
 
     // 집 모서리 점 좌표 받기
-    vector<pll> walls(n);
     for(int i=0; i<n; i++){
         cin >> walls[i].x >> walls[i].y;
     }
 
     // 구멍 좌표 받기
-    vector<pll> holes(h);
-    for(int i=0; i<h; i++){
+    for(int i=1; i<=h; i++){
         cin >> holes[i].x >> holes[i].y;
     }
 
     // 쥐 좌표 받기
-    vector<pll> mouses(m);
-    for(int i=0; i<m; i++){
+    for(int i=1; i<=m; i++){
         cin >> mouses[i].x >> mouses[i].y;
     }
 
-	for(int i=0; i<h; i++){
+	for(int i=1; i<=h; i++){
         // source => 구멍 (용량 k)
-        mf.add_edge_from_source(i, k);
+        nf.addEdge(SRC, i, k);
     }
 
-    for(int i=0; i<m; i++){
+    for(int i=1; i<=m; i++){
         // 쥐 => SINK (용량 1)
-        mf.add_edge_to_sink(50 + i, 1);
+        nf.addEdge(50 + i, SINK, 1);
     }
 
 
 
-	for (int i=0; i<h; i++){
+	for (int i=1; i<=h; i++){
 		pll hole = holes[i];
 
-		for(int j=0; j<m; j++){
+		for(int j=1; j<=m; j++){
 			pll mouse = mouses[j];
 
             int overlap = 0;
@@ -191,13 +164,13 @@ int main(){
             // 나머지 아무것도 교차 안한다면 graph에 추가
             if (overlap<=maximum){
                 // i번 구멍 => j번 쥐
-                mf.add_edge(i, 50 + j, 1);
+                nf.addEdge(i, 50 + j, 1);
             }
         }
     }
 
     // 최대 유량이 m이 되었다면 가능
-	if (mf.flow() >= m) cout << "Possible";
+	if (nf.maxFlow() == m) cout << "Possible";
     else cout << "Impossible";
     
     return 0;
