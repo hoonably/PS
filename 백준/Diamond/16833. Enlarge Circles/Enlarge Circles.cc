@@ -1,148 +1,116 @@
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <limits>
-#include <algorithm>
-
+#include <bits/stdc++.h>
+#define FOR(i,a,b) for(int i=(a);i<(b);i++)
+#define all(v) v.begin(), v.end()
 using namespace std;
+typedef long long ll;
+typedef pair<int,int> pii; typedef pair<ll,ll> pll;
+typedef tuple<int,int,int> tiii;
+const int dx[6] = { 1,-1,0,0,0,0 };
+const int dy[6] = { 0,0,1,-1,0,0 };
+const int dz[6] = { 0,0,0,0,1,-1 };
+const int INF = 0x7f7f7f7f;
+const ll LINF = 0x7f7f7f7f7f7f7f7f;
+const int MOD = 1'000'000'007;
 
-const double EPS = 1e-8;
-const double INF = numeric_limits<double>::infinity();
+/* -----------------------------------------------------
+https://www.acmicpc.net/problem/19578
 
-class LPSolver {
-public:
-    LPSolver(const vector<vector<double>>& a, const vector<double>& b, const vector<double>& c)
-        : m(b.size()), N(c.size()), container_n(N + 1), container_b(m), container_d(m + 2, vector<double>(N + 2)) {
-        for (size_t i = 0; i < m; ++i) {
-            for (size_t j = 0; j < N; ++j) {
-                container_d[i][j] = a[i][j];
+선형 계획법 문제
+보석상 https://www.acmicpc.net/problem/1281 문제와 반대
+
+생각하기 매우 어려움.
+
+(a0+a1+a2+...+an) - (b0+b1+b2+...+bn) 이 최대가 되려면?
+
+모든 ai-bj <= cij 만족하려면
+ai-bj가 가장 작은 값부터 최대인 Cij가 되도록 매칭시키면 된다.
+
+최대유량이 되려면 모두 매칭이 되어야함
+최소비용인듯 하지만 어쩔 수 없이 모두 만족시키려면 최대한 작게 매칭시키면서 Cij로 매칭시켜야함.
+
+모든 매칭에 성공한다면 그게 바로 ai-bj를 모두 만족하면서 최대일 때이다.
+*/
+
+const int SZ = 410, SRC = 401, SINK = 402;
+const double eps = 1e-4;
+
+struct MCMF{  // use Dinic
+
+    using CostType = double;  // Cost가 double type
+
+	struct Edge{ int to, cap; CostType cost; int rev; };
+	vector<Edge> graph[SZ];
+	void addEdge(int _from, int _to, int _cap, CostType _cost){
+		graph[_from].push_back({_to, _cap, _cost, (int)graph[_to].size()});
+		graph[_to].push_back({_from, 0, -_cost, (int)graph[_from].size()-1});
+	}
+
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++)
+			graph[i].clear();
+	}
+
+	bool inQ[SZ];
+	CostType dists[SZ]; //dijkstra
+    bool spfa() {
+        // memset(dists, 1e9, sizeof(dists));  // int
+        fill(dists, dists+SZ, 1e9);  // double (memset 불가능)
+        memset(inQ, false, sizeof(inQ));
+        queue<int> q;
+        q.push(SRC);
+        inQ[SRC] = true;
+        dists[SRC] = 0;
+        while (!q.empty()) {
+            int now = q.front();
+            q.pop();
+            inQ[now] = false;
+            for (auto edge: graph[now]) {
+                if (edge.cap && dists[edge.to] > dists[now] + edge.cost + eps) {
+                    dists[edge.to] = dists[now] + edge.cost;
+                    if (!inQ[edge.to]) inQ[edge.to] = true, q.push(edge.to);
+                }
             }
         }
-
-        for (size_t i = 0; i < m; ++i) {
-            container_b[i] = N + i;
-            container_d[i][N] = -1.0;
-            container_d[i][N + 1] = b[i];
-        }
-
-        for (size_t j = 0; j < N; ++j) {
-            container_n[j] = j;
-            container_d[m][j] = -c[j];
-        }
-
-        container_n[N] = -1;
-        container_d[m + 1][N] = 1.0;
+        return dists[SINK] < 1e9;  // dist[SINK]가 갱신되었다면 true
     }
 
-    void pivot(size_t r, size_t s) {
-        double inv = 1.0 / container_d[r][s];
-        for (size_t i = 0; i < m + 2; ++i) {
-            if (i != r && fabs(container_d[i][s]) > EPS) {
-                double inv2 = container_d[i][s] * inv;
-                for (size_t j = 0; j < N + 2; ++j) {
-                    container_d[i][j] -= container_d[r][j] * inv2;
+	bool chk[SZ];
+	int work[SZ];
+
+	int dfs(int now, int flow){
+        chk[now] = true;
+        if(now == SINK) return flow;
+        for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(!chk[i.to] && dists[i.to] == dists[now] + i.cost && i.cap){
+                int ret = dfs(i.to, min(flow, i.cap));
+                if(ret){
+                    i.cap -= ret; graph[i.to][i.rev].cap += ret;
+                    return ret;
                 }
-                container_d[i][s] = container_d[r][s] * inv2;
             }
         }
+        return 0;
+	}
 
-        for (size_t j = 0; j < N + 2; ++j) {
-            if (j != s) {
-                container_d[r][j] *= inv;
+    pair<CostType, int> run() {
+        CostType cost = 0;
+        int flow = 0;
+        while (spfa()) {
+            memset(chk, 0, sizeof chk);
+            memset(work, 0, sizeof work);
+            int now = 0;
+            while (true) {
+				now = dfs(SRC, 1e9);
+				if (now==0) break;
+                cost += dists[SINK] * now;
+                flow += now;
+                memset(chk, 0, sizeof chk);
             }
         }
-
-        for (size_t i = 0; i < m + 2; ++i) {
-            if (i != r) {
-                container_d[i][s] *= -inv;
-            }
-        }
-
-        container_d[r][s] = inv;
-        swap(container_b[r], container_n[s]);
+        return {cost, flow};
     }
-
-    bool simplex(int phase) {
-        size_t x = m + phase - 1;
-
-        while (true) {
-            int s = -1;
-            for (size_t j = 0; j <= N; ++j) {
-                if (container_n[j] != -phase) {
-                    if (s == -1 || make_pair(container_d[x][j], container_n[j]) < make_pair(container_d[x][s], container_n[s])) {
-                        s = j;
-                    }
-                }
-            }
-
-            if (container_d[x][s] >= -EPS) {
-                return true;
-            }
-
-            int r = -1;
-            for (size_t i = 0; i < m; ++i) {
-                if (container_d[i][s] <= EPS) {
-                    continue;
-                }
-                if (r == -1 || make_pair(container_d[i][N + 1] / container_d[i][s], container_b[i]) < make_pair(container_d[r][N + 1] / container_d[r][s], container_b[r])) {
-                    r = i;
-                }
-            }
-
-            if (r == -1) {
-                return false;
-            }
-
-            pivot(r, s);
-        }
-    }
-
-    double solve(vector<double>& x) {
-        size_t r = 0;
-        for (size_t i = 1; i < m; ++i) {
-            if (container_d[i][N + 1] < container_d[r][N + 1]) {
-                r = i;
-            }
-        }
-
-        if (container_d[r][N + 1] < -EPS) {
-            pivot(r, N);
-            if (!simplex(2) || container_d[m + 1][N + 1] < -EPS) {
-                return -INF;
-            }
-
-            for (size_t i = 0; i < m; ++i) {
-                if (container_b[i] == -1) {
-                    int s = -1;
-                    for (size_t j = 0; j <= N; ++j) {
-                        if (container_n[j] != -1) {
-                            if (s == -1 || make_pair(container_d[i][j], container_n[j]) < make_pair(container_d[i][s], container_n[s])) {
-                                s = j;
-                            }
-                        }
-                    }
-                    pivot(i, s);
-                }
-            }
-        }
-
-        if (simplex(1)) {
-            for (size_t i = 0; i < m; ++i) {
-                if (container_b[i] < static_cast<int>(N)) {
-                    x[container_b[i]] = container_d[i][N + 1];
-                }
-            }
-            return container_d[m][N + 1];
-        }
-
-        return INF;
-    }
-
-private:
-    size_t m, N;
-    vector<int> container_n, container_b;
-    vector<vector<double>> container_d;
-};
+} mcmf;
 
 struct dot{int x, y;};
 double getDist(dot a, dot b){
@@ -152,61 +120,33 @@ double getDist(dot a, dot b){
 }
 
 dot A[201];
-double dists[201][201];
-double distsMin[201];  // 각 점에서 최소거리
 
-int main() {
+int main(){
+	ios_base::sync_with_stdio(0); cin.tie(0);
 
     int N;
     cin >> N;
-    for (int i=0; i<N; i++){
+    for (int i=1; i<=N; i++){
         int x, y;
         cin >> A[i].x >> A[i].y;
     }
 
-    for (int i = 0; i < N; ++i) {
-        for (int j = i+1; j < N; ++j) {
-            double dist = getDist(A[i], A[j]);
-            dists[i][j] = dist;
-            dists[j][i] = dist;
+    for (int i=1; i<=N; i++){
+        mcmf.addEdge(SRC, i, 1, 0);
+        mcmf.addEdge(i+200, SINK, 1, 0);
+    }
+
+    for (int i=1; i<=N; i++){
+        for (int j=1; j<=N; j++){
+            if (i==j) continue;
+            // 두 반지름의 합 <= d
+            double d = getDist(A[i], A[j]);
+            mcmf.addEdge(i, j+200, 1, d);
         }
     }
 
-    // 각 점에서 가능한 최대 반지름 기록
-    fill(distsMin, distsMin+201, 1e9);
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < i; ++j) {
-            distsMin[i] = min(distsMin[i], dists[i][j]);
-            distsMin[j] = min(distsMin[j], dists[i][j]);
-        }
-    }
-
-    vector<vector<double>> a(N * (N - 1) / 2, vector<double>(N));
-    vector<double> b(N * (N - 1) / 2);
-    vector<double> c(N, 1.0);
-    int idx = 0;
-
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < i; ++j) {
-            if (distsMin[i] + distsMin[j] <= dists[i][j] + EPS) {
-                continue;
-            }
-            a[idx][i] = 1.0;
-            a[idx][j] = 1.0;
-            b[idx] = dists[i][j];
-            ++idx;
-        }
-    }
-
-    vector<double> ret(N * (N - 1) / 2);
-    LPSolver solver(a, b, c);
-    solver.solve(ret);
-
-    double ans = 0;
-    for (double i : ret){
-        ans += i;
-    }
-    printf("%.6f\n", 2.0 * M_PI * ans);
+    cout << setprecision(9);
+    cout << M_PI * mcmf.run().first;  // 2배 해주면 중복이라 안해줄거임
 
     return 0;
 }
