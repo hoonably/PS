@@ -19,11 +19,9 @@ row의 합을 왼쪽 노드로, col의 합을 오른쪽 노드로 분리
 모든 flow(edge 연결값)의 최대값이 가장 작도록 하는 ans 탐색
 
 이 문제는 간선 수가 많지 않아서 
-포드 풀커슨 방법 사용하고 자유롭게 flow 변경 
+포드 풀커슨 방법 사용하고 자유롭게 flow 변경
 O((V+E)F)
 */
-
-#define MAX
 
 const int SZ = 110, SRC = 101, SINK = 102;
 
@@ -72,6 +70,7 @@ struct FordFulkerson{
     }
 
 	FlowType maxFlow(int s = SRC, int t = SINK){
+		memset(flow, 0, sizeof(flow));
         FlowType ret = 0, minFlow;
         while(BFS(s, t)){
             memset(work, 0, sizeof(work));
@@ -86,11 +85,6 @@ struct FordFulkerson{
 		for (int i=1; i<=N; i++)
 			for (int j=1; j<=N; j++)
 				capacity[i][j+50]=c;
-	}
-
-	// flow 초기화
-	void initFlow(){
-		memset(flow, 0, sizeof(flow));
 	}
 
 	void printFlow(int N){
@@ -140,7 +134,6 @@ int main(){
 
 		// 모든 사이 용량을 mid로 맞춰줌
 		nf.initCap(N, Mid);
-		nf.initFlow();
 
 		if(nf.maxFlow() == sum) {
 			ans = Mid;
@@ -154,7 +147,6 @@ int main(){
 	cout << ans << '\n';
 
     nf.initCap(N, ans);  // ans 였을 때로 cap 맞춰주기
-	nf.initFlow();
 	nf.maxFlow();
 	nf.printFlow(N);
     
