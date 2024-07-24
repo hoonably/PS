@@ -22,7 +22,7 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 시간 복잡도는 O(V*E)이지만 실제로는 훨씬 빨리 돌아가는 알고리즘으로 O(V+E) 혹은 O(E)라고 해도 무방
 */
 
-const int SZ = 210, SRC = 201, SINK = 202;
+const int SZ = 110, SRC = 101, SINK = 102, BRIDGE1 = 103, BRIDGE2 = 104;
 
 struct MCMF{  // use Dinic
 
@@ -43,8 +43,7 @@ struct MCMF{  // use Dinic
 	bool inQ[SZ];
 	CostType dists[SZ]; //dijkstra
     bool spfa() {
-        // 0x3f = 0x3f3f3f3f = 106,119,567
-        // memset(dists, 0x3f, sizeof(dists));  // int
+        // memset(dists, 1e9, sizeof(dists));  // int
         fill(dists, dists+SZ, 1e9);  // double (memset 불가능)
         memset(inQ, false, sizeof(inQ));
         queue<int> q;
@@ -103,16 +102,13 @@ struct MCMF{  // use Dinic
     }
 } mcmf;
 
-#define x first
-#define y second
-
-pii A[201];
-
-double getDist(pii a, pii b){
-    int dx = a.x - b.x;
-    int dy = a.y - b.y;
+double getDist(int x, int y, int xx, int yy){
+    int dx = xx - x;
+    int dy = yy - y;
     return sqrt(dx*dx + dy*dy);
 }
+
+vector<tiii> l, r;
 
 int main(){
 	ios_base::sync_with_stdio(0); cin.tie(0);
@@ -120,38 +116,35 @@ int main(){
 	int N;
     cin >> N;
 
+    int ans = 0;
     for (int i=1; i<=N; i++){
         int a, b;
         cin >> a >> b;
-        A[i] = {a, b};
-        A[i+100] = {-a, b};
+        if (a<0) {
+            l.push_back({i, a, b});
+            mcmf.addEdge(SRC, i, 1, 0);
+            mcmf.addEdge(i, SINK, 1, abs(a));  // 선 위로 그냥 보내주는 경우
+        }
+        else if (a>0) {
+            r.push_back({i, a, b});
+            ans += a;  // 선 위로 그냥 보내주기
+            mcmf.addEdge(i, SINK, 1, -a);  // 윗줄대로 안하고 l에서 r에 맞춰서 옮기는 경우
+        }
     }
 
-    // i번째 점의 선대칭 지점 : i+100으로 표현
-
-    // 각 물건을 y축에 선대칭시켜서 새로운 물건을 하나씩 만들어준 뒤, 
-    // x좌표가 음수인 물건을 Li, x좌표가 양수인 물건을 Ri라고 합시다.
-    // Li와 Rj를 간선으로 이어주고 가중치를 (두 점 사이의 거리 / 2)로 설정
-
-    // 조심할 포인트
-    // 물건을 선 위로 이동시켜도 선대칭임.
-    // 하지만, 어차피 하나를 선 위로 이동시키면 다른 하나도 선 위로 이동시켜야 하므로
-    // 가중치를 (두 점 사이의 거리 / 2)로 설정하면 따로 처리를 안해줘도 됨.
-
-    for(int i=1; i<=N; i++){
-        mcmf.addEdge(SRC, i, 1, 0);
-        mcmf.addEdge(i+100, SINK, 1, 0);
-    }
-
-    for(int i=1; i<=N; i++){
-        for(int j=1; j<=N; j++){
-            double dist = getDist(A[i], A[j+100]);
-            mcmf.addEdge(i, j+100, 1, dist / 2);
+    // l에서 r에 맞추서 넘겨줌
+    for(tiii t : l){
+        auto [i, x, y] = t;
+        for(tiii tt : r){
+            auto [j, xx, yy] = tt;
+            // (x,y)를 옮겨서 (xx,yy)와 대칭으로 만들어주려면 이동해야하는 거리
+            double dist = getDist(x, y, -xx, yy);
+            mcmf.addEdge(i, j, 1, dist);
         }
     }
 
     cout << fixed << setprecision(3);
-    cout << mcmf.run().first;
+    cout << mcmf.run().first + ans;
 
     return 0;
 }
