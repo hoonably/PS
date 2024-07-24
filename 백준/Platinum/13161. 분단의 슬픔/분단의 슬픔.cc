@@ -21,82 +21,59 @@ E = 25,000개 F는 최대 500,000만이라 O(EF), O(VE^2) 둘다 택도 없음
 그래서 O(V^2E)인 디닉알고리즘을 써야만 시간내에 해결이 가능
 */
 
-#define MAX 
+const int SZ = 510, SRC = 501, SINK = 502;
 
-struct Dinic {
-	struct Edge {
-		int from, to, cap, rev;
-		Edge(int from, int to, int cap) : from(from), to(to), cap(cap) {};
-	};
-	vector<vector<Edge>> graph;
-	vector<int> work, level;
-	int N, SRC, SINK;  // SOURCE(시작) => node => SINK(끝)
+struct NetworkFlow{  // use Dinic
 
-	// 생성자 (SRC, BRIDGE, SINK 위해서 10개 여분)
-	Dinic(int N, int SRC, int SINK) : N(N+10), SRC(SRC), SINK(SINK) {
-	 	graph.resize(N+10);
-		work.resize(N+10);
-		level.resize(N+10);
-	}
+	using FlowType = int;
+
+	struct Edge{ int to, rev; FlowType cap; };
+	vector<Edge> graph[SZ];
+	int level[SZ], work[SZ];
 
 	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
-	void add_edge(int from, int to, int cap, int caprev = 0) {
-		graph[from].emplace_back(from, to, cap);
-		graph[to].emplace_back(to, from, caprev);
-		graph[from].back().rev = graph[to].size() - 1;
-		graph[to].back().rev = graph[from].size() - 1;
+	void addEdge(int _from, int _to, FlowType _cap, FlowType _caprev = 0){
+		graph[_from].push_back({_to, (int)graph[_to].size(), _cap});
+		graph[_to].push_back({_from, (int)graph[_from].size()-1, -_caprev});
 	}
-	void add_edge_from_source(int to, int cap) {
-		add_edge(SRC, to, cap);
+
+	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
+		for (int i=0; i<SZ; i++) graph[i].clear();
 	}
-	void add_edge_to_sink(int from, int cap) {
-		add_edge(from, SINK, cap);
-	}
-	int dfs(int c, int minFlow = INT_MAX) {
-		if (c == SINK) {
-			return minFlow;
-		}
-		int flow;
-		for (int &i = work[c]; i < graph[c].size(); i++) {
-			auto &e = graph[c][i];
-			if (e.cap > 0 && level[e.to] == level[e.from] + 1 && (flow = dfs(e.to, min(e.cap, minFlow)))) {
-				e.cap -= flow;
-				graph[e.to][e.rev].cap += flow;
-				return flow;
-			}
-		}
-		return 0;
-	}
-	int flow() {
-		int ret = 0;
-		queue<int> q;
-		while(true) {
-			int flow = 0;
-			fill(level.begin(), level.end(), -1);
-			q.push(SRC);
-			level[SRC] = 0;
-			while (!q.empty()) {
-				int c = q.front();
-				q.pop();
-				for (auto &e : graph[c]) {
-					if (e.cap > 0 && level[e.to] == -1) {
-						level[e.to] = level[e.from] + 1;
-						q.push(e.to);
-					}
-				}
-			}
-			fill(work.begin(), work.end(), 0);
-			while (int temp = dfs(SRC)) {
-				flow += temp;
-			}
-			if (flow == 0) {
-				break;
-			}
-			ret += flow;
-		}
-		return ret;
-	}
-};
+
+    bool BFS(int SRC, int SINK){
+        memset(level, 0, sizeof(level));
+        queue<int> q; q.push(SRC); level[SRC] = 1;
+        while(!q.empty()){
+            int now = q.front(); q.pop();
+            for(const auto &i : graph[now]){
+                if(!level[i.to] && i.cap) q.push(i.to), level[i.to] = level[now] + 1;
+            }
+        }
+        return level[SINK];
+    }
+    FlowType DFS(int now, int SINK, FlowType flow){
+        if(now == SINK) return flow;
+		for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &i = graph[now][work[now]];
+            if(level[i.to] != level[now] + 1 || !i.cap) continue;
+            FlowType ret = DFS(i.to, SINK, min(flow, i.cap));
+            if(!ret) continue;
+            i.cap -= ret;
+            graph[i.to][i.rev].cap += ret;
+            return ret;
+        }
+        return 0;
+    }
+    FlowType maxFlow(int s = SRC, int t = SINK){
+        FlowType ret = 0, minFlow;
+        while(BFS(s, t)){
+            memset(work, 0, sizeof(work));
+            while((minFlow = DFS(s, t, INF))) ret += minFlow;
+        }
+        return ret;
+    }
+} nf;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -104,16 +81,14 @@ int main(){
     int N;
     cin >> N;
 
-    Dinic mf(N, N+1, N+2);
-
     for (int i=1; i<=N; i++){
         int num;
         cin >> num;
         if (num==1){  // 무조건 A 진영
-			mf.add_edge_from_source(i, INF);
+			nf.addEdge(SRC, i, INF);
         }
         else if (num==2){  // 무조건 B 진영
-			mf.add_edge_to_sink(i,INF);
+			nf.addEdge(i, SINK, INF);
         }
     }
 
@@ -121,22 +96,22 @@ int main(){
 		for (int j=1; j<=N; j++){
 			int cap;
 			cin >> cap;
-			if (i==j) continue;
-			mf.add_edge(i, j, cap);
+			if (cap==0) continue;
+			nf.addEdge(i, j, cap);
 		}
 	}
 
-	cout << mf.flow() << '\n';
+	cout << nf.maxFlow() << '\n';
 	
 	// A진영
 	for (int i=1; i<=N; i++){
-		if (mf.level[i] != -1) cout << i << ' ';
+		if (nf.level[i] != 0) cout << i << ' ';
 	}
 	cout << '\n';
 
 	// B진영
 	for (int i=1; i<=N; i++){
-		if (mf.level[i] == -1) cout << i << ' ';
+		if (nf.level[i] == 0) cout << i << ' ';
 	}
 	cout << '\n';
     
