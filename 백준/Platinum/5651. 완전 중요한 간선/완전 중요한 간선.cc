@@ -21,63 +21,69 @@ flow를 수정하면서 문제를 푸는 문제에서는 다 일일이 수정해
 
 const int SZ = 310, SRC = 301, SINK = 302;
 
-struct NetworkFlow{  // use Dinic
+struct FordFulkerson{
 
 	using FlowType = int;
 
-	struct Edge{ int to, rev; FlowType cap; };
-	vector<Edge> graph[SZ];
-	int level[SZ], work[SZ];
+	FlowType flow[SZ][SZ], capacity[SZ][SZ];
+	vector<int> graph[SZ];
 
 	// 마지막 인자를 안쓰면 유방향, cap과 같게 쓰면 무방향(양쪽 cap 같음)
-	void addEdge(int _from, int _to, FlowType _cap, FlowType _caprev = 0){
-		graph[_from].push_back({_to, (int)graph[_to].size(), _cap});
-		graph[_to].push_back({_from, (int)graph[_from].size()-1, -_caprev});
-	}
+	void addEdge(int from, int to, int cap, int caprev = 0) {
+		graph[from].emplace_back(to);
+		graph[to].emplace_back(from);
+		capacity[from][to] += cap;
+		capacity[to][from] += caprev;
+    }
 
-	void initGraph(){ // 테스트케이스를 위한 그래프 초기화
-		for (int i=0; i<SZ; i++) graph[i].clear();
-	}
-
-    bool BFS(int SRC, int SINK){
+	int level[SZ], work[SZ];
+    bool BFS(int S, int T){
         memset(level, 0, sizeof(level));
-        queue<int> q; q.push(SRC); level[SRC] = 1;
+        queue<int> q; q.push(S); level[S] = 1;
         while(!q.empty()){
             int now = q.front(); q.pop();
-            for(const auto &next : graph[now]){
-                if(!level[next.to] && next.cap) q.push(next.to), level[next.to] = level[now] + 1;
+            for(int &next : graph[now]){
+                if(!level[next] && capacity[now][next]-flow[now][next]>0) {
+					q.push(next), level[next] = level[now] + 1;
+				}
             }
         }
-        return level[SINK];
+        return level[T];
     }
-    FlowType DFS(int now, int SINK, FlowType flow){
-        if(now == SINK) return flow;
+    FlowType DFS(int now, int T, FlowType f){
+        if(now == T) return f;
 		for(; work[now] < (int)graph[now].size(); work[now]++){
-            auto &next = graph[now][work[now]];
-            if(level[next.to] != level[now] + 1 || !next.cap) continue;
-            FlowType ret = DFS(next.to, SINK, min(flow, next.cap));
+            int next = graph[now][work[now]];
+            if(level[next] != level[now] + 1 || capacity[now][next]-flow[now][next]==0) continue;
+            FlowType ret = DFS(next, T, min(f, capacity[now][next]-flow[now][next]));
             if(!ret) continue;
-            next.cap -= ret;
-            graph[next.to][next.rev].cap += ret;
+            flow[now][next]+=ret;
+			flow[next][now]-=ret;
             return ret;
         }
         return 0;
     }
-    FlowType maxFlow(int s = SRC, int t = SINK){
+	FlowType maxFlow(int S = SRC, int T = SINK){
+		memset(flow, 0, sizeof(flow));
         FlowType ret = 0, minFlow;
-        while(BFS(s, t)){
+        while(BFS(S, T)){
             memset(work, 0, sizeof(work));
-            while((minFlow = DFS(s, t, INF))) ret += minFlow;
+            while((minFlow = DFS(S, T, INF))) ret += minFlow;
         }
         return ret;
     }
-} nf;
+
+    void init(){  // for Test Case
+		memset(capacity, 0, sizeof(capacity));
+        for(int i=0; i<SZ; i++) graph[i].clear();
+	}
+}nf;
 
 pii edges[5000];  // from, to 기록해놨다가 나중에 사용
 
 void solve(){
 
-    nf.initGraph();
+    nf.init();
 
     int N, M;
     cin >> N >> M;
@@ -94,6 +100,7 @@ void solve(){
     int ans = 0;
     for (int i = 0; i < M; i++) {
         auto [S, T] = edges[i];
+        if (nf.capacity[S][T]==0 || nf.capacity[S][T] - nf.flow[S][T] != 0) continue;
         // S=>T로 도달하지 못한다면 완전 중요한 간선
         if (!nf.BFS(S, T)) ans++;
     }
