@@ -48,14 +48,14 @@ struct MCMF{
 	}
 
     // SPFA를 사용한 MCMF
+	int par[SZ], c[SZ];
+	bool inQ[SZ];
 	pii run(){
 		int retCost = 0, retFlow=0;
-		vector<int> par(SZ), c(SZ);
-        vector<bool> inQ(SZ);
 
 		while(true){
-			fill(par.begin(), par.end(), -1);
-            fill(c.begin(), c.end(), INF);
+			memset(par, -1, sizeof(par));
+			memset(c, 0x3f, sizeof(c));
 
             c[SRC] = 0;
             inQ[SRC] = true;
