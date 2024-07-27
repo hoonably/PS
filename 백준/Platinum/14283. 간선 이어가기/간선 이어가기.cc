@@ -15,7 +15,6 @@ flow를 수정하면서 문제를 푸는 문제에서는 일일이 수정해줘�
 const int INF = 0x7f7f7f7f;
 const int SZ = 1010;
 int SRC, SINK;
-int N, M, Sum, S[1010], E[1010], X[1010];
 
 struct NetworkFlow{  // use Dinic
 
@@ -67,22 +66,9 @@ struct NetworkFlow{  // use Dinic
         }
         return ret;
     }
-    
-    // 이 문제에서 Solve 
-    FlowType Solve(int del){
-
-        // 최소 컷 구하기
-        FlowType minCut = maxFlow();
-        
-        // for(int i=1; i<=N; i++){
-        //     cout << (bool)level[i] << ' ';
-        // }cout << '\n';
-
-        // 지운 간선의 시작과 끝이 같은 컴포넌트라면 의미 없는 간선임
-        if((bool)level[S[del]] == (bool)level[E[del]]) return -1;
-        return Sum - minCut;
-    }
 } nf;
+
+int N, M, Sum, S[1010], E[1010], X[1010];
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -101,8 +87,12 @@ int main(){
             if (del==j) continue;  // 지울 간선을 제외하고 NetworkFlow
             nf.addEdge(S[j], E[j], X[j], X[j]);
         }
-        // cout << nf.maxFlow();
-        ans = max(ans, nf.Solve(del));
+
+        int minCut = nf.maxFlow();  // 최소 컷
+
+        // 지운 간선의 시작과 끝이 같은 컴포넌트라면 의미 없는 간선임
+        if ((bool)nf.level[S[del]] == (bool)nf.level[E[del]]) continue;
+        ans = max(ans, Sum - minCut);
     }
     cout << ans;
     
