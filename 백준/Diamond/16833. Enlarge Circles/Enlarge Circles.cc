@@ -13,7 +13,7 @@ const ll LINF = 0x7f7f7f7f7f7f7f7f;
 const int MOD = 1'000'000'007;
 
 /* -----------------------------------------------------
-https://www.acmicpc.net/problem/19578
+https://www.acmicpc.net/problem/16833
 
 선형 계획법 문제
 보석상 https://www.acmicpc.net/problem/1281 문제와 반대
