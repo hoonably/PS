@@ -15,7 +15,7 @@ SPFA : 바뀐 정점은 큐를 이용해서 관리하고, 큐에 해당 정점�
 시간 복잡도는 O(V*E)이지만 실제로는 훨씬 빨리 돌아가는 알고리즘으로 O(V+E) 혹은 O(E)라고 해도 무방
 */
 
-const int sz = 2000;  // in out 분할이라면 2배
+const int sz = 1000;  // in out 분할이라면 2배
 const int SZ = sz+10, bias = sz/2;
 const int SRC = sz+1, SINK = sz+2;
 
@@ -102,10 +102,6 @@ int main(){
 	ios_base::sync_with_stdio(0); cin.tie(0);
 
     cin >> N >> M;
-
-    // for(int i=1; i<=N; i++){
-    //     mcmf.addEdge(i, i+bias, 2, 0);
-    // }
 
     for(int i=0; i<M; i++){
         int A, B, C;
