@@ -19,77 +19,99 @@ const int vertexSZ = 200;  // in out 분할이라면 2배
 const int SZ = vertexSZ+10, bias = vertexSZ/2;
 const int SRC = vertexSZ+1, SINK = vertexSZ+2;
 
-using CostType = double;  // Cost가 double type
+struct MCMF{  // use Dinic
 
-struct edge {
-    int id, from, to;
-    double cap, cost;
-    edge(int id, int from, int to, int cap, int cost)
-    : id(id), from(from), to(to), cap(cap), cost(cost) {}
-};
+    // using CostType = int; const CostType EPS = 0;  // cost : int
+    using CostType = double; const CostType EPS = 1e-8;  // cost : double
+    using FlowType = int; 
 
-array<vector<int>, SZ> adj;
-vector<edge> graph;
+	struct Edge{ int to, rev; FlowType cap; CostType cost; };
+	vector<Edge> graph[SZ];
+	void addEdge(int _from, int _to, FlowType _cap, CostType _cost){
+		graph[_from].push_back({_to, (int)graph[_to].size(), _cap, _cost, });
+		graph[_to].push_back({_from, (int)graph[_from].size()-1, 0, -_cost});
+	}
 
-void addEdge(int now, int y, int d, int c) {
-    static int id = -1;
-    adj[now].emplace_back(++id);
-    graph.emplace_back(id, now, y, c, d);
-    adj[y].emplace_back(++id);
-    graph.emplace_back(id, y, now, 0, -d);
-}
-
-array<int, SZ> pred;
-bool inQ[SZ];
-CostType dists[SZ]; //dijkstra
-bool spfa(int SRC, int SINK) {
-    // memset(dists, INF, sizeof(dists));  // int
-    fill(dists, dists+SZ, INF);  // double (memset 불가능)
-    memset(inQ, false, sizeof(inQ));
-    queue<int> q;
-    q.push(SRC);
-    inQ[SRC] = true;
-    dists[SRC] = 0;
-    while (!q.empty()) {
-        int now = q.front();
-        q.pop();
-        inQ[now] = false;
-        for (auto id: adj[now]) {
-            auto& e = graph[id];
-            if (e.cap > 1e-9 && dists[e.to] > dists[now] + e.cost + 1e-9) {
-                dists[e.to] = dists[now] + e.cost;
-                pred[e.to] = id;
-                if (!inQ[e.to]) {
-                    q.emplace(e.to);
-                    inQ[e.to] = true;
+	bool inQ[SZ];
+	CostType costs[SZ]; //dijkstra
+    bool spfa(int S, int T) {
+        // memset(costs, 0x3f, sizeof(costs));  // int
+        fill(costs, costs+SZ, INF);  // double
+        memset(inQ, false, sizeof(inQ));
+        queue<int> q;
+        q.push(S);
+        inQ[S] = true;
+        costs[S] = 0;
+        while (!q.empty()) {
+            int now = q.front();
+            q.pop();
+            inQ[now] = false;
+            for (auto edge: graph[now]) {
+                if (edge.cap > EPS && costs[edge.to] > costs[now] + edge.cost + EPS) {
+                    costs[edge.to] = costs[now] + edge.cost;
+                    if (!inQ[edge.to]) inQ[edge.to] = true, q.push(edge.to);
                 }
             }
         }
+        return costs[T] < INF;  // costs[SINK]가 갱신되었다면 true
     }
-    return dists[SINK] < INF;  // dists[SINK]가 갱신되었다면 true
-}
+	bool chk[SZ];
+	int work[SZ];
+	FlowType dfs(int now, int T, FlowType flow){
+        chk[now] = true;
+        if(now == T) return flow;
+        for(; work[now] < (int)graph[now].size(); work[now]++){
+            auto &nxt = graph[now][work[now]];
+            if(!chk[nxt.to] && costs[nxt.to] == costs[now] + nxt.cost && nxt.cap){
+                FlowType ret = dfs(nxt.to, T, min(flow, nxt.cap));
+                if(ret){
+                    nxt.cap -= ret; graph[nxt.to][nxt.rev].cap += ret;
+                    return ret;
+                }
+            }
+        }
+        return 0;
+	}
+    pair<CostType, FlowType> run(int S = SRC, int T = SINK) {
+        CostType cost = 0;
+        FlowType flow = 0;
+        while (spfa(S, T)) {
+            memset(chk, 0, sizeof chk);
+            memset(work, 0, sizeof work);
+            FlowType now = 0;
+            while (true) {
+				now = dfs(S, T, INF);
+				if (now==0) break;
+                cost += costs[T] * now;
+                flow += now;
+                memset(chk, 0, sizeof chk);
+            }
+        }
+        return {cost, flow};
+    }
+
+    double solve(int S , int T, int P) {
+        CostType cost = 0;
+        FlowType flow = 0;
+        double ans = INF;
+        while (spfa(S, T)) {
+            memset(chk, 0, sizeof chk);
+            memset(work, 0, sizeof work);
+            FlowType now = 0;
+            while (true) {
+				now = dfs(S, T, INF);
+				if (now==0) break;
+                cost += costs[T] * now;
+                flow += now;
+                memset(chk, 0, sizeof chk);
+            }
+            ans = min(ans, (cost+P)/(double)flow);
+        }
+        return ans;
+    }
+} mcmf;
 
 int N, M, P, s, t;
-
-double solve(){
-    double F = 0, C = 0;
-    double ans = INF;
-    while (spfa(s, t)) {
-        double dF = INF;
-        for (int now = t; now != s; now = graph[pred[now]].from) {
-            dF = min(dF, graph[pred[now]].cap);
-        }
-        for (int now = t; now != s; now = graph[pred[now]].from) {
-            edge& e = graph[pred[now]];
-            C += dF * e.cost;
-            e.cap -= dF;
-            graph[e.id^1].cap += dF;
-        }
-        F += dF;
-        ans = min(ans, (C + P)/F);  // ans
-    }
-    return ans;
-}
 
 int main(){
 	ios_base::sync_with_stdio(0); cin.tie(0);
@@ -98,10 +120,10 @@ int main(){
     for (int i=0; i<M; i++){
         int v, u, d, c;
         cin >> v >> u >> d >> c;
-        addEdge(v, u, d, c);
+        mcmf.addEdge(v, u, c, d);
     }
 
-    double ans = solve();
+    double ans = mcmf.solve(s, t, P);
 
     cout << fixed << setprecision(9) << ans;
 
