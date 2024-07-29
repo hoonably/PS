@@ -21,8 +21,8 @@ const int SRC = vertexSZ+1, SINK = vertexSZ+2;
 
 struct MCMF{  // use Dinic
 
-    // using CostType = int; const CostType EPS = 0;  // cost : int
-    using CostType = double; const CostType EPS = 1e-8;  // cost : double
+    using CostType = int; const CostType EPS = 0;  // cost : int
+    // using CostType = double; const CostType EPS = 1e-8;  // cost : double
     using FlowType = int; 
 
 	struct Edge{ int to, rev; FlowType cap; CostType cost; };
@@ -35,8 +35,8 @@ struct MCMF{  // use Dinic
 	bool inQ[SZ];
 	CostType costs[SZ]; //dijkstra
     bool spfa(int S, int T) {
-        // memset(costs, 0x3f, sizeof(costs));  // int
-        fill(costs, costs+SZ, INF);  // double
+        memset(costs, 0x3f, sizeof(costs));  // int
+        // fill(costs, costs+SZ, INF);  // double
         memset(inQ, false, sizeof(inQ));
         queue<int> q;
         q.push(S);
