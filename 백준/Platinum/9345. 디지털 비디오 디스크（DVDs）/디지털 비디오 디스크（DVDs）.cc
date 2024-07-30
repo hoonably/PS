@@ -18,7 +18,7 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 
 #define MAX 100'000
 
-ll arr[MAX+1];  // 미리 arr를 정해놓는 경우
+int arr[MAX+1];  // 미리 arr를 정해놓는 경우
 
 struct SegmentTree {
 
