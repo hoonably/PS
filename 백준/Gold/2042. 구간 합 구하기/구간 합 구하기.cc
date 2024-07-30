@@ -13,7 +13,7 @@ N=8 -> 트리에서 8~15는 arr[0]~[7]
 
 int N, M, K;
 ll arr[MAX];
-vector<ll> segTree;
+ll segTree[MAX*4];
 
 // 구간합 초기화
 ll init(int node, int s, int e) {
@@ -49,11 +49,6 @@ int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
     cin >> N >> M >> K;
-
-    // 트리의 크기
-    int h = ceil(log2(N+1));  // ceil : 정수로 올림
-    int treeSize = 1 << (h + 1);
-    segTree.resize(treeSize);
 
     // arr[0]=0 으로 설정
     for (int i=1; i<=N; i++){
