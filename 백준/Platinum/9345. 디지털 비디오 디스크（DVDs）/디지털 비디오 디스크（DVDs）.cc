@@ -71,7 +71,7 @@ void solve(){
     // 현재 위치를 반환해주는 배열 초기화
     for (int i = 0; i < N; i++) arr[i] = i;
 
-    // 트리 초기화
+    // 트리 생성
     ST.build(1, 0, N-1);
 
     for (int i=0; i<K; i++){
@@ -96,9 +96,7 @@ int main(){
     
     int T;
     cin >> T;
-    while(T--){
-        solve();
-    }
+    while(T--) solve();
     
     return 0;
 }
