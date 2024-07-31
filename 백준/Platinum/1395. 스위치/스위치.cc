@@ -19,23 +19,23 @@ struct SegmentTree {
 
     using DataType = int;
     vector<DataType> tree;
-    vector<DataType> lazy;  // 스위치가 눌린 횟수
+    bool lazy[4*MAX];  // 스위치가 바뀌었는가?
 
     SegmentTree(int size) {
         int h = ceil(log2(size+1));  // ceil : 정수로 올림
         int treeSize = 1 << (h + 1);
         tree.resize(treeSize);
-        lazy.resize(treeSize);
+        // lazy.resize(treeSize);
     }
 
     void update_lazy(int node, int s, int e) {  // lazy값이 이미 있을 때 실행
-        if(lazy[node] %2 == 1){  // 스위치가 홀수번 눌렸을 때
+        if(lazy[node]){  // 스위치가 홀수번 눌렸을 때
             tree[node] = (e - s + 1) - tree[node];  // 전체 개수중에 반대로 뒤집기
             if(s != e){
-                lazy[node*2] += lazy[node];
-                lazy[node*2 + 1] += lazy[node];
+                lazy[node*2] ^= 1;
+                lazy[node*2 + 1] ^= 1;
             }
-            lazy[node] = 0;
+            lazy[node] ^= 1;
         }
     }
 
@@ -46,8 +46,8 @@ struct SegmentTree {
             // 직접 tree update
             tree[node] = (e - s + 1) - tree[node];
             if(s != e){
-                lazy[node*2] += 1;
-                lazy[node*2 + 1] += 1;
+                lazy[node*2] ^= 1;
+                lazy[node*2 + 1] ^= 1;
             }
             return;
         }
