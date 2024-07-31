@@ -38,16 +38,14 @@ struct SegmentTree {
         return tree[node] = build(node*2, s, mid) + build(node*2 + 1, mid + 1, e);
     }
 
-    void update_lazy(int node, int s, int e) {
-        if (lazy[node] != 0) {
-            tree[node] += (e-s+1)*lazy[node];
-            if (s != e) lazy[node*2] += lazy[node], lazy[node*2+1] += lazy[node];
-            lazy[node] = 0;
-        }
+    void update_lazy(int node, int s, int e) {  // lazy값이 이미 있을 때 실행
+        tree[node] += (e-s+1)*lazy[node];
+        if (s != e) lazy[node*2] += lazy[node], lazy[node*2+1] += lazy[node];
+        lazy[node] = 0;
     }
 
     void update_range(int node, int s, int e, int left, int right, DataType diff) {
-        update_lazy(node, s, e);
+        if (lazy[node]) update_lazy(node, s, e);
         if (left > e || right < s) return;
         if (left <= s && e <= right) {
             tree[node] += (e-s+1)*diff;
@@ -68,7 +66,7 @@ struct SegmentTree {
         if (left <= s && right >= e)
             return tree[node];
         int mid = (s + e) / 2;
-        return sum(node*2, s, mid, left, right) 
+        return sum(node*2, s, mid, left, right)
         + sum(node*2 + 1, mid + 1, e, left, right);
     }
 
