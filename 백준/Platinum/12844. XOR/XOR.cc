@@ -9,13 +9,13 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 // const int MOD = 1'000'000'007;
 
 /* -----------------------------------------------------
-Lazy Propagation
-https://www.acmicpc.net/problem/10999
+Lazy Propagation XOR
+https://www.acmicpc.net/problem/12844
 */
 
 #define MAX 500'000
 
-ll arr[MAX];  // 미리 arr를 정해놓는 경우
+int arr[MAX];  // 미리 arr를 정해놓는 경우
 
 struct SegmentTree {
 
@@ -33,13 +33,13 @@ struct SegmentTree {
     // 미리 정해놓은 배열로 세그트리 구성
     DataType build(int node, int s, int e) {  // arr 인덱스 따라서 (1, 1, N) / (0, 0, N-1)
         if (s == e) return tree[node] = arr[s];
-        int mid = (s + e) / 2;
-        return tree[node] = build(node*2, s, mid) ^ build(node*2 + 1, mid + 1, e);
+        int mid = (s + e) >> 1;
+        return tree[node] = build((node<<1), s, mid) ^ build((node<<1) + 1, mid + 1, e);
     }
 
     void update_lazy(int node, int s, int e) {  // lazy값이 이미 있을 때 실행
         if ((e-s+1)%2) tree[node] ^= lazy[node];  // XOR 홀수번 일때만 한번 해주기
-        if (s != e) lazy[node*2] ^= lazy[node], lazy[node*2+1] ^= lazy[node];
+        if (s != e) lazy[(node<<1)] ^= lazy[node], lazy[(node<<1)+1] ^= lazy[node];
         lazy[node] = 0;
     }
 
@@ -49,13 +49,13 @@ struct SegmentTree {
         if (left <= s && e <= right) {
             // 직접 tree update
             if ((e-s+1)%2) tree[node] ^= diff;  // XOR 홀수번 일때만 한번 해주기
-            if (s != e) lazy[node*2] ^= diff, lazy[node*2+1] ^= diff;
+            if (s != e) lazy[(node<<1)] ^= diff, lazy[(node<<1)+1] ^= diff;
             return;
         }
-        int mid = (s + e) / 2;
-        update_range(node*2, s, mid, left, right, diff);
-        update_range(node*2+1, mid+1, e, left, right, diff);
-        tree[node] = tree[node*2] ^ tree[node*2+1];
+        int mid = (s + e) >> 1;
+        update_range((node<<1), s, mid, left, right, diff);
+        update_range((node<<1)+1, mid+1, e, left, right, diff);
+        tree[node] = tree[(node<<1)] ^ tree[(node<<1)+1];
     }
 
     // left~right 구간 XOR 출력
@@ -63,9 +63,9 @@ struct SegmentTree {
         if (lazy[node]) update_lazy(node, s, e);
         if (left > e || right < s) return 0;
         if (left <= s && right >= e) return tree[node];
-        int mid = (s + e) / 2;
-        return getXOR(node*2, s, mid, left, right)
-        ^ getXOR(node*2 + 1, mid + 1, e, left, right);
+        int mid = (s + e) >> 1;
+        return getXOR((node<<1), s, mid, left, right)
+        ^ getXOR((node<<1) + 1, mid + 1, e, left, right);
     }
 
 }ST(MAX);
@@ -73,8 +73,8 @@ struct SegmentTree {
 int N, M;
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+    ios_base::sync_with_stdio(0); cin.tie(0);
+
     cin >> N;
     for (int i=0; i<N; i++){
         cin >> arr[i];
