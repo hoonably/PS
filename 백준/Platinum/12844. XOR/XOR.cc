@@ -19,7 +19,7 @@ ll arr[MAX];  // 미리 arr를 정해놓는 경우
 
 struct SegmentTree {
 
-    using DataType = long long;
+    using DataType = int;
     vector<DataType> tree;
     vector<DataType> lazy;
 
@@ -84,7 +84,7 @@ int main() {
 
     cin >> M;
     while(M--){
-        int a, b, c; ll d;
+        int a, b, c, d;
         cin >> a;
         if (a==1){
             cin >> b >> c >> d;  // Ab ~ Ac 에 d를 XOR
