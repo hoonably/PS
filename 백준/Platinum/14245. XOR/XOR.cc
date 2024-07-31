@@ -63,9 +63,9 @@ struct SegmentTree {
         if (idx > e || idx < s) return 0;
         update_lazy(node, s, e);
         if (s==e) return tree[node];
-        int mid = (s + e) / 2;
-        return getXOR(node*2, s, mid, idx)
-        + getXOR(node*2 + 1, mid + 1, e, idx);
+        int mid = (s + e) >> 1;
+        return getXOR((node<<1), s, mid, idx)
+        + getXOR((node<<1) + 1, mid + 1, e, idx);
     }
 
 }ST(MAX);
