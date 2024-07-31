@@ -32,8 +32,7 @@ struct SegmentTree {
 
     // 미리 정해놓은 배열로 세그트리 구성
     DataType build(int node, int s, int e) {  // arr 인덱스 따라서 (1, 1, N) / (0, 0, N-1)
-        if (s == e)
-            return tree[node] = arr[s];
+        if (s == e) return tree[node] = arr[s];
         int mid = (s + e) / 2;
         return tree[node] = build(node*2, s, mid) ^ build(node*2 + 1, mid + 1, e);
     }
@@ -48,8 +47,9 @@ struct SegmentTree {
         if (lazy[node]) update_lazy(node, s, e);
         if (left > e || right < s) return;
         if (left <= s && e <= right) {
-            lazy[node]^=diff;
-            update_lazy(node, s, e);
+            // 직접 tree update
+            if ((e-s+1)%2) tree[node] ^= diff;  // XOR 홀수번 일때만 한번 해주기
+            if (s != e) lazy[node*2] ^= diff, lazy[node*2+1] ^= diff;
             return;
         }
         int mid = (s + e) / 2;
@@ -58,14 +58,14 @@ struct SegmentTree {
         tree[node] = tree[node*2] ^ tree[node*2+1];
     }
 
-    // left~right 구간합 출력
-    DataType sum(int node, int s, int e, int left, int right){
+    // left~right 구간 XOR 출력
+    DataType getXOR(int node, int s, int e, int left, int right){
         if (lazy[node]) update_lazy(node, s, e);
         if (left > e || right < s) return 0;
         if (left <= s && right >= e) return tree[node];
         int mid = (s + e) / 2;
-        return sum(node*2, s, mid, left, right)
-        ^ sum(node*2 + 1, mid + 1, e, left, right);
+        return getXOR(node*2, s, mid, left, right)
+        ^ getXOR(node*2 + 1, mid + 1, e, left, right);
     }
 
 }ST(MAX);
@@ -92,7 +92,7 @@ int main() {
         }
         else {
             cin >> b >> c;  // Ab ~ Ac 를 모두 XOR한 값을 출력
-            cout << ST.sum(1, 0, N-1, b, c) << "\n";
+            cout << ST.getXOR(1, 0, N-1, b, c) << "\n";
         }
     }
 }
