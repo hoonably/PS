@@ -14,19 +14,18 @@ https://www.acmicpc.net/problem/1395
 */
 
 #define MAX 100'000
+#define treeSZ 262144  // cout 한 결과
 
 struct SegmentTree {
 
     using DataType = int;
-    vector<DataType> tree;
-    bool lazy[4*MAX];  // 스위치가 바뀌었는가?
+    DataType tree[treeSZ];
+    bool lazy[treeSZ];  // 스위치가 바뀌었는가?
 
-    SegmentTree(int size) {
-        int h = ceil(log2(size+1));  // ceil : 정수로 올림
-        int treeSize = 1 << (h + 1);
-        tree.resize(treeSize);
-        // lazy.resize(treeSize);
-    }
+    // SegmentTree() {  // 트리 크기 출력 후 주석처리
+    //     int treeSize = 1 << ((int)ceil(log2(MAX+1)) + 1);  // ceil : 정수로 올림
+    //     cout << treeSize;
+    // }
 
     void update_lazy(int node, int s, int e) {  // lazy값이 이미 있을 때 실행
         if(lazy[node]){  // 스위치가 홀수번 눌렸을 때
@@ -67,7 +66,7 @@ struct SegmentTree {
         + sum((node<<1) + 1, mid + 1, e, left, right);
     }
 
-}ST(MAX);
+}ST;
 
 int N, M;
 
