@@ -19,7 +19,7 @@ https://www.acmicpc.net/problem/10999
 
 struct SegmentTree {
 
-    using DataType = long long;
+    using DataType = int;
     vector<DataType> tree;
     vector<DataType> lazy;
 
