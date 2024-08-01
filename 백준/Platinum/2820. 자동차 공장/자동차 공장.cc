@@ -16,13 +16,15 @@ https://www.acmicpc.net/problem/2820
 Lazy Propagation + 오일러 투어 테크닉
 
 미리 정해놓은 배열로 세그트리 구성할때
-arr[s]로 그대로 넣지 말고, 순서가 바뀌므로
-arr[dfs_in[s]] 로 넣어줘야함;;
+ar[s]로 그대로 넣지 말고, 순서가 바뀌므로
+arr[dfs_in[i]] = ar[i]; 을 사용해
+그래프 기준으로 배열을 바꿔주고 넣는다.
 */
 
 #define MAX 500'000
 
-int arr[MAX+1];  // 미리 arr를 정해놓는 경우
+int ar[MAX+1];  // 사람 기준
+int arr[MAX+1];  // 그래프 기준
 
 int N, M;
 vector<int> adj[MAX+1];
@@ -44,12 +46,12 @@ struct SegmentTree {
     }
 
     // 미리 정해놓은 배열로 세그트리 구성
-    // 여기서 dfs_in[s] 로 넣어줘야지
+    // 여기서 build를 사용하면
     // 그냥 arr[s]로 넣어주면 나중에 정렬되어 트리에 넣기 때문에 인덱스가 달라짐
     // ex) 1 -> 3 -> 5 -> 4 -> 2 이런식으로 트리에 들어갈 수 있음
     DataType build(int node, int s, int e) {  // 인덱스 따라서 (1, 1, N) / (0, 0, N-1)
         if (s == e)
-            return tree[node] = arr[dfs_in[s]];  // 이거 때문에 틀렸음
+            return tree[node] = arr[s];
         int mid = (s + e) / 2;
         return tree[node] = build(node*2, s, mid) + build(node*2 + 1, mid + 1, e);
     }
@@ -103,7 +105,7 @@ int main() {
 
     cin >> N >> M;
     for (int i=1; i<=N; i++){
-        cin >> arr[i];
+        cin >> ar[i];
         if (i==1) continue;
         int p;
         cin >> p;  // 직속 상사의 번호
@@ -112,10 +114,10 @@ int main() {
 
     EulerTour(1);
 
-    // ST.build(1, 1, N);  // 틀림
-    for (int i=1; i<=N; i++){
-        ST.update_range(1, 1, N, dfs_in[i], dfs_in[i], arr[i]);
-    }
+    // ar  : 사람 이름 기준
+    // arr : 정렬된 그래프 기준
+    for (int i = 1; i <= N; i++) arr[dfs_in[i]] = ar[i];
+    ST.build(1, 1, N);  // 틀림
 
     while(M--){
         char q; int a, x;
