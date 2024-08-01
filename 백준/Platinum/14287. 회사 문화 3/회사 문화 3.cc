@@ -9,7 +9,7 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 // const int MOD = 1'000'000'007;
 
 /* -----------------------------------------------------
-https://www.acmicpc.net/problem/14268
+https://www.acmicpc.net/problem/14287
 
 회사 문화 3
 
@@ -21,7 +21,7 @@ Lazy Propagation + 오일러 투어 테크닉
 1-2-3-4-5 라면
 3이 칭찬을 받으면 1, 2, 3 이 칭찬을 받는다.
 그래서 2가 칭찬을 받은 양을 구하려면
-dfs_int[2]부터 dfs_out[2]까지 2,3,4,5 가 총 받은 칭찬의 합을 구하면 된다.
+dfs_in[2]부터 dfs_out[2]까지 2,3,4,5 가 총 받은 칭찬의 합을 구하면 된다.
 */
 
 #define MAX 100'000
@@ -93,8 +93,6 @@ void EulerTour(int now){  // (int now, int par){
 
 int main() {
     ios_base::sync_with_stdio(0); cin.tie(0);
-
-    memset(dfs_out, -1, sizeof(dfs_out));
 
     cin >> N >> M;
     for (int i=1; i<=N; i++){
