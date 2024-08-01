@@ -76,8 +76,8 @@ void EulerTour(int node){
         dfs_out[node] = idx - 1;
         return;
     }
-    for(int i = 0; i < adj[node].size(); i++){
-        EulerTour(adj[node][i]);
+    for(auto v : adj[node]){
+        EulerTour(v);
     }
     dfs_out[node] = idx - 1;
 }
