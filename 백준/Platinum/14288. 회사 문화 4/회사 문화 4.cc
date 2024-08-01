@@ -87,8 +87,6 @@ void EulerTour(int now){  // (int now, int par){
 int main() {
     ios_base::sync_with_stdio(0); cin.tie(0);
 
-    memset(dfs_out, -1, sizeof(dfs_out));
-
     cin >> N >> M;
     for (int i=1; i<=N; i++){
         int p;
