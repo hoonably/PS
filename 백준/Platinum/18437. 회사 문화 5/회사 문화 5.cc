@@ -23,7 +23,7 @@ struct SegmentTree {
 
     using DataType = int;
     vector<DataType> tree;
-    vector<DataType> lazy;  // 스위치가 바뀌었는가?
+    vector<char> lazy;  // 스위치가 바뀌었는가?
 
     SegmentTree(int size) {
         int h = ceil(log2(size+1));  // ceil : 정수로 올림
