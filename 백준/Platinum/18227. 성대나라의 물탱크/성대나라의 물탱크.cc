@@ -34,14 +34,14 @@ struct SegmentTree {
         tree.resize(treeSize);
     }
 
-    // idx 인덱스의 숫자를 diff "만큼" 변화
-    void updateDiff(int node, int s, int e, int idx, DataType diff){
+    // idx 인덱스의 숫자를 1 "만큼" 변화
+    void updateDiff(int node, int s, int e, int idx){
         if (idx > e || idx < s) return;
-        tree[node] += diff;
+        tree[node] += 1;
         if (s == e) return;
         int mid = (s + e) / 2;
-        updateDiff(node*2, s, mid, idx, diff);
-        updateDiff(node*2 + 1, mid + 1, e, idx, diff);
+        updateDiff(node*2, s, mid, idx);
+        updateDiff(node*2 + 1, mid + 1, e, idx);
     }
 
     // idx 인덱스의 숫자를 value "로" 변화
@@ -106,7 +106,7 @@ int main() {
         int a, b;
         cin >> a >> b;;
         if (a==1){
-            ST.updateDiff(1, 1, N, dfs_in[b], 1);
+            ST.updateDiff(1, 1, N, dfs_in[b]);
         }
         else {
             cout << ST.sum(1, 1, N, dfs_in[b], dfs_out[b]) * depth[b] << "\n";
