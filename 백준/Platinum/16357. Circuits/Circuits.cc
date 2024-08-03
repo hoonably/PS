@@ -31,7 +31,7 @@ Lazy Propagation으로 쿼리를 이용해 처리하면 된다.
 나중에 작은 사각형을 없앨 차례가 왔을 때 직전에 처리한 큰 사각형의 정보를 잃어버리게 된다.
 */
 
-#define MAX 200'001
+#define MAX 200'000
 
 pii arr[MAX+1];  // 미리 arr를 정해놓는 경우
 
@@ -57,7 +57,7 @@ struct SegmentTree {
     }
 
     void update_range(int node, int s, int e, int left, int right, DataType diff) {
-        update_lazy(node, s, e);  // 기존에 lazy 값이 있음
+        update_lazy(node, s, e);
         if (left > e || right < s) return;
         if (left <= s && e <= right) {
             tree[node] += diff;
