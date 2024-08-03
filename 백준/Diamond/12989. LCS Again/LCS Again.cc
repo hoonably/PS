@@ -19,19 +19,16 @@ S와의 LCS (Longest Common Subsequence)의 길이가 n-1인 문자열의 개수
 #define MAX 
 
 ll ans, cnt;
-char ret, last, last2, c;
+char ret, last=-1, last2=-2, c;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
     int n, m;
     cin >> n >> m;
-    ans = n * (m - 1);
 
-    cin >> last;
-    last2 = -1;
-
-    for (int i = 2; i <= n; i++) {
+    ans = 1;
+    for (int i = 1; i <= n; i++) {
         cin >> c;
         
         if (c == last2) cnt++;
