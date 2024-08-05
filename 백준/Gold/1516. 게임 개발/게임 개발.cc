@@ -57,9 +57,7 @@ int main(){
         cin >> D[now];  // 건설소요 시각
 
         int before;
-        while(true){
-            cin >> before;
-            if (before==-1) break;
+        while(cin >> before && before!=-1){
             // before가 now 앞에 선다
             graph[before].push_back(now);
             inDegree[now]++;  // 진입차수
