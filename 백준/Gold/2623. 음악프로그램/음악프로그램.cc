@@ -18,7 +18,7 @@ https://www.acmicpc.net/problem/2252
 : 방향이 있는 그래프의 꼭짓점들을 나열
 */
 
-#define MAX 32001
+#define MAX 1001
 
 int N, M;
 int inDegree[MAX];  // 진입차수 (자신으로 오는 노드의 개수)
