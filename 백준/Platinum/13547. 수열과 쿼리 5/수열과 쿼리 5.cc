@@ -24,64 +24,53 @@ https://www.acmicpc.net/problem/13547
 
 #define MAX 100000
 
-struct QueryNode {
-    // i j: Ai, Ai+1, ..., Aj에 존재하는 서로 다른 수의 개수
-
-    int i, j, idx;
-    int sqrtN;
-
-    QueryNode() : QueryNode(0, 0, -1, 0) {}
-    QueryNode(int i, int j, int idx, int N) : i(i), j(j), idx(idx) { sqrtN = sqrt(N); }
-
-    // (s/√N, e) 순으로 오름차순 정렬
-    bool operator <(const QueryNode& A)const {
-        if (i / sqrtN != A.i / sqrtN)
-            return (i / sqrtN < A.i / sqrtN);
-        return (j < A.j);
+int sqrtN;
+struct Query{
+    // i j: Ai ~ Aj에 존재하는 서로 다른 수의 개수
+    int idx, s, e;
+    bool operator < (const Query &A) const{
+        if(s/sqrtN != A.s/sqrtN) return s/sqrtN < A.s/sqrtN;
+        return e < A.e;
     }
 };
 
 int N, M, A[MAX];
-int result[MAX];
-int dcnt = 0, cnt[1000001];
-QueryNode Q[MAX];
+int cnt[1000001];
+int ans[MAX];
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
     cin >> N;
+    sqrtN = sqrt(N);
     for (int i = 0; i < N; ++i){
         cin >> A[i];
     }
 
     cin >> M;
-    for (int idx = 0; idx < M; ++idx) {
-        int i, j;
-        cin >> i >> j;
-        Q[idx] = QueryNode(i - 1, j, idx, N);
+    vector<Query> Q(M);
+    for(int i=0; i<M; ++i){
+        cin >> Q[i].s >> Q[i].e;
+        Q[i].s--;
+        Q[i].e--;
+        Q[i].idx = i;
     }
-    sort(Q, Q + M);  // 쿼리 정렬
+    sort(all(Q));  // 쿼리 정렬
 
-    // 첫 번째에 위치한 쿼리의 결과는 손수 구하기
-    int i0 = Q[0].i, j0 = Q[0].j;
-    for (int i = i0; i < j0; ++i){
-        if (cnt[A[i]]++ == 0){
-            ++dcnt;
-        }
-    }
-    result[Q[0].idx] = dcnt;
+    int s=0, e=0, x=1;
+    cnt[A[0]]=1;
 
-    // 다음 쿼리부터 바로 이전 쿼리의 결과를 사용해 계산해 나가기
-    for (int i = 1; i < M; ++i) {
-        while (Q[i].i < i0) if (cnt[A[--i0]]++ == 0) ++dcnt;
-        while (j0 < Q[i].j) if (cnt[A[j0++]]++ == 0) ++dcnt;
-        while (Q[i].i > i0) if (--cnt[A[i0++]] == 0) --dcnt;
-        while (j0 > Q[i].j) if (--cnt[A[--j0]] == 0) --dcnt;
-        result[Q[i].idx] = dcnt;
+    for(int i=0;i<M;++i){
+        while(s<Q[i].s) if (--cnt[A[s++]]==0) --x;
+        while(s>Q[i].s) if (++cnt[A[--s]]==1) ++x;
+        while(e>Q[i].e) if (--cnt[A[e--]]==0) --x;
+        while(e<Q[i].e) if (++cnt[A[++e]]==1) ++x;
+        ans[Q[i].idx]=x;
     }
 
-    for (int i = 0; i < M; ++i)
-        cout << result[i] << "\n";
+    for(int i=0; i<M; i++) {
+        cout << ans[i] << '\n';
+    }
     
     return 0;
 }
