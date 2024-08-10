@@ -8,14 +8,13 @@ vector<string> solution(vector<string> record) {
     string status, userID, nickname;
 
     for (string line : record){
-        // istringstream으로 이미 있는 string 자르기
-        istringstream l (line);
-        
-        getline(l, status, ' ');
-        getline(l, userID, ' ');
+
+        stringstream l (line);
+        l >> status;
+        l >> userID;
         
         if (status[0]=='E') {
-            getline(l, nickname, ' ');
+            l >> nickname;
             nick[userID] = nickname;
             temp.push_back({true, userID});
         } // 채팅방에 들어옴
@@ -25,11 +24,12 @@ vector<string> solution(vector<string> record) {
         } // 채팅방을 나감
 
         else {
-            getline(l, nickname, ' ');
+            l >> nickname;
             nick[userID] = nickname;
         } // 이름을 바꿈
     }
 
+    // 이제 마지막 닉네임을 적용시켜 answer을 출력
     vector<string> answer;
     for (auto t : temp){
         nickname = nick[t.second];
