@@ -38,15 +38,17 @@ ll res;  // 모든 cnt[x] 중 최댓값
 ll ans[MAX];
 
 void Plus(int x){
-	res -= 1LL * cnt[x] * cnt[x] * x;
+	// res -= 1LL * cnt[x] * cnt[x] * x;
+    res += ll (2 * cnt[x] + 1) * x;  // 더 빠른 코드
 	cnt[x]++; 
-	res += 1LL * cnt[x] * cnt[x] * x;
+	// res += 1LL * cnt[x] * cnt[x] * x;
 }
 
 void Minus(int x){
-	res -= 1LL * cnt[x] * cnt[x] * x;
+	// res -= 1LL * cnt[x] * cnt[x] * x;
 	cnt[x]--; 
-	res += 1LL * cnt[x] * cnt[x] * x;
+    res -= ll (2 * cnt[x] + 1) * x;  // 더 빠른 코드
+	// res += 1LL * cnt[x] * cnt[x] * x;
 }
 
 int main(){
