@@ -34,7 +34,7 @@ struct Query{
 int N, Q;
 vector<int> A, B;
 int cnt[MAX];  // 좌표 압축 후 최대 500'000 가지
-int res;  // 모든 cnt[x] 중 최댓값
+int res;
 int ans[MAX];
 
 void Plus(int x){
