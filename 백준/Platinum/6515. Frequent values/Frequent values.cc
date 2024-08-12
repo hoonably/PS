@@ -32,6 +32,7 @@ int A[MAX];
 int cnt[2*MAX];
 int table[MAX];  // table[y] = (cnt[x] == y)를 만족하는 y의 개수
 int res;  // 모든 cnt[x] 중 최댓값
+int ans[MAX];
 
 void Plus(int x){
 	if(cnt[x] != 0) table[cnt[x]]--;
@@ -77,7 +78,6 @@ int main(){
         int s=0, e=0;
 
         // 이전 쿼리의 결과를 이용해 계산해나가기
-        vector<int> ans(Q);
         for(int i=0;i<Q;++i){
             while(s<Qu[i].s) Minus(A[s++]);
             while(s>Qu[i].s) Plus(A[--s]);
@@ -86,8 +86,8 @@ int main(){
             ans[Qu[i].idx] = res;
         }
 
-        for(int i : ans) {
-            cout << i << '\n';
+        for(int i=0; i<Q; i++) {
+            cout << ans[i] << '\n';
         }
     }
 
