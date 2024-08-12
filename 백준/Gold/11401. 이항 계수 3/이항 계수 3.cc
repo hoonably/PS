@@ -1,72 +1,60 @@
 #include <bits/stdc++.h>
-#define ll long long
+#define all(v) v.begin(), v.end()
 using namespace std;
+typedef long long ll;
+typedef pair<int,int> pii; typedef pair<ll,ll> pll; 
+typedef tuple<int,int,int> tiii;
+const int INF = 0x3f3f3f3f;  // 1061109567
+// const ll INF = 0x3f3f3f3f3f3f3f3f;
+const int MOD = 1'000'000'007;
 
-/*
-페르마의 소정리
+/* -----------------------------------------------------
+https://www.acmicpc.net/problem/11402
 
-p가 소수, a가 정수일 때
-a의 p제곱 ≡ a   (mod p)   
+뤼카(Édouard Lucas)의 정리 
+nCk % p (p : 소수) 를 쉽게 구할 수 있는 방법
 
-세 줄은 합동기호이고, p로 나눈 나머지가 서로 같다는 뜻이다.
-
-ex) 12의 7승을 7로 나눈 나머지 = > 12를 7로 나눈 나머지
-
-
-
-!!! 여기서 이 식의 양 변을 a의 제곱으로 나눠주면 !!!
-a의 p-2제곱 ≡ 1/a  (mod p)
-
-이를 통해 나눗셈이었던 것을 곱셈 형태로 변형하면 된다.
-nCk = N! / ((N-K)! * K!) % p
-nCk = N! * ((N-K)! * K!) ^ (p-2) % p
-
+쉽게, nCk를 M으로 나눈 나머지를 구하기 위해서는
+N과 K를 M진 전개해 얻은 각 자릿수의 조합끼리 곱하고 M으로 나누면 된다.
+ 
+ex) N:100 K:45 MOD:13
+100 = 13*7 + 1*9
+ 45 = 13*3 + 1*6
 */
 
-#define MOD 1000000007
+#define MAX 
+
 ll N, K;
 
-// n팩토리얼을 MOD로 나눈 나머지
-ll factorial(int n){
-    ll ans = 1;
-    for (int i=2; i<=n; i++){
-        ans *= i;
-        ans %= MOD;
-    }
-    return ans;
-}
+ll nCk(int N, int K){
+    // 페르마 소정리를 이용한 nCk를 M로 나눈 수 (M는 소수)
+    ll A = 1, B = 1;
+    for (int i = N; i > N-K; i--)
+        A = A * i % MOD;
+	
+    for (int i = K; i >= 2; i--)
+        B = B * i % MOD;
 
-// a의 b제곱을 C로 나눈 나머지
-ll power(ll a, ll b){
-
-    if (b==1) return a % MOD;
-
-    if (b%2==0){
-        ll temp = power(a, b/2);
-        return temp * temp % MOD;
+    N = 1, K = MOD-2;
+    while (K){
+        if (K & 1) N = N * B % MOD;
+        K /= 2;
+        B = B * B % MOD;
     }
-    else {
-        return power(a, b-1) * a % MOD;
-    }
+    return A*N %MOD;
 }
 
 int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(0);
+    ios_base::sync_with_stdio(0); cin.tie(0);
     
     cin >> N >> K;
-
-    // 조합 nCk = N! / ((N-K)! * K!) % p
-
-    // 분자
-    ll top = factorial(N);
-    // 분모
-    ll bottom = factorial(N - K) * factorial(K) % MOD;
-
-    // 페르마의 소정리 적용
     
-    // nCk = N! * ((N-K)! * K!) ^ (p-2) % p
-    cout << top * power(bottom, MOD - 2) % MOD;
-
+    ll res = 1;
+    while (N || K){
+        res = res * nCk(N%MOD, K%MOD) % MOD;
+        N /= MOD, K /= MOD;
+    }
+    cout << res;
+    
     return 0;
 }
