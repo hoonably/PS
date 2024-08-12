@@ -39,7 +39,7 @@ int nCk(int N, int K){
     N = 1, K = M-2;
     while (K){
         if (K & 1) N = N * B % M;
-        K >>= 1;
+        K /= 2;
         B = B * B % M;
     }
     return A*N %M;
