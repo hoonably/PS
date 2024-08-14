@@ -15,7 +15,7 @@ const ll INF = 0x3f3f3f3f3f3f3f3f;
 #define MAX 
 
 int N;
-vector<ll> A;
+vector<int> A;
 ll best = INF;
 tiii ans;
 
@@ -24,7 +24,7 @@ int main(){
     
     cin >> N;
     A.resize(N);
-    for(ll& num : A) cin >> num;
+    for(int& num : A) cin >> num;
 
     sort(all(A));
 
@@ -35,7 +35,7 @@ int main(){
 
         int s = i+1, e = N-1;
         while(s<e){
-            ll sum = A[i]+A[s]+A[e];
+            ll sum = (ll)A[i]+A[s]+A[e];
 
             // 답 갱신
             if (abs(sum) < best){
