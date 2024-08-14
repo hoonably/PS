@@ -41,8 +41,6 @@ int main(){
             if (abs(sum) < best){
                 best = abs(sum);
                 ans = {i, s, e};
-
-                if (best==0) break;
             }
 
             if (sum<0) s++;
