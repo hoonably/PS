@@ -24,7 +24,7 @@ long long 범위 : a = 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37
 #define MAX 
 typedef unsigned long long ull;
 
-ll pow(ull a, ll b, ll mod){  // (a^b)%mod
+ull pow(ull a, ull b, ull mod){  // (a^b)%mod
     ull ret = 1;
     a %= mod;
     while (b){
@@ -34,20 +34,19 @@ ll pow(ull a, ll b, ll mod){  // (a^b)%mod
     }
     return ret;
 }
-bool miller_rabin(ll n, int a){
+bool miller_rabin(ull n, int a){
     if (a%n == 0) return true;
-    ll d = n - 1;
-    while (d % 2 == 0){
-        if (pow(a, d, n) == n-1)
-            return 1;
+    ull d = n - 1;
+    while(1) {
+        ull temp = pow(a, d, n);
+        if(temp == n-1) return true;
+        if(d%2 == 1) return (temp == 1 || temp == n-1);
         d /= 2;
     }
-    ll temp = pow(a, d, n);
-    return temp == 1 || temp == n-1;
 }
 int a_list[] = {2, 7, 61};  // int 범위
-// ll a_list[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};  // long long 범위
-bool isPrime(ll n){
+// int a_list[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};  // long long 범위
+bool isPrime(ull n){
     for (int a : a_list){
         if (!miller_rabin(n, a)) return false;
     }
@@ -61,7 +60,7 @@ int main(){
     
     cin >> N;
     while(N--){
-        ll area;
+        ull area;
         cin >> area;
         if (isPrime(2*area+1)) cnt++;
     }
