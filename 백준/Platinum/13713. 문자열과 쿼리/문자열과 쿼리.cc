@@ -43,6 +43,8 @@ int main(){
     
     cin >> S;
 	int len = S.size();
+
+	// 접미사를 구해야하므로 뒤집기
     reverse(all(S));
 
     auto Z = Z_function(S, len);
@@ -50,6 +52,8 @@ int main(){
     int M; cin >> M;
     while(M--){
 		int i; cin >> i;
+
+		// 뒤집었으니 len-i 로
 		cout << Z[len - i] << '\n';
 	}
 
