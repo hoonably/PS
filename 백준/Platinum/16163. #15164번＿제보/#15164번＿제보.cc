@@ -57,8 +57,9 @@ ll manachers(string S, int len){
             r = i + A[i];
             p = i;
         }
-
-        cnt += (A[i]+1) / 2; // 각 자리별 회문 개수
+        
+        // A[i]=5 라면 3개의 회문이 가능함
+        cnt += (A[i]+1) / 2;
     }
 
     return cnt;
