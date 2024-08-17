@@ -33,7 +33,7 @@ i - A[i] - 1에서 i + A[i] + 1까지는 팰린드롬이  아니다.
 
 int A[2*MAX+2];
  
-ll manachers(string S, int len){
+ll manachers(const string& S, int len){
 
     ll cnt = 0;
 
