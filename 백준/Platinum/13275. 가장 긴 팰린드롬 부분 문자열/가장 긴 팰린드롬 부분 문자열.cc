@@ -48,7 +48,7 @@ void manachers(string S, int len){
     }
 }
 
-string str, temp;
+string str;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -56,15 +56,17 @@ int main(){
     cin >> str;
  
     int len = str.size();
- 
-    for (int i = 0; i < len; i++){
-        temp += '#';
-        temp += str[i];
+
+    str.resize(2*len+1);
+
+    str[2 * len] = '#';
+    for (int i = len - 1; i >= 0; i--) {
+        str[i * 2 + 1] = str[i];
+        str[i * 2] = '#';
     }
-    temp += '#';
-    
+
     len = 2*len+1;
-    manachers(temp, len);
+    manachers(str, len);
 
     int ans = 0;
     for (int i = 0; i < len; i++)
