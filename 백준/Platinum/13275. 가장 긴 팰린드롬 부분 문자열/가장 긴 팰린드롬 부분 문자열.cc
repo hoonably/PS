@@ -40,9 +40,6 @@ void manachers(const string& S, int len){
         //  그리고 A[i]의 초기값은 min(r - i, A[i′])이다. (즉, r은 중심점 p를 기준으로 하는 p + A[p]를 의미하게 된다.)
         if (i <= r) A[i] = min(A[2 * p - i], r - i);
 
-        //  i > r이라면, A[i]의 초기값은 0이다.
-        else A[i] = 0;
-
         // S[i - A[i]]와 S[i + A[i]]가 같을 때까지 A[i]를 증가시킨다.
         while (i - A[i] - 1 >= 0 && i + A[i] + 1 < len){
             if (S[i - A[i] - 1] == S[i + A[i] + 1]) A[i]++;
