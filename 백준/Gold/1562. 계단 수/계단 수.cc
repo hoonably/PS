@@ -15,7 +15,7 @@ https://www.acmicpc.net/problem/1562
 #define MAX 
 
 int n;
-int dp[101][10][1024];	
+int dp[101][10][1<<10];	
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -23,15 +23,9 @@ int main(){
     cin >> n;
 	//base
 	dp[1][0][1] = 0;	//명시적
-	dp[1][1][2] = 1;
-	dp[1][2][4] = 1;
-	dp[1][3][8] = 1;
-	dp[1][4][16] = 1;
-	dp[1][5][32] = 1;
-	dp[1][6][64] = 1;
-	dp[1][7][128] = 1;
-	dp[1][8][256] = 1;
-	dp[1][9][512] = 1;
+	for (int i=1; i<=9; ++i){
+		dp[1][i][1<<i] = 1;
+	}
  
 	//step
 	for (int i = 2; i <= n; ++i) {
