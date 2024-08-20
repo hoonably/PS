@@ -50,7 +50,6 @@ int main(){
 		}
 
         // cur 9
-        cur = 9;
         for (int state = 0; state <= 1023; ++state)
             dp[i][cur][state | (1 << cur)] = (dp[i][cur][state | (1 << cur)] + dp[i - 1][cur - 1][state]) % MOD;
     }
