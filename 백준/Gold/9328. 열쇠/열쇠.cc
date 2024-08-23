@@ -27,7 +27,7 @@ int bfs(int sx, int sy){
     int cnt = 0;
 
     queue<pair<int,int>> q; // Bfs 큐
-    queue<pair<int,int>> door[27]; // 각 알파벳 문의 큐
+    queue<pair<int,int>> door[27]; // 열쇠가 없었어서 방문하지 못했던 방의 큐
     visited[sx][sy] = true; 
     q.push({sx,sy});
 
@@ -41,25 +41,25 @@ int bfs(int sx, int sy){
         for(int i = 0; i < 4; i++){
             int nx = x + dx[i];
             int ny = y + dy[i];
-            char ch = board[nx][ny]; // 다음 위치의 단어
+            char c = board[nx][ny]; // 다음 위치의 단어
 
             // 이미 방문했거나, 벽이거나, 범위 밖으로 벗어나면 안됨
-            if(nx < 0 || ny < 0 || nx > h+1 || ny > w+1 ||
-                visited[nx][ny] || ch == '*') continue;
+            if (nx < 0 || ny < 0 || nx > h+1 || ny > w+1 ||
+                visited[nx][ny] || c == '*') continue;
             visited[nx][ny] = true;
 
             // 다음 위치가 문이라면
-            if('A' <= ch && ch <= 'Z'){
+            if('A' <= c && c <= 'Z'){
                 // 현재 해당 문의 키를 가지고 있지 않으면 해당 문의 큐에 넣음
-                if(!haveKey[ch-'A']) door[ch-'A'].push({nx,ny});
+                if(!haveKey[c-'A']) door[c-'A'].push({nx,ny});
                 // 해당 문의 키를 가지고 있으면 bfs 큐에 넣음
                 else q.push({nx,ny});
             }
 
             // 다음 위치가 열쇠
-            else if('a'<= ch && ch <= 'z'){
-                haveKey[ch-'a'] = true; // 열쇠 개수 추가
-                int idx = ch-'a'; // 해당 열쇠에 대응하는 문의 알파벳 인덱스
+            else if('a'<= c && c <= 'z'){
+                int idx = c-'a';
+                haveKey[idx] = true;
                 // 해당 문의 큐 안에 있는걸 전부 bfs 큐로 옮김
                 while(!door[idx].empty()){
                     q.push(door[idx].front());
