@@ -27,7 +27,7 @@ int main(){
         cin >> h;
         if (cnt[h]) {
             cnt[h]--; 
-            if (h!=0) cnt[h-1]++;
+            cnt[h-1]++;
         }
         else {
             cnt[h-1]++;
