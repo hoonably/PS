@@ -26,8 +26,9 @@ const int SZ = MAX/sqrtN;  // 분할 후 개수
 struct Query{
     int idx, s, e;
     bool operator < (const Query &A) const{
+        int block1 = s/sqrtN, block2 = A.s/sqrtN;
         // 1. 분할값이 다르다면
-        if(s/sqrtN != A.s/sqrtN) return s < A.s;
+        if(block1 != block2) return block1 < block2;
         // 2. 분할값이 같다면 e1 < e2 라면 먼저 처리
         return e < A.e;
     }
@@ -37,7 +38,7 @@ int N, M, K;
 int A[MAX];
 int cnt[MAX], bucket[SZ];
 int ans[MAX];
-deque<int> pos[MAX];
+list<int> pos[MAX];
 
 
 void Plus(int x, bool changeFront){
@@ -48,11 +49,12 @@ void Plus(int x, bool changeFront){
 		cnt[now]--;
 		bucket[now/sqrtN]--;
 	}
-	if(changeFront) dq.push_front(x);  // 앞을 변경
-	else dq.push_back(x);  // 뒤를 변경
+	if(changeFront) dq.emplace_front(x);  // 앞을 변경
+	else dq.emplace_back(x);  // 뒤를 변경
 
 	now = dq.back() - dq.front();
-	cnt[now]++; bucket[now/sqrtN]++;
+	cnt[now]++; 
+    bucket[now/sqrtN]++;
 }
 
 void Minus(int x, bool changeFront){
@@ -76,11 +78,12 @@ int query(){
 	for(int i=SZ-1; i>=0; i--){
 		if(bucket[i] == 0) continue;
         // 제일 뒤의 값부터 있다면 그 값 return
-		for(int j=sqrtN-1; j>=0; j--){
-			if(cnt[i*sqrtN+j] > 0){
-				return i*sqrtN+j;
-			}
-		}
+        int idx = (i + 1) * sqrtN;
+        while(--idx){
+            if (cnt[idx] != 0) {
+                return idx;
+            }
+        }
 	}
 	return 0;
 }
@@ -112,7 +115,7 @@ int main(){
 
     for(int i=0;i<M;++i){
         // 순서 중요
-        // pop해버리면 안됨
+        // 먼저 pop해버리면 안됨
         while(s>Qu[i].s) Plus(--s, true);
         while(e<Qu[i].e) Plus(++e, false);
         while(s<Qu[i].s) Minus(s++, true);
