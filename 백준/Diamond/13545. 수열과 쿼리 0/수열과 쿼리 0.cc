@@ -20,7 +20,7 @@ Ai ~ Aj의 합 = A1~Aj 합 - A1~Ai의 합 (누적합 사용)
 배열의 인덱스가 음수가 될 수 있기 때문에 모두 100'000을 더해준다.
 */
 
-#define MAX 200'001
+#define MAX 100'001
 
 const int sqrtN = 400;
 const int SZ = MAX/sqrtN + 10;  // 분할 후 개수
@@ -38,9 +38,9 @@ struct Query{
 
 int N, M;
 int S[MAX];
-int cnt[MAX], bucket[SZ];
+int cnt[2*MAX], bucket[SZ];
 int ans[MAX];
-list<int> pos[MAX];  // list가 deque보다 빠르고 메모리 덜 사용
+list<int> pos[2*MAX];  // list가 deque보다 빠르고 메모리 덜 사용
 
 
 void Plus(int x, bool changeFront){
