@@ -24,6 +24,7 @@ int main(){
 
     if (v.empty()){  // 모두 순방향
         cout << M;
+        return 0;
     }
 
     sort(v.begin(), v.end());
