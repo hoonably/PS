@@ -15,7 +15,7 @@ https://www.acmicpc.net/problem/1328
 #define MAX 
 
 int N, L, R;
-ll dp[101][101][101];
+int dp[101][101][101];
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -34,7 +34,7 @@ int main(){
     for(int n=2; n<=N ; ++n)
         for(int l=1 ; l<=n ; ++l)
             for(int r=1; r<=n ; ++r)
-                dp[n][l][r] = (dp[n-1][l-1][r] + dp[n-1][l][r-1] + dp[n-1][l][r]*(n-2))%MOD;
+                dp[n][l][r] = (dp[n-1][l-1][r] + dp[n-1][l][r-1] + (ll)dp[n-1][l][r]*(n-2))%MOD;
 
     cout << dp[N][L][R];
     
