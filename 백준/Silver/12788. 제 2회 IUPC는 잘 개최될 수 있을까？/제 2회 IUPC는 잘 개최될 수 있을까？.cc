@@ -14,19 +14,22 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 
 #define MAX 
 
-int N, M, K;
-int A[1000];
+int N, M, K, A;
+priority_queue<int> pq;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
     cin >> N >> M >> K;
-    for(int i=0; i<N; i++) cin >> A[i];
-    sort(A, A+N, greater<int>());
+    for(int i=0; i<N; i++) {
+        cin >> A;
+        pq.push(A);
+    }
 
     int remain = M*K;
     for(int i=0; i<N; i++){
-        remain -= A[i];
+        remain -= pq.top();
+        pq.pop();
         if (remain <= 0){
             cout << i+1;
             return 0;
