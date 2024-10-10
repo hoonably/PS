@@ -17,6 +17,6 @@
 [![solvedac badge](https://solvedac-readme-badge.vercel.app/api/v1/badge?user=hoonably)](https://github.com/2ykwang/solvedac-readme-badge)
 [![solvedac badge](https://solvedac-readme-badge.vercel.app/api/v1/badge?user=hoonably&compact=1&theme=github-dark)](https://github.com/2ykwang/solvedac-readme-badge)
 -->
-[![Solved.ac 프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=hoonably)](https://solved.ac/{hoonably})
-![mazandi profile](http://mazandi.herokuapp.com/api?handle=hoonably&theme=dark)
+[![Solved.ac 프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=hoonably)](https://solved.ac/hoonably)
+[![mazandi profile](http://mazandi.herokuapp.com/api?handle=hoonably&theme=dark)](https://solved.ac/hoonably)
   
