@@ -1,9 +1,9 @@
 
-- 백준에서 푼 문제들을 자동으로 기록해놓는 Repository입니다.  
-  > This repo is a repository that automatically records the problems solved in Baekjoon.  
+- This repo is a repository that automatically records the problems solved in Baekjoon.  
+  > 백준에서 푼 문제들을 자동으로 기록해놓는 Repository입니다.  
 
-- 대부분 C++로 작성되어있으며 일부는 Python으로 작성되었습니다.  
-  > Most of them are written in C++ and some in Python.  
+- Most of them are written in C++ and some in Python.  
+  > 대부분 C++로 작성되어있으며 일부는 Python으로 작성되었습니다.  
 
 </br>
 
