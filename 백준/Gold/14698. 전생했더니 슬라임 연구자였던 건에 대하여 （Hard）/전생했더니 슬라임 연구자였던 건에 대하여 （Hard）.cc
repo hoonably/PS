@@ -18,14 +18,15 @@ priority_queue<ll, vector<ll>, greater<ll>> pq;
 
 void solve(){
     int n; cin >> n;
+    ll x;
     for(int i=0; i<n; i++){
-        ll x; cin >> x;
-        pq.push(x);
+        cin >> x; pq.push(x);
     }
 
     ll ans = 1;
-    while(pq.size()>=2){
-        ll newSlime = pq.top(); pq.pop();
+    ll newSlime;
+    for(int i=0; i<n-1; i++){
+        newSlime = pq.top(); pq.pop();
         newSlime *= pq.top(); pq.pop();
         pq.push(newSlime);
         ans *= newSlime % MOD;
