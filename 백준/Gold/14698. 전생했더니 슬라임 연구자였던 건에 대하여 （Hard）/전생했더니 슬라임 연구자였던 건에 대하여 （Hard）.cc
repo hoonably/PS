@@ -26,11 +26,10 @@ void solve(){
 
     ll ans = 1;
     while(pq.size()>=2){
-        ll small1 = pq.top(); pq.pop();
-        ll small2 = pq.top(); pq.pop();
-        ll big = small1 * small2;
-        pq.push(big);
-        ans *= big % MOD;
+        ll newSlime = pq.top(); pq.pop();
+        newSlime *= pq.top(); pq.pop();
+        pq.push(newSlime);
+        ans *= newSlime % MOD;
         ans %= MOD;
     }
     cout << ans << '\n';
