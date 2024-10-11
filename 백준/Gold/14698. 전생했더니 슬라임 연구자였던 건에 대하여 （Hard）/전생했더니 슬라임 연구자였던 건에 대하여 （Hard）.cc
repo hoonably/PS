@@ -14,10 +14,9 @@ const int MOD = 1'000'000'007;
 
 #define MAX 
 
-
+priority_queue<ll, vector<ll>, greater<ll>> pq;
 
 void solve(){
-    priority_queue<ll, vector<ll>, greater<ll>> pq;
     int n; cin >> n;
     for(int i=0; i<n; i++){
         ll x; cin >> x;
@@ -33,6 +32,8 @@ void solve(){
         ans %= MOD;
     }
     cout << ans << '\n';
+
+    pq.pop();
 }
 
 int main(){
