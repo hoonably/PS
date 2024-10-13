@@ -15,7 +15,7 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 #define MAX 
 
 int N, M;
-int board[1001][1001];
+char board[1001][1001];
 int sum;
 
 int main(){
