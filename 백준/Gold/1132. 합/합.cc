@@ -4,8 +4,8 @@ using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii; typedef pair<ll,ll> pll; 
 typedef tuple<int,int,int> tiii;
-const int INF = 0x3f3f3f3f;  // 1061109567
-// const ll INF = 0x3f3f3f3f3f3f3f3f;
+// const int INF = 0x3f3f3f3f;  // 1061109567
+const ll INF = 0x3f3f3f3f3f3f3f3f;
 // const int MOD = 1'000'000'007;
 
 /* -----------------------------------------------------
@@ -41,7 +41,7 @@ int main(){
 	if (!flg) {
 		// A부터 J까지의 모든 알파벳이 사용된 경우에는 어딘가에 0을 줘야 함
 		// 0이 되도 괜찮은 것 중 가장 작은 것에 0을 배정
-		ll min = 10000000000000000;
+		ll min = INF;
 		int idx;	// 0을 배정할 알파벳 index
 		for (int i = 0; i < 10; i++) {
 			if (!notZero[i] && alpha[i] < min) {
