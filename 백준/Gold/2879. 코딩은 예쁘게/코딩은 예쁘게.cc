@@ -15,39 +15,36 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 #define MAX 
 
 int N;
-int now[1001], res[1001];
+int diff[1001];
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
     cin >> N;
-    for(int i=0; i<N; i++) cin >> now[i];
-    for(int i=0; i<N; i++) cin >> res[i];
+    for(int i=0; i<N; i++) cin >> diff[i];
+    for(int i=0; i<N; i++) {
+        int res;
+        cin >> res;
+        diff[i] = res - diff[i];
+    }
 
     // 시작지점부터 맞춰줌
 	int ans = 0, gap = 0;
 	for (int i = 0; i < N; i++) {
-		int diff = res[i] - now[i];
 
         // 탭을 추가
-		if (diff > 0) {
+		if (diff[i] > 0) {
             // 이전 값이 음수면 그 차이만큼 더해줌
-			if (gap < 0) ans += diff;
-			else {
-				if (gap >= diff) gap = diff;
-				else ans += (diff - gap);
-			}
+			if (gap < 0) ans += diff[i];
+			else if (gap < diff[i]) ans += (diff[i] - gap);
 		}
 
         // 탭을 삭제
 		else {
-			if (gap > 0) ans -= diff;
-			else {
-				if (gap <= diff) gap = diff;
-				else ans += (gap - diff);
-			}
+			if (gap > 0) ans -= diff[i];
+			else if (gap > diff[i]) ans += (gap - diff[i]);
 		}
-		gap = diff;
+		gap = diff[i];
 	}
 	cout << ans;
     
