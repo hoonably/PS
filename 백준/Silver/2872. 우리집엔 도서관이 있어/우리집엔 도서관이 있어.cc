@@ -39,12 +39,11 @@ int main(){
     
     n = readInt();
 	vector<int> book(n);
-	for (int &i : book) i = readInt();
+	for (int &b : book) b = readInt();
 
 	int cnt = n;
 	for (int i = n - 1; i >= 0; i--) {
-		if (book[i] == cnt)
-			cnt--;
+		if (book[i] == cnt) --cnt;
 	}
 	cout << cnt;
 
