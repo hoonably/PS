@@ -14,14 +14,32 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 
 #define MAX 
 
+char rbuf[1<<16];
+int idx, ridx;
+inline char read(){
+    if(ridx == idx){
+        ridx = fread(rbuf, 1, 1<<16, stdin);
+        if(!ridx) return 0;
+        idx = 0;
+    }
+    return rbuf[idx++];
+}
+inline int readInt(){
+    int sum = 0;
+    char now = read();
+    while(now <= 32) now = read();
+    while(now >= 48) sum = sum * 10 + now - '0', now = read();
+    return sum;
+}
+
 int n;
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
-    cin >> n;
+    n = readInt();
 	vector<int> book(n);
-	for (int &i : book) cin >> i;
+	for (int &i : book) i = readInt();
 
 	int cnt = n;
 	for (int i = n - 1; i >= 0; i--) {
