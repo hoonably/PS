@@ -15,7 +15,6 @@ const int INF = 0x3f3f3f3f;  // 1061109567
 #define MAX 
 
 int n;
-int trees[100'000];
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -28,8 +27,9 @@ int main(){
         cin >> h;
         ans += h;
     }
-    for(int i=0; i<n; i++) cin >> trees[i];
-    sort(trees, trees+n);
+    vector<int> trees(n);
+    for(int &t : trees) cin >> t;
+    sort(all(trees));
 
     for(int i=0; i<n; i++) {
         ans += trees[i] * i;
