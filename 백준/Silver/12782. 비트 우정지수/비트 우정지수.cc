@@ -21,12 +21,12 @@ void solve(){
     cin >> N >> M;
 
     int cntN = 0, cntM = 0;
-    for(char c : N) if(c=='1') cntN++;
-    for(char c : M) if(c=='1') cntM++;
+    for(char c : N) if(c=='1') ++cntN;
+    for(char c : M) if(c=='1') ++cntM;
 
     int diff = 0;
     int ans = abs(cntN-cntM);
-    for(int i=0; i<N.size(); i++) if (M[i]!=N[i]) diff++;
+    for(int i=0; i<N.size(); ++i) if (M[i]!=N[i]) ++diff;
     diff -= ans;  // 1의 개수 차이만큼 빼줌
     ans += (diff+1)/2;
     cout << ans << '\n';
