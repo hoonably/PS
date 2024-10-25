@@ -4,7 +4,6 @@ typedef long long ll;
 typedef pair<int,int> pii;
 #define FOR(i,a,b) for(int i=(a);i<=(b);i++)
 #define MAX 100001
-#define INF 1e9;
 
 /*
 Graham scan 알고리즘을 통한 볼록 껍질 구하기
@@ -22,91 +21,143 @@ Graham scan 알고리즘을 통한 볼록 껍질 구하기
 
 */
 
-struct dot {
-    ll x,y;
-};
+#define x first
+#define y second
+using dot = pair<int, int>;
 
-dot P[MAX];
-dot CH[MAX];  // Convex Hull
+dot operator + (const dot &a, const dot &b){ return { a.x + b.x, a.y + b.y }; }
+dot operator - (const dot &a, const dot &b){ return { a.x - b.x, a.y - b.y }; }
+double operator * (const dot &a, const dot &b){ return a.x*a.x + a.y*a.y; }
+double operator / (const dot &a, const dot &b){ return a.x*b.y - b.x*a.y; }
+dot operator * (const dot &a, double b){ return { a.x * b, a.y * b }; }
+dot operator / (const dot &a, double b){ return { a.x / b, a.y / b }; }
 
+int ccw(const dot &p1, const dot &p2, const dot &p3){
+    auto res = (p2 - p1) / (p3 - p2);
+    return (res > 0) - (res < 0);
+}
+ll ccw2(dot A1, dot A2, dot B1, dot B2){
+    return (A2.x-A1.x)*(B2.y-B1.y) - (A2.y-A1.y)*(B2.x-B1.x);
+}
+
+double dist(dot a, dot b){
+	double dx = a.x - b.x;
+	double dy = a.y - b.y;
+	return dx*dx + dy*dy;
+}
 ll dist2(dot A, dot B){  // 거리의 제곱 연산
     ll dx = A.x-B.x;
     ll dy = A.y-B.y;
     return dx*dx + dy*dy;
 }
 
-ll ccw(dot a, dot b, dot c) {
-    // 양수라면 반시계방향
-    return a.x * b.y + b.x * c.y + c.x * a.y - (b.x * a.y + c.x * b.y + a.x * c.y);
+// 선분이 교차하는지
+bool Cross(dot s1, dot e1, dot s2, dot e2){
+    auto cw1 = ccw(s1, e1, s2) * ccw(s1, e1, e2);
+    auto cw2 = ccw(s2, e2, s1) * ccw(s2, e2, e1);
+    if(cw1 == 0 && cw2 == 0){
+        if(e1 < s1) swap(s1, e1);
+        if(e2 < s2) swap(s2, e2);
+        return !(e1 < s2 || e2 < s1);
+    }
+    return cw1 <= 0 && cw2 <= 0;
 }
 
-ll ccw2(dot A1, dot A2, dot B1, dot B2){
-    // 선분 A , 선분 B 외적
-    return (A2.x-A1.x)*(B2.y-B1.y) - (A2.y-A1.y)*(B2.x-B1.x);
+// 어디서 교차하는지 Call by reference로 알려줌
+bool Cross(dot s1, dot e1, dot s2, dot e2, dot &res){
+    if(!Cross(s1, e1, s2, e2)) return false;
+    double det = (e1 - s1) / (e2 - s2);
+    if(abs(det) < 1e-10) return false;  // 부동소수로 인한 0 이상 값 방지
+    res = s1 + (e1 - s1) * ((s2 - s1) / (e2 - s2) / det);
+    return true;
 }
 
-bool compare(dot a, dot b){ //반시계 정렬
-    
-    ll cc = ccw(P[0], a, b);
-    if (cc) // 0 번 점을 기준으로 각도가 작은 순
-        return cc > 0;
-    else if (a.y != b.y) //y가 작은 순
-        return a.y < b.y;
-    else //x가 작은 순
-        return a.x < b.x;
-}
+struct ConvexHull{
+    vector<dot> dots;
+    void build(vector<dot> &a){
+        swap(a[0], *min_element(a.begin(), a.end()));
+        sort(a.begin()+1, a.end(), [&](const dot &s, const dot &e){
+            double cw = ccw(a[0], s, e);
+            if(cw != 0) return cw > 0;
+            return dist(a[0], s) < dist(a[0], e);
+        });
+        dots.clear();
+        for(auto i : a){
+            while(dots.size() >= 2 && ccw(dots[dots.size()-2], dots.back(), i) <= 0) dots.pop_back();
+            dots.push_back(i);
+        }
+        // assert 함수는 size가 2 이하라면 다각형이 안만들어지므로 오류 발생
+        // assert(dots.size() >= 3 && "Can't make ConvexHull");
+    }
+    // 다각형 내부에 점이 있는지
+    bool contain(const dot &p) const {
+        int i = lower_bound(dots.begin()+1, dots.end(), p, [&](const dot &a, const dot &b){
+            double cw = ccw(dots[0], a, b);
+            if(cw) return cw > 0;
+            return dist(dots[0], a) < dist(dots[0], b);
+        }) - dots.begin();
+        if(i == dots.size()) return 0;
+        if(i == 1) return ccw(dots[0], p, dots[1]) == 0 && dots[0] <= p && p <= dots[1];
+        int t1 = ccw(dots[0], p, dots[i]) * ccw(dots[0], p, dots[i-1]);
+        int t2 = ccw(dots[i], dots[i-1], dots[0]) * ccw(dots[i], dots[i-1], p);
+        if(t1 == -1 && t2 == -1) return 0;
+        return ccw(dots[0], p, dots[i-1]) != 0;
+    }
+    // 다각형 내부에 다각형이 있는지
+    bool contain(const ConvexHull &h) const {
+        for(const auto &i : h.dots) if(!contain(i)) return false;
+        return true;
+    }
+    // 넓이를 리턴하는 함수
+    double area() const {
+        double ret = 0;
+        for(int i=0; i<dots.size(); i++){
+            int j = i + 1; if(j == dots.size()) j = 0;
+            ret += dots[i].x * dots[j].y;
+            ret -= dots[j].x * dots[i].y;
+        }
+        return abs(ret) * 0.5;
+    }
+    // 선분을 리턴하는 함수
+    vector<pair<dot, dot>> makeEdges() const {
+        vector<pair<dot, dot>> ret;
+        for(int i=0; i+1<dots.size(); i++) ret.emplace_back(dots[i], dots[i+1]);
+        if(dots.size() > 1) ret.emplace_back(dots.back(), dots[0]);
+        return ret;
+    }
+    // 회전하는 캘리퍼스
+    double rotatingCallipers(){
+        ll ans = 0;  // 불필요한 연산 방지를 위해 일단 제곱으로 저장 후 나중에 루트 씌우기
+        int C = 1;
+        int dotSZ = dots.size();
+        for (int A=0; A<dotSZ; A++){
+            // 양수(반시계 방향)라면 C를 높이기
+            while(ccw2(dots[A], dots[(A+1)%dotSZ], dots[C], dots[(C+1)%dotSZ])>0){
+                C = (C+1)%dotSZ;
+            }
+            // 시계방향이 된다면 더이상 C를 높여봤자 작아짐
+            ans = max(ans, dist2(dots[A], dots[C]));  // 최대값 갱신 (이후에 A가 바뀜)
+        }
+        return sqrt(ans);
+    }
+};
+
+ConvexHull CH;
 
 int main() {
     ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
     
     int N;
-    cin >> N;
-
+	cin >> N;
+    vector<dot> v(N);
     for (int i=0; i<N; i++){
-        cin >> P[i].x >> P[i].y;
+        cin >> v[i].x >> v[i].y;
     }
-    
-    // y좌표와 x좌표가 가장 작은 점이 P[0]에 오도록 변경
-    for (int i=1; i<N; i++){
-        if(P[i].y < P[0].y || (P[i].y == P[0].y && P[i].x < P[0].x)){
-            swap(P[0], P[i]);
-        }
-    }
-    
-    sort(P+1, P+N, compare);
-    
-    // 볼록껍질 검사
-    CH[0] = P[0];
-    CH[1] = P[1];
+    CH.build(v);
 
-    int now = 2;
-    for(int i=2; i<N; i++){
-        while (now >= 2){
-            // 상위 두개의 원소 반시계인지 비교   
-            if (ccw(CH[now-2], CH[now-1], P[i]) > 0){
-                break;  // 반시계방향이라면 종료
-            }
-            now--;  // 반시계방향이 아니라면 없애고 계속 탐색
-        }
-        CH[now] = P[i];
-        now++;
-    }
-    
-    // 회전하는 캘리퍼스 구하기
-    ll ans = 0;  // 불필요한 연산 방지를 위해 일단 제곱으로 저장 후 나중에 루트 씌우기
-    int C = 1;
-    for (int A=0; A<now; A++){
-        // 양수(반시계 방향)라면 C를 높이기
-        while(ccw2(CH[A], CH[(A+1)%now], CH[C], CH[(C+1)%now])>0){
-            C = (C+1)%now;
-        }
-        // 시계방향이 된다면 더이상 C를 높여봤자 작아짐
-    
-        ans = max(ans, dist2(CH[A], CH[C]));  // 최대값 갱신 (이후에 A가 바뀜)
-    }
     cout << fixed;
     cout.precision(9);
-    cout << sqrt(ans);  // 루트 씌워서 정답 출력
+    cout << CH.rotatingCallipers();
     
     return 0;
 }
