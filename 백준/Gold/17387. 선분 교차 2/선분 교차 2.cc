@@ -1,78 +1,56 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 typedef long long ll;
 
-/*
-세 점이 일직선에 있는 경우를 생각해줘야한다.
+#define x first
+#define y second
+using dot = pair<ll, ll>;
 
-CCW(A, B, C) * CCW(A, B, D) < 0    &&
-CCW(C, D, A) * CCW(C, D, B) < 0
+dot operator + (const dot &a, const dot &b){ return { a.x + b.x, a.y + b.y }; }
+dot operator - (const dot &a, const dot &b){ return { a.x - b.x, a.y - b.y }; }
+double operator * (const dot &a, const dot &b){ return a.x*a.x + a.y*a.y; }
+double operator / (const dot &a, const dot &b){ return a.x*b.y - b.x*a.y; }
+dot operator * (const dot &a, double b){ return { a.x * b, a.y * b }; }
+dot operator / (const dot &a, double b){ return { a.x / b, a.y / b }; }
 
-점 C, D 는 선분AB의 연장선상 직선을 기준으로 
-항상 서로 반대편에 존재하고 
-
-점 A, B는 선분CD의 연장선상 직선을 기준으로 
-서로 반대편에 존재함으로써 교점이 존재하는 상태로 판단
-*/
-
-struct P {
-    ll x, y;
-
-    void read() {cin >> x >> y;}
-
-    // 연산자 <= 로 x, y 순으로 bool 반환
-    bool operator<=(P const &p1){
-        if (x==p1.x){
-            return y<=p1.y;
-        }
-        else return x<=p1.x;
-    }
-};
-
-int ccw(P p1, P p2, P p3) {
-    ll s = p1.x * p2.y + p2.x * p3.y + p3.x * p1.y;
-    s -= p1.y * p2.x + p2.y * p3.x + p3.y * p1.x;
-
-    if (s > 0) return 1;  // 반시계방향
-    else if (s == 0) return 0;  //직선
-    else return -1;  // 시계방향
+int ccw(const dot &A, const dot &B, const dot &C){
+    auto res = (B - A) / (C - B);
+    return (res > 0) - (res < 0);
 }
 
-bool isOverlapped(P A, P B, P C, P D) {
-    int ans1 = ccw(A, B, C) * ccw(A, B, D); // 선분AB를 기준으로 점 C, 점 D 를 체크하는 부분
-    int ans2 = ccw(C, D, A) * ccw(C, D, B); // 선분CD를 기준으로 점 A, 점 B 를 체크하는 부분
-    
-    // 1. 선분이 일직선인 경우
-    if(ans1 == 0 && ans2 == 0){     
-        if(B <= A) swap(A, B);  // A, B 정렬
-        if(D <= C) swap(D, C);  // C, D 정렬
-        
-        return A <= D && C <= B;  // 순위가 겹치면 true
+// 선분 교차 : 선분 A, 선분 B가 교차하는가?
+bool Cross(dot A1, dot A2, dot B1, dot B2){
+    auto cw1 = ccw(A1, A2, B1) * ccw(A1, A2, B2);
+    auto cw2 = ccw(B1, B2, A1) * ccw(B1, B2, A2);
+    if(cw1 == 0 && cw2 == 0){
+        if(A2 < A1) swap(A1, A2);
+        if(B2 < B1) swap(B1, B2);
+        return !(A2 < B1 || B2 < A1);
     }
+    return cw1 <= 0 && cw2 <= 0;
+}
 
-    // 2. 한 점에서 교차 (CCW가 방향이 모두 다름)
-    if(ans1 <= 0 && ans2 <= 0){
-        return true;
-    }
-    // 3. 교차 안함
-    else return false;  //CCW가 같은 방향이 있음
+// 어디서 교차하는지 Call by reference로 저장
+bool Cross(dot A1, dot A2, dot B1, dot B2, dot &res){
+    if(!Cross(A1, A2, B1, B2)) return false;
+    auto det = (A2 - A1) / (B2 - B1);
+    if(abs(det) < 1e-10) return false;  // 부동소수로 인한 0 이상 값 방지
+    res = A1 + (A2 - A1) * ((B1 - A1) / (B2 - B1) / det);
+    return true;
 }
 
 int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     
-    P L11, L12, L21, L22;
-    L11.read(); L12.read();
-    L21.read(); L22.read();
+    dot A1, A2, B1, B2;
+    cin >> A1.first >> A1.second;
+    cin >> A2.first >> A2.second;
+    cin >> B1.first >> B1.second;
+    cin >> B2.first >> B2.second;
 
-    if (isOverlapped(L11,L12,L21,L22)) {
-        cout << 1;
-    }
-    else {
-        cout << 0;
-    }
+    cout << Cross(A1, A2, B1, B2);
+
     
     return 0;
 }
