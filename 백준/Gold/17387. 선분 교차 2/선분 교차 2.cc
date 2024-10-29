@@ -6,6 +6,7 @@ typedef long long ll;
 #define y second
 using dot = pair<ll, ll>;
 
+istream& operator >>(istream& stream, dot& in){ return stream >> in.first >> in.second; }
 dot operator + (const dot &a, const dot &b){ return { a.x + b.x, a.y + b.y }; }
 dot operator - (const dot &a, const dot &b){ return { a.x - b.x, a.y - b.y }; }
 double operator * (const dot &a, const dot &b){ return a.x*a.x + a.y*a.y; }
@@ -44,10 +45,7 @@ int main(){
     cin.tie(0);
     
     dot A1, A2, B1, B2;
-    cin >> A1.first >> A1.second;
-    cin >> A2.first >> A2.second;
-    cin >> B1.first >> B1.second;
-    cin >> B2.first >> B2.second;
+    cin >> A1 >> A2 >> B1 >> B2;
 
     cout << Cross(A1, A2, B1, B2);
 
