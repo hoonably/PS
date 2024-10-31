@@ -26,30 +26,30 @@ struct meat{
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
     
-    int n, m;
-    cin >> n >> m;
-    vector<meat> arr(n);
-    for(auto &u : arr) {
-        cin >> u.weight >> u.price;
+    int N, M;
+    cin >> N >> M;
+    vector<meat> A(N);
+    for(auto &M : A) {
+        cin >> M.weight >> M.price;
     }
-    sort(all(arr));
+    sort(all(A));
 
-    unsigned int ans = 3e9 + 1;
+    unsigned int ans = 3e9;
     unsigned int wsum = 0, psum = 0;
 
-    for(int i = 0; i < n; i++) {
-        wsum += arr[i].weight;
-        if(i > 0 && arr[i-1].price == arr[i].price) {
-            psum += arr[i].price;
+    for(int i = 0; i < N; i++) {
+        wsum += A[i].weight;
+        if(i > 0 && A[i-1].price == A[i].price) {
+            psum += A[i].price;
         }
         else {
             psum = 0;
         }
-        if(wsum >= m) {
-            ans = min(ans, psum + arr[i].price);
+        if(wsum >= M) {
+            ans = min(ans, psum + A[i].price);
         }
     }
-    if(ans == 3e9+1) cout << "-1";
+    if(ans == 3e9) cout << "-1";
     else cout << ans;
     
     return 0;
