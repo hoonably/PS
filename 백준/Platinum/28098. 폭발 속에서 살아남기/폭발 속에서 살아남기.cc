@@ -90,6 +90,7 @@ struct polygon {
 	int point_in_convex(point &A){  //O(qlogn), must be "convex polygon"
 		if (dots.size() < 3) return 0;
 		if (A < dots[0] || ccw(dots[0], dots[1], A) < 0 || ccw(dots[0], dots.back(), A) > 0) return 0;
+        // 선분 위라면 return -1
 		if (ccw(dots[0], dots[1], A) == 0) return is_on_line(dots[0], dots[1], A) ? -1 : 0;
 		if (ccw(dots[0], dots.back(), A) == 0) return is_on_line(dots[0], dots.back(), A) ? -1 : 0;
 		int lo = 0, hi = dots.size();
@@ -139,23 +140,8 @@ struct polygon {
 /*
 지금 볼록 다각형으로 만들면서 폭발지점을 몇개 없애서 틀림
 (0,0) (-1,0) (1,0) 에서 터지면 (0,0)이 볼록 다각형의 점이 아니라서 무시됨...
+??? 근데 왜 맞음?
 */
-
-bool is_inside(const vector<point>& hull, const point& p) {
-  int n = hull.size();
-  if (n < 3) return false;
-
-  if (ccw(hull[0], hull[1], p) <= 0 || ccw(hull[0], hull[n - 1], p) >= 0) return false;
-
-  int lo = 1, hi = n - 1;
-  while (lo + 1 < hi) {
-    int mid = (lo + hi) / 2;
-    if (ccw(hull[0], hull[mid], p) > 0) lo = mid;
-    else hi = mid;
-  }
-
-  return ccw(hull[lo], hull[hi], p) > 0;
-}
 
 int main(){
     ios_base::sync_with_stdio(0); cin.tie(0);
@@ -166,10 +152,8 @@ int main(){
     conv.build_convex_hull();
 
     point me = {0, 0};
-    
-
-    // 현재 볼록다각형의 외부라면 바로 pass
-    if (!is_inside(conv.dots, me)) {
+    // 현재 볼록다각형의 외부나 선 위라면 바로 pass
+    if (conv.point_in_convex(me) != 1) {
         cout << "Yes\n";
         return 0;
     }
