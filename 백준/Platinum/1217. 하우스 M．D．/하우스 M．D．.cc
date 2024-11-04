@@ -101,9 +101,7 @@ void solve(){
 
         // i, j 동시에 만족하면 안됨
         // not(i and j) = not i or not j
-        // i => not j, j => not i
-        ts.add(i, ts.negation(j));  // i라면 j가 아니어야함
-        ts.add(j, ts.negation(i));  // j라면 i가 아니어야함
+        ts.addCNF(ts.negation(i), ts.negation(j));  // 둘중 하나는 아니어야함
     }
     cout << ts.solve() << '\n';
 }
