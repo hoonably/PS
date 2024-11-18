@@ -52,6 +52,10 @@ int main(){
 
             swap(board[i][j], board[nx][ny]);
             cnt();
+            if (ans == N) {
+                cout << N;
+                return 0;
+            }
             // backtracking
             swap(board[i][j], board[nx][ny]);
         }
