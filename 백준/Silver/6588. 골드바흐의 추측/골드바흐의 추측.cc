@@ -26,7 +26,8 @@ void eratos(int _N){
             }
         }
     }
-    for(int i=2; i<=_N; i++){
+    primes.push_back(2);
+    for(int i=3; i<=_N; i+=2){  // odd number
         if(isPrime[i]) primes.push_back(i);
     }
 }
