@@ -59,14 +59,14 @@ int main(){
             unionParent(a, b);
             continue;
         }
-        v.push_back({a, b, c});  //가중치 오름차순 정렬 위해 c먼저
+        v.push_back({a, b, c});
         Sum += c;
     }
 
-    // 가중치 기준으로 정렬
+    // 가중치 높은 기준으로 정렬
     sort(v.begin(), v.end());
 
-    // 최소 스패닝 트리 Minimum Spanning Tree
+    // 포기하도록 만든 애정도의 합의 최솟값
     cout << Sum - MST();
     
     return 0;
