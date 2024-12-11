@@ -11,7 +11,6 @@ typedef long long ll;
 */
 
 int V, E, t;
-int plus_t;
 vector<tuple<int,int,int>> v;
 int parent[MAX];
 
@@ -26,23 +25,21 @@ void unionParent(int a, int b){
     parent[b] = a;
 }
 
-ll MST(){
+int MST(){
     for (int i = 1; i <= V; i++) {
         parent[i] = i;
     }
 
-    ll ans = 0;
-    int cnt = 0;
+    int ret = 0, cnt = 0;
     for (auto edge : v){
         auto [cost, now, next] = edge;
 
         if (findParent(now) == findParent(next)) continue; // 이미 연결되어있다면 PASS
 
         unionParent(now, next);
-        ans += cost + plus_t;
-        plus_t += t;
+        ret += cost;
 
-        if (++cnt == V-1) return ans;  // V-1개이면 바로 끝
+        if (++cnt == V-1) return ret;  // V-1개이면 바로 끝
     }
 
     return -1;  // MST가 완성되지 않음
@@ -63,7 +60,7 @@ int main(){
     sort(v.begin(), v.end());
 
     // 최소 스패닝 트리 Minimum Spanning Tree
-    cout << MST();
+    cout << MST() + ((V-2) * (V-1) / 2 * t);
     
     return 0;
 }
