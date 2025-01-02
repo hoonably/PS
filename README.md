@@ -11,8 +11,8 @@
 - [Baekjoon hoonably profile](https://www.acmicpc.net/user/hoonably)
 - [solved.ac hoonably profile](https://solved.ac/profile/hoonably)
 
-- <p>🏆 Ranking: # $\huge{\color{#00A4DE}579}$ (Top $\huge{\color{#CF4647}0.39}$%) </p>
-- <p>⏳ Longest Streak: $\huge{\color{#00A4DE}300+α}$  Days (23.12.31 ~ now) </p>
+- 🏆 Ranking: # 576 (Top 0.39)
+- ⏳ Longest Streak: 366 Days (23.12.31 ~ 24.12.31)
 ## 
 <!--
 [![Solved.ac 프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj=hoonably)](https://solved.ac/hoonably)
