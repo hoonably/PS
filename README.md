@@ -11,14 +11,17 @@
 - [Baekjoon hoonably profile](https://www.acmicpc.net/user/hoonably)
 - [solved.ac hoonably profile](https://solved.ac/profile/hoonably)
 
-- 🏆 Ranking: # 576 (Top 0.39)
-- ⏳ Longest Streak: 366 Days (23.12.31 ~ 24.12.31)
-## 
-<!--
-[![Solved.ac 프로필](http://mazassumnida.wtf/api/mini/generate_badge?boj=hoonably)](https://solved.ac/hoonably)
-[![solvedac badge](https://solvedac-readme-badge.vercel.app/api/v1/badge?user=hoonably)](https://github.com/2ykwang/solvedac-readme-badge)
-[![solvedac badge](https://solvedac-readme-badge.vercel.app/api/v1/badge?user=hoonably&compact=1&theme=github-dark)](https://github.com/2ykwang/solvedac-readme-badge)
--->
-[![Solved.ac 프로필](http://mazassumnida.wtf/api/v2/generate_badge?boj=hoonably)](https://solved.ac/hoonably)
-[![mazandi profile](http://mazandi.herokuapp.com/api?handle=hoonably&theme=dark)](https://solved.ac/hoonably)
-  
+### Baekjoon
+- 🏆 Ranking: **#576** (Top 0.38%)
+- ⏳ Longest Streak: **366** Days (23.12.31 ~ 24.12.31)
+<a href="https://solved.ac/hoonably" style="margin-right: 10px;" target="_blank">
+  <img src="http://mazassumnida.wtf/api/v2/generate_badge?boj=hoonably" alt="Solved.ac 프로필">
+</a>
+<a href="https://solved.ac/hoonably" target="_blank">
+  <img src="http://mazandi.herokuapp.com/api?handle=hoonably&theme=dark" alt="mazandi profile">
+</a>
+
+### ICPC 2024 Seoul Online Preliminary Contest 
+  - 2024.10.26
+  - Team ‘WhereIsWoongJae’ with Hyeonseo Kim, Jaehyun Bang
+  - 201st / 455
