@@ -1,29 +1,34 @@
 #include <bits/stdc++.h>
+#define all(v) v.begin(), v.end()
 using namespace std;
+typedef long long ll;
+typedef pair<int,int> pii; typedef pair<ll,ll> pll;
+typedef tuple<int,int,int> tiii;
+const int INF = 0x3f3f3f3f;  // 1061109567
+// const ll INF = 0x3f3f3f3f3f3f3f3f;
+// const int MOD = 1000000007;
+
+/* -----------------------------------------------------
+
+*/
+
+unordered_set<int> S;
 
 int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(0);
-
-    int N, M, get_num;
-    // 집합 선언
-    set<int> card;
+    ios_base::sync_with_stdio(0); cin.tie(0);
     
-    cin >> N;
-    for (int i=0; i<N; i++){
-        cin >> get_num;
-        card.insert(get_num);
+    int N; cin >> N;
+    for(int i=0; i<N; i++){
+        int card; cin >> card;
+        S.insert(card);
     }
-    cin >> M;
-    for (int i=0; i<M; i++){
-        cin >> get_num;
-        // find(요소) : 요소가 나오면 그 주소 반환
-        // 그러므로 반환값이 end 주소라면 없는것임
-        if (card.find(get_num) == card.end()){
-            cout << "0 ";
-        }
-        else cout << "1 ";
+    int M; cin >> M;
+    for(int i=0; i<M; i++){
+        int card; cin >> card;
+        if (S.find(card)!=S.end()) cout << "1 ";
+        else cout << "0 ";
     }
 
+    
     return 0;
 }
