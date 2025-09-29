@@ -11,17 +11,26 @@
 - [Baekjoon hoonably profile](https://www.acmicpc.net/user/hoonably)
 - [solved.ac hoonably profile](https://solved.ac/profile/hoonably)
 
-### Baekjoon
-- 🏆 Ranking: **#576** (Top 0.38%)
-- ⏳ Longest Streak: **366** Days (23.12.31 ~ 24.12.31)
+
+## Baekjoon Online Judge  
+2023.12 – Present  
+Best Ranking: <u>#576</u> (Top 0.38%)  
+Longest Streak: <u>366 Days</u> (23.12.31 ~ 24.12.31)  
+<a href="https://solved.ac/hoonably" target="_blank">solved.ac profile</a> /
+<a href="https://github.com/hoonably/PS" target="_blank">PS codes repo</a> /
+<a href="https://github.com/hoonably/algorithm" target="_blank">Algorithm repo</a>
+
 <a href="https://solved.ac/hoonably" style="margin-right: 10px;" target="_blank">
-  <img src="http://mazassumnida.wtf/api/v2/generate_badge?boj=hoonably" alt="Solved.ac 프로필">
+  <img src="http://mazassumnida.wtf/api/v2/generate_badge?boj=hoonably" alt="Solved.ac 프로필" style="display: inline-block;">
 </a>
 <a href="https://solved.ac/hoonably" target="_blank">
-  <img src="http://mazandi.herokuapp.com/api?handle=hoonably&theme=dark" alt="mazandi profile">
+  <img src="http://mazandi.herokuapp.com/api?handle=hoonably&theme=dark" alt="mazandi profile" style="display: inline-block;">
 </a>
 
-### ICPC 2024 Seoul Online Preliminary Contest 
-  - 2024.10.26
-  - Team ‘WhereIsWoongJae’ with Hyeonseo Kim, Jaehyun Bang
-  - 201st / 455
+<br>
+
+## Contest
+<a href="https://icpckorea.org/2024-seoul/preliminary">ICPC 2024 Seoul Preliminary Contest</a> - 201st  
+<a href="https://github.com/user-attachments/assets/97edb7e4-69f2-4c7d-bcd8-40ac526ae9a1">UDPC 2025 Senior Division</a> - 11th  
+
+<br><br>
